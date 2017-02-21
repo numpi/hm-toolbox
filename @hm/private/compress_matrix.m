@@ -13,11 +13,11 @@ else
 	[QU,RU] = qr(Uold, 0);
 	[QV,RV] = qr(Vold, 0);
 	
-	[U,V] = compress_matrix(RU * RV');
-	U = QU * U;
-	V = QV * V;
+	[U,S,V] = svd(RU * RV');
+	rk = sum(diag(S) > threshold);
+	U = QU * U(:,1:rk) * S(1:rk,1:rk);
+	V = QV * V(:,1:rk);
 end
-
 
 end
 

@@ -39,6 +39,8 @@ classdef hm
 			switch varargin{1}
 				case 'low-rank'
 					obj = create_low_rank_h_matrix(varargin{2:end});
+				case 'tridiagonal'
+					obj = create_tridiagonal_h_matrix(varargin{2});
 				otherwise
 					error('Unsupported constructor mode');
 			end
