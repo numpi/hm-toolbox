@@ -1,7 +1,9 @@
 function [ U, V ] = compress_factors(Uold, Vold)
 %COMPRESS_FACTORS Compress a low-rank representation U*V'. 
 
-if size(Uold, 2) < 16
+threshold = eps;
+
+if size(Uold, 2) < 12
 	U = Uold;
 	V = Vold;
 else

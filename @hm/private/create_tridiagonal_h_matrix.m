@@ -6,7 +6,7 @@ H = hm();
 block_size = hmoption('block-size');
 
 if size(A, 1) <= block_size
-	H.F = A;
+	H.F = full(A);
 	H.sz = size(A);
 else
 	mp = ceil(size(A, 1) / 2);

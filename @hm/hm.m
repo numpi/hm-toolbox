@@ -45,6 +45,8 @@ classdef hm
 					obj = create_tridiagonal_h_matrix(varargin{2});
 				case 'banded'
 					obj = create_banded_h_matrix(varargin{2:end});
+				case 'diagonal'
+					obj = create_diagonal_h_matrix(varargin{2:end});
 				otherwise
 					error('Unsupported constructor mode');
 			end

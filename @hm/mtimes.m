@@ -3,15 +3,21 @@ function H = mtimes(H1, H2)
 
 % Multiplication H * v
 if isfloat(H2)
-	if ~isempty(H1.F)
-		H = H1.F * H2;
-	else
-		if isscalar(H2)
+	if isscalar(H2)
+		if ~isempty(H1.F)
+			H = hm();
+			H.F = H1.F * H2;
+			H.sz = H1.sz;
+		else
 			H = H1;
 			H.A11 = H1.A11 * H2;
 			H.A22 = H1.A22 * H2;
 			H.U21 = H1.U21 * H2;
-			H.U12 = H1.U12 * H2;		
+			H.U12 = H1.U12 * H2;
+		end
+	else
+		if ~isempty(H1.F)
+			H = H1.F * H2;
 		else
 			mp = H1.A11.sz(2);
 			Hu = H1.A11 * H2(1:mp,:) + H1.U12 * (H1.V12' * H2(mp+1:end,:));
