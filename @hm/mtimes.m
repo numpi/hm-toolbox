@@ -1,15 +1,24 @@
 function H = mtimes(H1, H2)
 %MTIMES Matrix multiplication
 
+
 % Multiplication H * v
 if isfloat(H2)
 	if ~isempty(H1.F)
 		H = H1.F * H2;
 	else
-		mp = H1.A11.sz(2);
-		Hu = H1.A11 * H2(1:mp,:) + H1.U12 * (H1.V12' * H2(mp+1:end,:));
-		Hl = H1.U21 * (H1.V21' * H2(1:mp,:)) + H1.A22 * H2(mp+1:end,:);		
-		H = [ Hu ; Hl ];
+		if isscalar(H2)
+			H = H1;
+			H.A11 = H1.A11 * H2;
+			H.A22 = H1.A22 * H2;
+			H.U21 = H1.U21 * H2;
+			H.U12 = H1.U12 * H2;		
+		else
+			mp = H1.A11.sz(2);
+			Hu = H1.A11 * H2(1:mp,:) + H1.U12 * (H1.V12' * H2(mp+1:end,:));
+			Hl = H1.U21 * (H1.V21' * H2(1:mp,:)) + H1.A22 * H2(mp+1:end,:);		
+			H = [ Hu ; Hl ];
+		end
 	end
 	
 	return;
@@ -20,10 +29,14 @@ if isfloat(H1)
 	if ~isempty(H2.F)
 		H = H1 * H2.F;
 	else
-		mp = H2.A11.sz(1);
-		Hl = H1(:,1:mp) * H2.A11 + (H1(:,mp+1:end) * H2.U21) * H2.V21';
-		Hr = (H1(:,1:mp) * H2.U12) * H2.V12' + H1(:,mp+1:end) * H2.A22;
-		H = [ Hl , Hr ];
+		if isscalar(H1)
+			H = H2 * H1;
+		else
+			mp = H2.A11.sz(1);
+			Hl = H1(:,1:mp) * H2.A11 + (H1(:,mp+1:end) * H2.U21) * H2.V21';
+			Hr = (H1(:,1:mp) * H2.U12) * H2.V12' + H1(:,mp+1:end) * H2.A22;
+			H = [ Hl , Hr ];
+		end
 	end
 	
 	return;
