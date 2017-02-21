@@ -1,7 +1,6 @@
 function H = mtimes(H1, H2)
 %MTIMES Matrix multiplication
 
-
 % Multiplication H * v
 if isfloat(H2)
 	if ~isempty(H1.F)
@@ -49,12 +48,15 @@ if ~isempty(H1.F)
 else
 	H = H1;
 	
-	H.A11 = H1.A11 * H2.A11 + hm('low-rank', H1.U12 * (H1.V12' * H2.U21), H2.V21);
-	H.A22 = hm('low-rank', H1.U21 * (H1.V21' * H2.U12), H2.V12) + H1.A22 * H2.A22;
+	% H.A11 = H1.A11 * H2.A11 + hm('low-rank', H1.U12 * (H1.V12' * H2.U21), H2.V21);
+	% H.A22 = hm('low-rank', H1.U21 * (H1.V21' * H2.U12), H2.V12) + H1.A22 * H2.A22;
+		
+	H.A11 = hmatrix_rank_update(H1.A11 * H2.A11, H1.U12 * (H1.V12' * H2.U21), H2.V21);
+	H.A22 = hmatrix_rank_update(H1.A22 * H2.A22,  H1.U21 * (H1.V21' * H2.U12), H2.V12);
 	
-	[H.U12, H.V12] = compress_matrix([ H1.A11 * H2.U12, H1.U12 ], ...
+	[H.U12, H.V12] = compress_factors([ H1.A11 * H2.U12, H1.U12 ], ...
 									 [ H2.V12, (H1.V12' * H2.A22)']);
-	[H.U21, H.V21] = compress_matrix([ H1.A22 * H2.U21, H1.U21 ], ...
+	[H.U21, H.V21] = compress_factors([ H1.A22 * H2.U21, H1.U21 ], ...
 									 [ H2.V21, (H1.V21' * H2.A11)']);								 
 end
 	
