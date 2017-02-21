@@ -29,10 +29,12 @@ classdef hm
 		if nargin == 0
 			obj.F = [];
 			obj.sz = [0 0];
+			return;
 		end
 		
 		if nargin == 1
 			obj = create_h_matrix(varargin{1});
+			return;
 		end
 		
 		if nargin > 1
@@ -41,6 +43,8 @@ classdef hm
 					obj = create_low_rank_h_matrix(varargin{2:end});
 				case 'tridiagonal'
 					obj = create_tridiagonal_h_matrix(varargin{2});
+				case 'banded'
+					obj = create_banded_h_matrix(varargin{2:end});
 				otherwise
 					error('Unsupported constructor mode');
 			end

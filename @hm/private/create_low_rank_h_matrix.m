@@ -1,12 +1,17 @@
 function obj = create_low_rank_h_matrix(U, V)
 %CREATE_LOW_RANK_H_MATRIX Create a low rank H matrix. 
 
+global hm_block_size
+
+if isempty(hm_block_size)
+	hmoption('block-size');
+end
+
 obj = hm();
-block_size = hmoption('block-size');
 
 obj.sz = [ size(U, 1), size(V, 1) ];
 
-if obj.sz(1) <= block_size
+if obj.sz(1) <= hm_block_size
 	obj.F = U * V';
 else
 	mp = ceil(obj.sz(1) / 2);

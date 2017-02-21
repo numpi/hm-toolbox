@@ -6,7 +6,6 @@ H = H1;
 if ~isempty(H.F)
 	H.F = H1.F + H2.F;
 else
-
 	H.A11 = H1.A11 + H2.A11;
 	H.A22 = H1.A22 + H2.A22;
 
