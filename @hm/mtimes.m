@@ -59,7 +59,6 @@ else
 	[H.U21, H.V21] = compress_factors([ H1.A22 * H2.U21, H1.U21 ], ...
 									 [ H2.V21, (H1.V21' * H2.A11)']);								 
 end
-	
 
 end
 

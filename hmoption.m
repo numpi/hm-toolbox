@@ -7,7 +7,7 @@ function opt = hmoption(key, value)
 global hm_block_size
 
 if isempty(hm_block_size)
-	hm_block_size = 2;
+	hm_block_size = 96;
 end
 
 if ~exist('value', 'var')
