@@ -3,8 +3,11 @@ function eT = expm(A, method)
 
 nrm = norm(A);
 n = size(A, 2);
-
-h = floor(log2(nrm)) + 2;
+if nrm == 0
+	eT = hm('diagonal', ones(n,1));
+	return;
+end
+h = max(floor(log2(nrm)) + 2, 0);
 A = A * (1 / 2^h);
 
 if ~exist('method','var')

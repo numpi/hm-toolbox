@@ -31,11 +31,11 @@ end
 
 % Multiplication w' * H
 if isfloat(H1)
-	if ~isempty(H2.F)
-		H = H1 * H2.F;
+	if isscalar(H1)
+		H = H2 * H1;
 	else
-		if isscalar(H1)
-			H = H2 * H1;
+		if ~isempty(H2.F)
+			H = H1 * H2.F;
 		else
 			mp = H2.A11.sz(1);
 			Hl = H1(:,1:mp) * H2.A11 + (H1(:,mp+1:end) * H2.U21) * H2.V21';
