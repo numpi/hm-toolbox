@@ -1,6 +1,6 @@
 function H = minus(H1,H2)
 %MINUS difference of matrices
-if ~is(H1,'hm') || ~is(H2,'hm')
+if ~isa(H1,'hm') || ~isa(H2,'hm')
 	error('Unsupported operation');
 else
 	H = H1;
