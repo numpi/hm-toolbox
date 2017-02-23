@@ -20,7 +20,11 @@ if ~exist('value', 'var')
 else
 	switch key
 		case 'block-size'
-			hm_block_size = value;
+			if value <= 2
+				error('minimum block size must be at least 3');
+			else
+				hm_block_size = value;
+			end
 		otherwise
 			error('Unsupported option specified');
 	end
