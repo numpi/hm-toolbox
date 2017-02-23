@@ -1,7 +1,44 @@
-function eT = expm(A, method)
+function eT = expm(A, method, N, nrm)
 %EXPM Evaluate the matrix exponential of A. 
+%
+% E = EXPM(A) computes the matrix exponential of the HM matrix A. The
+% method used is a Pade' approximant combined with a scaling and squaring
+% technique. 
+%
+% E = EXPM(A, METHOD) selects a different method for the evaluation of the
+% matrix exponential. The available choices are: 
+%
+%  - 'pade': The default choice, a Pade approximant with scaling and
+%    squaring
+%  - 'taylor': A truncated Taylor series with scaling and squaring. 
+%  - 'ratcheb': A rationa Chebyshev approximation that only works for
+%    negative definite matrices. 
+%
+% E = EXPM(A, METHOD, N) uses a degree N approximation. The meaning of the
+% integer N is method-dependent, but typically gives the number of terms
+% used in the approximation. 
+%
+% E = EXPM(A, METHOD, N, NRM) gives an estimate for the norm of A that is
+% used for the scaling and squaring. 
 
-nrm = norm(A);
+if ~exist('method','var')
+	method = 'pade';
+end
+
+if ~exist('N', 'var')
+	N = 12;
+end
+
+% Implementation of an efficient evaluation for negative definite matrices
+if strcmp(method, 'ratcheb')
+	error('Not implemented yet');
+	return;
+end
+
+if ~exist('nrm', 'var')
+	nrm = norm(A);
+end
+
 n = size(A, 2);
 if nrm == 0
 	eT = hm('diagonal', ones(n,1));
@@ -10,11 +47,9 @@ end
 h = max(floor(log2(nrm)) + 2, 0);
 A = A * (1 / 2^h);
 
-if ~exist('method','var')
-	method = 'pade';
-end
+
 if strcmp(method,'taylor')
-	maxit = 12;
+	maxit = N;
 	eT = hm('diagonal', ones(n,1));
 	
 	tempT = eT;
@@ -25,15 +60,15 @@ if strcmp(method,'taylor')
 elseif strcmp(method,'pade')
 	
 	c = 1 / 2;
-	eTn = cqt(1, 1, [], [], T.sz(1), T.sz(2)) + c*T;
-	eTd = cqt(1, 1, [], [], T.sz(1), T.sz(2)) - c*T;
+	eTn = hm('diagonal', ones(n,1)) + c * A;
+	eTd = hm('diagonal', ones(n,1)) - c * A;
 	
-	q = 6;
+	q = floor(N / 2);
 	p = 1;
-	X = T;
+	X = A;
 	for k = 2 : q
 		c = c * (q-k+1) / (k*(2*q-k+1));
-		X = T * X;
+		X = A * X;
 		cX = c*X;
 		eTn = eTn + cX;
 		if p
@@ -44,7 +79,7 @@ elseif strcmp(method,'pade')
 		p = ~p;
 	end
 	
-	eT =  eTn * inv(eTd);
+	eT =  eTn / eTd;
 else
 	error('Invalid parameter method in EXPM');
 end

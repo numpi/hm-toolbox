@@ -8,11 +8,11 @@ At = A';
 
 s = 0;
 
-for i = 1 : 100
+for i = 1 : 30
 	olds = s;
 	s = norm(v);
 	
-	if abs(olds - s) < abs(s) * 1e-6
+	if abs(olds - s) < abs(s) * 1e-3
 		break;
 	end
 	
