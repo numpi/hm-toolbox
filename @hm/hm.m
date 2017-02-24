@@ -46,6 +46,8 @@ classdef hm
 						obj = create_banded_h_matrix(obj, varargin{2:end});
 					case 'diagonal'
 						obj = create_diagonal_h_matrix(obj, varargin{2:end});
+					case 'sparse'
+						obj = create_sparse_h_matrix(obj, varargin{2});
 					otherwise
 						error('Unsupported constructor mode');
 				end
@@ -94,6 +96,23 @@ classdef hm
 			end                
 		end
 		
+		function obj = create_sparse_h_matrix(obj, A)
+		%CREATE_SPARSE_H_MATRIX Create an H-matrix starting from a sparse one
+		
+			n = size(A, 2);
+			block_size = hmoption('block-size');
+			
+			if n <= block_size
+				obj.F = A;
+			else
+				mp = ceil(size(A, 1));
+				obj.A11 = create_sparse_h_matrix(hm(), A(1:mp, 1:mp));
+				obj.A22 = create_sparse_h_matrix(hm(), A(mp+1:end,mp+1:end));
+				
+				% FIXME: Missing implementation of two-sided Lanczos method
+			end
+		end
+		
 		function H = create_banded_h_matrix(obj, A, band)
 		%CREATE_BANDED_H_MATRIX Create a banded H-matrix. 
 			H = obj;
@@ -101,7 +120,7 @@ classdef hm
 			block_size = hmoption('block-size');
 
 			if size(A, 1) <= block_size
-				H.F = A;
+				H.F = full(A);
 				H.sz = size(A);
 			else
 				mp = ceil(size(A, 1) / 2);
@@ -111,10 +130,10 @@ classdef hm
 					H.A11 = create_banded_h_matrix(hm(), A(1:mp,1:mp), band);
 					H.A22 = create_banded_h_matrix(hm(), A(mp+1:end,mp+1:end), band);
 
-					H.U12 = [ zeros(mp-band,band) ; A(mp-band+1:mp,mp+1:mp+band) ];
+					H.U12 = [ zeros(mp-band,band) ; full(A(mp-band+1:mp,mp+1:mp+band)) ];
 					H.V12 = [ eye(band) ; zeros(n - mp - band, band) ];
 
-					H.U21 = [ A(mp+1:mp+band,mp-band+1:mp) ; zeros(n - mp - band, band) ];
+					H.U21 = [ full(A(mp+1:mp+band,mp-band+1:mp)) ; zeros(n - mp - band, band) ];
 					H.V21 = [ zeros(mp-band, band) ; eye(band) ];
 				else
 					H = create_h_matrix(H, A);
@@ -184,10 +203,10 @@ classdef hm
 				H.A11 = create_tridiagonal_h_matrix(hm(), A(1:mp,1:mp));
 				H.A22 = create_tridiagonal_h_matrix(hm(), A(mp+1:end,mp+1:end));
 
-				H.U12 = [ zeros(mp-1,1) ; A(mp,mp+1) ];
+				H.U12 = [ zeros(mp-1,1) ; full(A(mp,mp+1)) ];
 				H.V12 = [ 1 ; zeros(n - mp - 1, 1) ];
 
-				H.U21 = [ A(mp+1,mp) ; zeros(n - mp - 1, 1) ];
+				H.U21 = [ full(A(mp+1,mp)) ; zeros(n - mp - 1, 1) ];
 				H.V21 = [ zeros(mp-1,1) ; 1 ];
 
 				H.sz = size(A);

@@ -44,7 +44,7 @@ if nrm == 0
 	eT = hm('diagonal', ones(n,1));
 	return;
 end
-h = max(floor(log2(nrm)) + 2, 0);
+h = max(ceil(log2(nrm)), 0);
 A = A * (1 / 2^h);
 
 
