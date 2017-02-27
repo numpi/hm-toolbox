@@ -3,7 +3,7 @@ function [ U, V ] = compress_factors(Uold, Vold)
 
 threshold = 1e-12;
 
-if isempty(Uold)
+if isempty(Uold) || size(Uold, 2) < 6
 	U = Uold;
 	V = Vold;
 	return;
