@@ -47,7 +47,6 @@ end
 h = max(ceil(log2(nrm)), 0);
 A = A * (1 / 2^h);
 
-
 if strcmp(method,'taylor')
 	maxit = N;
 	eT = hm('diagonal', ones(n,1));
