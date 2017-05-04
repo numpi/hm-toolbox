@@ -11,7 +11,7 @@ function eT = expm(A, method, N, nrm)
 %  - 'pade': The default choice, a Pade approximant with scaling and
 %    squaring
 %  - 'taylor': A truncated Taylor series with scaling and squaring. 
-%  - 'ratcheb': A rationa Chebyshev approximation that only works for
+%  - 'ratcheb': A rational Chebyshev approximation that only works for
 %    negative definite matrices. 
 %
 % E = EXPM(A, METHOD, N) uses a degree N approximation. The meaning of the
@@ -31,7 +31,7 @@ end
 
 % Implementation of an efficient evaluation for negative definite matrices
 if strcmp(method, 'ratcheb')
-	error('Not implemented yet');
+    eT = expm_ratcheb(A);
 	return;
 end
 
