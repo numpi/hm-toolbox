@@ -1,18 +1,30 @@
-function X = lyap(A, C, debug)
+function X = lyap(A, C, varargin)
 %LYAP Solve the Lyapounov equation AX + XA' + C = 0
 
 N = 32;
 
 [x, w] = hm_legpts(N);
 
-if ~exist('debug', 'var')
-	debug = false;
-end
+p = inputParser;
+
+addOptional(p, 'debug', false, @isboolean);
+addOptional(p, 'expm',  'pade', @ischar);
+
+parse(p, varargin{:});
+
+debug = p.Results.debug;
+expm_method = p.Results.expm;
 
 % Acceleration parameter. 
 L = 100;
 
-nrm = norm(A);
+% The computation of the norm is required only for scaling and squaring
+% methods, therefore we can save some time in the ratcheb case. 
+if ~strcmp(expm_method, 'ratcheb')
+    nrm = norm(A);
+else
+    nrm = 0.0;
+end
 
 % Perform the change of variables and weights
 ww = (2 * L * w) .* ( sin(x) ./ (1 - cos(x)).^2 );
@@ -38,7 +50,7 @@ X = partialSum(xx, ww, @f);
 	end
 
 	function Y = f(x)	  
-	  eA = expm(-x*A, 'pade', 8, nrm * abs(x));
+	  eA = expm(-x*A, expm_method, 8, nrm * abs(x));
 	  nevals = nevals + 1;
 	  Y = -eA * C * eA';
 	  
