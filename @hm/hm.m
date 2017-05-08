@@ -81,19 +81,7 @@ classdef hm
 
 				[obj.U21, obj.V21] = compress_matrix(A(mp+1:end,1:mp));
 				[obj.U12, obj.V12] = compress_matrix(A(1:mp,mp+1:end));
-			end
-        
-			function [U, V] = compress_matrix(Uold)
-			%COMPRESS_MATRIX Get a low-rank representation for Uold.  
-			  threshold = eps;
-
-			  [U,S,V] = svd(Uold);
-
-			  rk = sum(diag(S) > threshold);
-
-			  U = U(:,1:rk) * sqrt(S(1:rk,1:rk));
-			  V = V(:,1:rk) * sqrt(S(1:rk,1:rk));
-			end                
+            end                       
 		end
 		
 		function obj = create_sparse_h_matrix(obj, A)
@@ -135,8 +123,12 @@ classdef hm
 
 					H.U21 = [ full(A(mp+1:mp+band,mp-band+1:mp)) ; zeros(n - mp - band, band) ];
 					H.V21 = [ zeros(mp-band, band) ; eye(band) ];
+                    
+                    % Perform a compression
+                    [H.U21, H.V21] = compress_factors(H.U21, H.V21);                    
+                    [H.U12, H.V12] = compress_factors(H.U12, H.V12);
 				else
-					H = create_h_matrix(H, A);
+					H = create_h_matrix(H, full(A));
 				end
 
 				H.sz = size(A);

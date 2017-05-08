@@ -19,6 +19,8 @@ n = size(A, 1);
 I = hm('diagonal', ones(n, 1));
 X = hm('diagonal', zeros(n, 1));
 
+A = -A;
+
 % compute the nodes and wheights of the rational Chebyshev expansion 
 % REMARK: they don't depend on t
 [omega,xi] = rational(m,1);
@@ -28,8 +30,8 @@ else
     nu=m-1;
 end
 
-for i=1:2:nu    
-    AInv = inv(A - hm('diagonal', xi(i) * ones(n, 1)));;
+for i=1:2:nu
+    AInv = inv(A - hm('diagonal', xi(i) * ones(n, 1)));
 
     % the poles come complex conjugate
     X = X + real(2 * omega(i) * AInv);

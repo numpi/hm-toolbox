@@ -3,19 +3,18 @@ function [ U, V ] = compress_factors(Uold, Vold)
 
 threshold = 1e-12;
 
-if size(Uold, 2) < 6
+if isempty(Uold)
 	U = Uold;
 	V = Vold;
-	return;
+else
+	[QU, RU] = qr(Uold, 0);
+	[QV, RV] = qr(Vold, 0);
+
+	[U,S,V] = svd(RU * RV');
+	rk = sum(diag(S) > S(1,1) * threshold);
+	U = QU * U(:,1:rk) * S(1:rk,1:rk);
+	V = QV * V(:,1:rk);
 end
-
-[QU, RU] = qr(Uold, 0);
-[QV, RV] = qr(Vold, 0);
-
-[U,S,V] = svd(RU * RV');
-rk = sum(diag(S) > S(1,1) * threshold);
-U = QU * U(:,1:rk) * S(1:rk,1:rk);
-V = QV * V(:,1:rk);
 
 end
 
