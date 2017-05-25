@@ -4,7 +4,7 @@ function Ht = transpose(H)
 Ht = H; 
 
 if ~isempty(H.F)
-	Ht = H.F.';
+	Ht.F = H.F.';
 else
 	Ht.A11 = H.A11.';
 	Ht.A22 = H.A22.';
