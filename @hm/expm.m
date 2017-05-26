@@ -35,6 +35,15 @@ if strcmp(method, 'ratcheb')
 	return;
 end
 
+if strcmp(method, 'fasttaylor')
+    A_pwr = nrm.pwr;
+    A_k = nrm.k;
+    t   = nrm.t;
+    % eT = expm_fasttaylor(t, A_pwr, A_k, A, nrm.nrm, N);
+	error('fasttaylor has not been implemented yet');
+    return;
+end
+
 if ~exist('nrm', 'var')
 	nrm = norm(A);
 end
@@ -44,7 +53,13 @@ if nrm == 0
 	eT = hm('diagonal', ones(n,1));
 	return;
 end
-h = max(ceil(log2(nrm)), 0);
+
+if strcmp('method', 'pade')
+	h = max(ceil(log2(nrm / 5.37)), 0);
+else
+	h = max(ceil(log2(nrm / 5.37)), 0);
+end
+
 A = A * (1 / 2^h);
 
 if strcmp(method,'taylor')
