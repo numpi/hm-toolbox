@@ -19,6 +19,10 @@ classdef hm
 		% Dense version of the matrix, if the size is smaller than the
 		% minimum allowed block size. 
 		F
+		
+		% If this flag is true no compression is performed, until
+		% hm_recompress is called. 
+		compression_disabled
 	end
 	
 	methods
@@ -48,6 +52,8 @@ classdef hm
 						obj = create_diagonal_h_matrix(obj, varargin{2:end});
 					case 'sparse'
 						obj = create_sparse_h_matrix(obj, varargin{2});
+                    case 'chebfun2'
+                        obj = create_chebfun2_h_matrix(obj, varargin{2:end});
 					otherwise
 						error('Unsupported constructor mode');
 				end
@@ -203,7 +209,37 @@ classdef hm
 
 				H.sz = size(A);
 			end
-		end
+        end
+        
+        function obj = create_chebfun2_h_matrix(obj, fct, xdom, ydom, n)
+            block_size = hmoption('block-size');
+            obj.sz = [ n, n ];
+            
+            x = linspace(xdom(1), xdom(2), n);
+            y = linspace(ydom(1), ydom(2), n);
+            
+            if n <= block_size
+                obj.F = fct( x, y.' );
+            else                
+				mp = ceil(n / 2);
+                obj.A11 = create_chebfun2_h_matrix(obj(), fct, ...
+                    [ x(1), x(mp) ], ...
+                    [ y(1), y(mp) ], mp);
+                obj.A22 = create_chebfun2_h_matrix(hm(), fct, ...
+                    [ x(mp+1), x(end) ], ...
+                    [ y(mp+1), y(end) ], n - mp);
+                
+                % Create the low-rank block A12 and A21
+                [obj.U12, obj.V12] = chebfun2_low_rank(fct, ...
+                    [ x(mp+1), x(end) ], ...
+                    [ y(1), y(mp) ], ...
+                    mp, n - mp);
+                [obj.U21, obj.V21] = chebfun2_low_rank(fct, ...
+                    [ x(1), x(mp) ], ...
+                    [ y(mp+1), y(end) ], ...
+                    n - mp, mp);
+            end
+        end
 
 		
 	end

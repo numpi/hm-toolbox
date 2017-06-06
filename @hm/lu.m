@@ -14,5 +14,5 @@ else
 	[HL.A11, HU.A11] = lu(H.A11);
 	HU.U12 = HL.A11\H.U12;
 	HL.V21 = HU.A11'\H.V21;
-	[HL.A22, HU.A22] = lu(hmatrix_rank_update(H.A22,-HL.U21*(HL.V21'*HU.U12),HU.V12));
+	[HL.A22, HU.A22] = lu(hmatrix_rank_update(H.A22,-HL.U21*(HL.V21'*HU.U12),HU.V12, true));
 end

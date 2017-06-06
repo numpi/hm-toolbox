@@ -9,7 +9,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
 		H.A11 = H1.A11\H2.A11;
 		[H.U21, H.V21] = compress_factors([H2.U21, H1.U21], [H2.V21,-H.A11'*H1.V21]);
 		H.U21 = H1.A22\ H.U21;
-		H.A22 = H1.A22\hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * (H1.A11 \ H2.U12) ) ,H2.V12);   
+		H.A22 = H1.A22\hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * (H1.A11 \ H2.U12) ) ,H2.V12, true);   
 	end
 else % case of dense right-hand side
 	if ~isempty(H1.F)
