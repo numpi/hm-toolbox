@@ -214,6 +214,10 @@ classdef hm
         function obj = create_chebfun2_h_matrix(obj, fct, xdom, ydom, n)
             block_size = hmoption('block-size');
             obj.sz = [ n, n ];
+
+            if ~exist('chebfun2', 'class')
+                error('Chebfun not found: did you forget to add it to the path?');
+            end
             
             x = linspace(xdom(1), xdom(2), n);
             y = linspace(ydom(1), ydom(2), n);

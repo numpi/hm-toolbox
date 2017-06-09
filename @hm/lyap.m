@@ -32,7 +32,11 @@ xx = L * cot(x ./ 2).^2;
 
 nevals = 0;
 
-X = partialSum(xx, ww, @f);
+% X = partialSum(xx, ww, @f);
+X = ww(1) * f(xx(1));
+for i = 2 : length(ww)
+    X = X + ww(i) * f(xx(i));
+end
 
 	function X = partialSum(xx, ww, ef)
 		%PARTIALSUM Perform the sum of the function EF at some points. 
@@ -49,8 +53,16 @@ X = partialSum(xx, ww, @f);
 		end			
 	end
 
-	function Y = f(x)	  
-	  eA = expm(-x*A, expm_method, 8, nrm * abs(x));
+	function Y = f(x)
+      if strcmp(expm_method, 'mixed')
+          if abs(x) * nrm > 8
+              expm_method = 'ratcheb';
+          else
+              expm_method = 'pade';
+          end
+      end
+          
+      eA = expm(-x*A, expm_method, 8, nrm * abs(x));
 	  nevals = nevals + 1;
 	  Y = -eA * C * eA';
 	  
