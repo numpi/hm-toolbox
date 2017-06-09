@@ -223,7 +223,7 @@ classdef hm
             y = linspace(ydom(1), ydom(2), n);
             
             if n <= block_size
-                obj.F = fct( x, y.' );
+                obj.F = fct( ones(n,1) * x, y.' * ones(1,n) );
             else                
 				mp = ceil(n / 2);
                 obj.A11 = create_chebfun2_h_matrix(obj(), fct, ...
