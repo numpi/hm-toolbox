@@ -7,13 +7,25 @@ N = 32;
 
 p = inputParser;
 
-addOptional(p, 'debug', false, @isboolean);
+addOptional(p, 'debug', false, @islogical);
 addOptional(p, 'expm',  'pade', @ischar);
+addOptional(p, 'method', 'expm', @ischar);
 
 parse(p, varargin{:});
 
 debug = p.Results.debug;
 expm_method = p.Results.expm;
+method = p.Results.method;
+
+if strcmp(method, 'sign')
+	X = sign_lyap(A, C);
+	return;
+end
+
+if strcmp(method, 'adi')
+	X = adi_lyap(A, C);
+	return;
+end
 
 % Acceleration parameter. 
 L = 100;
