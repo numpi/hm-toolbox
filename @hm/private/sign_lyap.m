@@ -27,7 +27,7 @@ while ~converged && it < max_it
 	
 	mu = sqrt( norm(As) / norm(A) );
 	
-    G = .5 * (As' * G * As + G) / mu;
+    G = .5 * (As' * G * As / mu + G * mu);
     A = .5 * (mu * A + As / mu);
     
     corr = ( norm(A - Aold) + norm(G - Gold) ) / ( norm(A) + norm(G) );

@@ -10,8 +10,11 @@ II = hm('diagonal', ones(n,1));
 
 j = 0;
 
-[p,q] = adi_param_syl(pi / n, 4, pi / n, 4, n);
-[p,q] = adi_shift_order(logspace(log10(pi/n), log10(4), 100), p);
+a = min(eig(full(A)));
+b = max(eig(full(A)));
+
+[p,q] = adi_param_syl(a, b, a, b, n);
+[p,q] = adi_shift_order(logspace(log10(a), log10(b), 100), p);
 
 while ~converged
 	j = j + 1;
@@ -28,7 +31,6 @@ while ~converged
 		converged = true;
 	end
 end
-
 
 end
 
