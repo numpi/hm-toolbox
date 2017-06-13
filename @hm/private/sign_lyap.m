@@ -8,6 +8,9 @@ function X = sign_lyap(A, G)
 
 threshold = 1e-6;
 
+% We need to change sign to the right hand side
+G = -G;
+
 % Compute the sign function of the matrix
 %   
 %  [ A'  G ]
@@ -26,9 +29,10 @@ while ~converged && it < max_it
     As = inv(A);
 	
 	mu = sqrt( norm(As) / norm(A) );
+    mu = 1;
 	
-    G = .5 * (As' * G * As / mu + G * mu);
-    A = .5 * (mu * A + As / mu);
+    G = .5 * (As.' * G * As / mu + G * mu);
+    A = .5 * (mu * A + As / mu);        
     
     corr = ( norm(A - Aold) + norm(G - Gold) ) / ( norm(A) + norm(G) );
     converged = corr < threshold;  
