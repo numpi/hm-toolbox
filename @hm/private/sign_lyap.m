@@ -28,8 +28,7 @@ while ~converged && it < max_it
     
     As = inv(A);
 	
-	mu = sqrt( norm(As) / norm(A) );
-    mu = 1;
+    mu = sqrt( norm(As) / norm(A) );
 	
     G = .5 * (As.' * G * As / mu + G * mu);
     A = .5 * (mu * A + As / mu);        
