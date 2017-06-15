@@ -11,7 +11,7 @@ else
 	[QV, RV] = qr(Vold, 0);
 
 	[U,S,V] = svd(RU * RV');
-	rk = min(30, sum(diag(S) > S(1,1) * threshold));
+	rk = sum(diag(S) > S(1,1) * threshold);
 	U = QU * U(:,1:rk) * S(1:rk,1:rk);
 	V = QV * V(:,1:rk);
 end
