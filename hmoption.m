@@ -9,7 +9,7 @@ global hm_block_size
 global hm_threshold
 
 if isempty(hm_block_size)
-	hm_block_size = 128;
+	hm_block_size = 256;
 end
 
 if isempty(hm_threshold)
