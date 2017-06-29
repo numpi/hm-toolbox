@@ -3,7 +3,7 @@ function [U,V] = compress_matrix(A)
 
 maxk = 64;
 
-if max(size(A)) > 2048
+if max(size(A)) < 2048
     [U,S,V] = svd(A);
 else
     [U,S,V] = svds(A, maxk);    

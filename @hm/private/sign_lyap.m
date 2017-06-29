@@ -32,7 +32,7 @@ while ~converged && it < max_it
 	
     G = .5 * (As.' * G * As / mu + G * mu);
     A = .5 * (mu * A + As / mu);        
-    
+    %[qsrank(G),qsrank(A)]
     corr = ( norm(A - Aold) + norm(G - Gold) ) / ( norm(A) + norm(G) );
     converged = corr < threshold;  
 	
