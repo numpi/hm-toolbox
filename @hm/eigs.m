@@ -23,10 +23,10 @@ switch args.opts
     case { 'sm', 'SM' }
         if nargout == 2
             [V, D] = eigs(@(x) args.H \ x, n, args.k, args.opts);
-            D = 1 ./ D;
+            %D = 1 ./ D;
         else
             V = eigs(@(x) args.H \ x, n, args.k, args.opts);
-            V = 1 ./ V;
+            %V = 1 ./ V;
         end                
         
     otherwise

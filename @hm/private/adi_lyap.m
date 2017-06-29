@@ -1,36 +1,59 @@
-function X = adi_lyap(A, C)
+function X = adi_lyap(A, C, tol, maxit)
 %ADI_LYAP Solve the Lyapunov equation using the ADI
 
-converged = false;
+n = size(A,1);
+I = hm('diagonal', ones(n,1));
 
-n = size(A, 1);
-X = hm('diagonal', zeros(n, 1));
-
-II = hm('diagonal', ones(n,1));
-
-j = 0;
-
-a = min(eig(full(A)));
-b = max(eig(full(A)));
-
-[p,q] = adi_param_syl(a, b, a, b, n);
-[p,q] = adi_shift_order(logspace(log10(a), log10(b), 100), p);
-
-while ~converged
-	j = j + 1;
-	pj = p(j); % Get the shift
-	
-	Xold = X;
-	X = -2 * pj * inv(A + pj * II) * C * inv(A + pj * II)' ...
-		+ inv(A + pj * II) * (A - pj * II) * X * (A - pj * II)' * inv(A + pj * II)';
-	
-	%j,
-	%norm(Xold - X) / norm(X)
-	
-	if norm(Xold - X) < norm(X) * 1e-3 || j == 100
-		converged = true;
-	end
+% compute the ADI shifts to obtain a residual norm <tol
+if norm(A-A','fro') < 1e-12
+    alpha = 0;
+    %opts.tol = 1e-5;
+    a = eigs(-A, 1, 'opts','sm' );
+    b = eigs(-A, 1, 'opts','lm' );
+else
+    ll = eig(-full(A));
+    a = min(abs(ll));
+    b = max(abs(ll));
+    alpha = max(atan(abs(imag(ll))./abs(real(ll))));
 end
 
-end
+% Compute the number of shifts that guarantees to achieve the tolerance tol
+p = myadipars(a,b,alpha,tol);
+% otherwise fix the number of shifts (good results can be obtained anyway)
+%nshift=input('How many shifts do you want to compute?\n');
+%p=myadipars_n(a,b,alpha,nshift);
 
+J = length(p);
+%disp(['Number of computed shifts: ', num2str(J)])
+j = 1;
+
+% zero initial guess
+X = hm('diagonal', zeros(n,1));
+
+for i = 1:maxit
+    
+    % compute the current sparse approximate inverse
+    AshiftedInv = (A+p(j)*I)\I;
+    Ashifted = A-p(j)*I;
+    
+    X = AshiftedInv * C - AshiftedInv * X * Ashifted;
+    X = AshiftedInv * C - AshiftedInv * X' * Ashifted;
+    
+    res=norm(A * X + X * A - C,'fro') / norm(C,'fro');
+    %fprintf('It: %d, norm_R: %10.5e\n',i, res)
+    %fprintf('*************************\n')
+    
+    if res<tol
+        break
+    end
+    
+    % re use the shifts
+    if j == J
+        j = 1;
+    else
+        j = j + 1;
+    end
+    
+    %pause
+end
+X = -X;

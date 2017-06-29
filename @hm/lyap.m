@@ -23,7 +23,7 @@ if strcmp(method, 'sign')
 end
 
 if strcmp(method, 'adi')
-	X = adi_lyap(A, C);
+	X = adi_lyap(A, C, 1e-8, 100);
 	return;
 end
 
