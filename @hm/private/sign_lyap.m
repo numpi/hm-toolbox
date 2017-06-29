@@ -22,6 +22,9 @@ max_it = inf;
 
 n = size(A, 1);
 
+% The next iteration at which the residue will be checked.
+next_check = 3;
+
 while ~converged && it < max_it
     Gold = G;
     Aold = A;
@@ -32,12 +35,23 @@ while ~converged && it < max_it
 	
     G = .5 * (As.' * G * As / mu + G * mu);
     A = .5 * (mu * A + As / mu);        
-    %[qsrank(G),qsrank(A)]
-    corr = ( norm(A - Aold) + norm(G - Gold) ) / ( norm(A) + norm(G) );
-    converged = corr < threshold;  
+
+    
+    % We assume that we need at least two steps for convergence. 
+    if it == next_check
+        corr = ( norm(A - Aold, 'fro') + norm(G - Gold, 'fro') ) ...
+            / ( norm(A, 'fro') + norm(G, 'fro') );
+        converged = corr < threshold;  
+        
+        % Newton is quadratically convergent, so if the above gives a good
+        % estimate of the error we have a good guess of the next time we'll
+        % need to check the norm. 
+        next_check = it + max(1, floor(log2(log2(corr / threshold))));
+    end
 	
     % Enable for sign method debugging
     % fprintf ('SIGN :: Iteration %d, Relative correction: %e\n', it, corr);  
+    fprintf('SIGN :: Iteration %d, qsrank %d\n', it, qsrank(A));
     it = it + 1;
 end
 
