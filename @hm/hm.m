@@ -242,7 +242,9 @@ classdef hm
                     [ x(1), x(mp) ], ...
                     [ y(mp+1), y(end) ], ...
                     n - mp, mp);
-            end
+			end
+			
+			obj = compress_hmatrix(obj);
         end
 
 		

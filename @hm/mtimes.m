@@ -4,6 +4,11 @@ function H = mtimes(H1, H2)
 % Multiplication H * v
 if isfloat(H2)
 	if isscalar(H2)
+		if H2 == 0
+			H = hm('diagonal', zeros(size(H1,1), 1));
+			return;
+		end
+		
 		if ~isempty(H1.F)
 			H = hm();
 			H.F = H1.F * H2;
@@ -36,6 +41,7 @@ end
 
 % Multiplication of two H-matrices
 H = hmatrix_mtimes(H1, H2);
+H = compress_hmatrix(H);
 
 end
 

@@ -1,7 +1,7 @@
-function [ U, V ] = compress_factors(Uold, Vold)
+function [ U, V ] = compress_factors(Uold, Vold, nrm)
 %COMPRESS_FACTORS Compress a low-rank representation U*V'. 
 
-threshold = 1e-10;
+threshold = hmoption('threshold');
 
 if isempty(Uold)
 	U = Uold;
@@ -13,7 +13,14 @@ else
 	[U,S,V] = svd(RU * RV');
 	%rk = sum(diag(S) > threshold);
 	%rk = min(sum(diag(S) > S(1,1) * threshold),50);
-	rk = sum(diag(S) > S(1,1) * threshold);
+	
+	% Frobenius norm of the residuals after truncation
+	t = diag(S);
+	t = cumsum(t(end:-1:1));
+	
+	% Numerical rank of the outer product
+	rk = sum(t > nrm * threshold);
+	
 	U = QU * U(:,1:rk) * S(1:rk,1:rk);
 	V = QV * V(:,1:rk);
 end

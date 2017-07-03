@@ -44,8 +44,6 @@ for i = 1 : size(cc, 1)
         V = [ V, g ];
     end
 end
-    
-[U, V] = compress_factors(U, V);
 
 end
 
