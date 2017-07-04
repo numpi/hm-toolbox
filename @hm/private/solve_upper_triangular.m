@@ -8,7 +8,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
 		H.U21 = H1.A22\H2.U21;
 		H.A22 = H1.A22\H2.A22;
 		H.U12 = [H2.U12, H1.U12];
-		H.V12 = [H2.V12,-H.A22'*H1.V12];
+		H.V12 = [H2.V12, -hmatrix_mtimes_dense(H.A22',H1.V12)];
 		H.U12 = H1.A11\ H.U12;
 		H.A11 = H1.A11\hmatrix_rank_update(H2.A11, -H1.U12 * (H1.V12' * (H1.A22 \ H2.U21) ) ,H2.V21);   
 	end

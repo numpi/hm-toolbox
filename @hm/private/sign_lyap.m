@@ -30,15 +30,17 @@ while ~converged && it < max_it
     Aold = A;
     
     As = inv(A);
-	
+if it ==1	
     mu = sqrt( norm(As) / norm(A) );
-	
+else
+    mu=1;
+end
     G = .5 * (As.' * G * As / mu + G * mu);
     A = .5 * (mu * A + As / mu);        
 
     
     % We assume that we need at least two steps for convergence. 
-    if it == next_check
+    if it == next_check || 1
         corr = ( norm(A - Aold, 'fro') + norm(G - Gold, 'fro') ) ...
             / ( norm(A, 'fro') + norm(G, 'fro') );
         converged = corr < threshold;  
