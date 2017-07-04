@@ -8,6 +8,6 @@ elseif isempty(H.U12)
 elseif isempty(H.U21)
 	IH = inv_upper_triangular(H);
 else	
-	[HL, HU] = lu(H);
-	IH = HU\inv(HL);
+	[HL, HU] = hmatrix_lu(H);
+	IH = HU \ inv(HL);
 end

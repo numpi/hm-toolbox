@@ -13,10 +13,10 @@ else
 	HL.V12 = zeros(n-mp,0);
 	HU.U21 = zeros(n-mp,0);
 	HU.V21 = zeros(mp,0);
-	[HL.A11, HU.A11] = lu(H.A11);
+	[HL.A11, HU.A11] = hmatrix_lu(H.A11);
 	HU.U12 = HL.A11\H.U12;
 	HL.V21 = HU.A11'\H.V21;
-	[HL.A22, HU.A22] = lu(hmatrix_rank_update(H.A22,-HL.U21*(HL.V21'*HU.U12),HU.V12));
+	[HL.A22, HU.A22] = hmatrix_lu(hmatrix_rank_update(H.A22,-HL.U21*(HL.V21'*HU.U12),HU.V12));
 end
 
 
