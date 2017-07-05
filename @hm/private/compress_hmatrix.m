@@ -3,7 +3,7 @@ function H = compress_hmatrix(H, nrm)
 %
 
 if ~exist('nrm', 'var')
-	nrm = norm(H, 'fro');
+	nrm = norm(H, 'fro') * size(H, 1);
 end
 
 if isempty(H.F)

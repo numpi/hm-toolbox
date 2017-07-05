@@ -9,5 +9,5 @@ elseif isempty(H.U21)
 	IH = inv_upper_triangular(H);
 else	
 	[HL, HU] = hmatrix_lu(H);
-	IH = HU \ inv(HL);
+	IH = HU \ inv_lower_triangular(HL);
 end

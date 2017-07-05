@@ -30,7 +30,7 @@ while ~converged && it < max_it
     Aold = A;
     
     As = inv(A);
-if it ==1	
+if it == 1
     mu = sqrt( norm(As) / norm(A) );
 else
     mu=1;

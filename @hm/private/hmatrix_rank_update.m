@@ -12,6 +12,8 @@ else
 	H.V21 = [ H.V21, V(1:mp,:) ];
 	H.U12 = [ H.U12, U(1:mp,:) ];
 	H.V12 = [ H.V12, V(mp+1:end,:) ];
-
+	
+	[H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21,'fro') * norm(H.V21, 'fro'));
+	[H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12,'fro') * norm(H.V12, 'fro'));	
 end
 

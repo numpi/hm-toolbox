@@ -3,6 +3,10 @@ function [ U, V ] = compress_factors(Uold, Vold, nrm)
 
 threshold = hmoption('threshold');
 
+% f = fopen('/tmp/compress_factors.txt', 'a');
+% fprintf(f, '%d\n', size(Uold, 1));
+% fclose(f);
+
 if isempty(Uold)
 	U = Uold;
 	V = Vold;
