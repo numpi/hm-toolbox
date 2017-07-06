@@ -34,6 +34,12 @@ L = 5;
 % methods, therefore we can save some time in the ratcheb case. 
 if ~strcmp(expm_method, 'ratcheb')
     nrm = norm(A);
+	
+	if nrm > 5.37	
+		A = A / (nrm / 5.37);
+		C = C / (nrm / 5.37);
+		nrm = 5.37;
+	end
 else
     nrm = 0.0;
 end
@@ -66,15 +72,23 @@ end
 	end
 
 	function Y = f(x)
-      if strcmp(expm_method, 'mixed')
-          if abs(x) * nrm > 8
-              expm_method = 'ratcheb';
+      if strcmp(expm_method, 'mixed')		  
+          if abs(x) * nrm > 64
+              expm_l_method = 'ratcheb';
           else
-              expm_method = 'pade';
-          end
-      end
+              expm_l_method = 'pade';
+		  end
+	  else
+		  expm_l_method = expm_method;
+	  end	  	  
+	  
+	  %if strcmp(expm_l_method, 'ratcheb')
+	  %	  fprintf('r ');
+	  %else
+	  %	  fprintf('p ');
+	  %end
           
-      eA = expm(-x*A, expm_method, 6, nrm * abs(x));
+      eA = expm(-x*A, expm_l_method, 13, nrm * abs(x));
 	  nevals = nevals + 1;
 	  Y = -eA * C * eA';
 	  
