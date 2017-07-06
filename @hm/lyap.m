@@ -23,12 +23,12 @@ if strcmp(method, 'sign')
 end
 
 if strcmp(method, 'adi')
-	X = adi_lyap(A, C, 1e-8, 100);
+	X = adi_lyap(A, C, 1e-6, 100);
 	return;
 end
 
 % Acceleration parameter. 
-L = 100;
+L = 5;
 
 % The computation of the norm is required only for scaling and squaring
 % methods, therefore we can save some time in the ratcheb case. 
@@ -74,7 +74,7 @@ end
           end
       end
           
-      eA = expm(-x*A, expm_method, 8, nrm * abs(x));
+      eA = expm(-x*A, expm_method, 6, nrm * abs(x));
 	  nevals = nevals + 1;
 	  Y = -eA * C * eA';
 	  

@@ -5,7 +5,7 @@ p = inputParser;
 
 p.addRequired('H');
 p.addOptional('k', 5);
-p.addOptional('opts', 'lm');
+p.addOptional('opts', 'lm', @ischar);
 
 p.parse(varargin{:});
 args = p.Results;

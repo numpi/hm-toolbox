@@ -6,7 +6,7 @@ function X = sign_lyap(A, G)
 %
 % This function using the sign function. 
 
-threshold = 1e-6;
+threshold = 1e-8;
 
 % We need to change sign to the right hand side
 G = -G;
@@ -53,7 +53,7 @@ end
 	
     % Enable for sign method debugging
     % fprintf ('SIGN :: Iteration %d, Relative correction: %e\n', it, corr);  
-    fprintf('SIGN :: Iteration %d, qsrank %d\n', it, qsrank(A));
+    % fprintf('SIGN :: Iteration %d, qsrank %d\n', it, qsrank(A));
     it = it + 1;
 end
 

@@ -131,8 +131,8 @@ classdef hm
 					H.V21 = [ zeros(mp-band, band) ; eye(band) ];
                     
                     % Perform a compression
-                    [H.U21, H.V21] = compress_factors(H.U21, H.V21);                    
-                    [H.U12, H.V12] = compress_factors(H.U12, H.V12);
+                    [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));                    
+                    [H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
 				else
 					H = create_h_matrix(H, full(A));
 				end
