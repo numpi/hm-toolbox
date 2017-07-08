@@ -10,12 +10,14 @@ p = inputParser;
 addOptional(p, 'debug', false, @islogical);
 addOptional(p, 'expm',  'pade', @ischar);
 addOptional(p, 'method', 'expm', @ischar);
+addOptional(p, 'parallel', false, @islogical);
 
 parse(p, varargin{:});
 
 debug = p.Results.debug;
 expm_method = p.Results.expm;
 method = p.Results.method;
+parallel = p.Results.parallel;
 
 if strcmp(method, 'sign')
 	X = sign_lyap(A, C);
@@ -51,9 +53,48 @@ xx = L * cot(x ./ 2).^2;
 nevals = 0;
 
 % X = partialSum(xx, ww, @f);
-X = ww(1) * f(xx(1));
-for i = 2 : length(ww)
-    X = X + ww(i) * f(xx(i));
+if ~parallel
+	X = ww(1) * f(xx(1));
+	for i = 2 : length(ww)
+		X = X + ww(i) * f(xx(i));
+	end
+else
+	n = size(A, 1);
+	if exist('gcp', 'file')
+		pool = gcp;
+		nworkers = pool.NumWorkers * 6;		
+	else
+		nworkers = matlabpool('size');
+	end
+	
+	X = hm('diagonal', zeros(n, 1));
+	
+	XX = cell(1, nworkers);
+	for j = 1 : ceil(N / nworkers)
+		base = (j - 1) * nworkers + 1;
+		
+		parfor i = 1 : min(length(ww) - base, nworkers)
+			if strcmp(expm_method, 'mixed')		  
+				if abs(xx(i+base)) * nrm > 64
+					expm_l_method = 'ratcheb';
+				else
+					expm_l_method = 'pade';
+				end
+			else
+				expm_l_method = expm_method;
+			end
+
+			eA = expm(-xx(i+base)*A, expm_l_method, 13, nrm * abs(xx(i+base)));
+			nevals = nevals + 1;
+			XX{i} = -ww(i+base) * eA * C * eA';
+		end
+		
+		for i = 1 : nworkers
+			X = X + XX{i};
+		end		
+	end
+	
+	
 end
 
 	function X = partialSum(xx, ww, ef)

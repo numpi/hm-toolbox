@@ -49,7 +49,7 @@ end
         % estimate of the error we have a good guess of the next time we'll
         % need to check the norm. 
         next_check = it + max(1, floor(log2(log2(corr / threshold))));
-    end
+	end
 	
     % Enable for sign method debugging
     % fprintf ('SIGN :: Iteration %d, Relative correction: %e\n', it, corr);  

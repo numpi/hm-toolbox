@@ -19,7 +19,7 @@ function eT = expm(A, method, N, nrm)
 % used in the approximation. 
 %
 % E = EXPM(A, METHOD, N, NRM) gives an estimate for the norm of A that is
-% used for the scaling and squaring. 
+% used for the scaling and squaring.
 
 if ~exist('method','var')
 	method = 'pade';
