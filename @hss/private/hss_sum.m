@@ -5,6 +5,7 @@ C = hss_compress(C,tol);
 end
 
 function C = hss_sum_ric(A,B)
+C = hss();
 	if  A.topnode ~= B.topnode || A.leafnode ~= B.leafnode
 		error('HSS_SUM:: the two hss matrices have not compatible partitioning')
 	else

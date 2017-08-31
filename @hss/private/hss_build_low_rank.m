@@ -6,7 +6,6 @@ function B = hss_build_low_rank(varargin)
 		if size(U,2) ~= size(V,2)
 			error('HSS_BUILD_LOW_RANK:: dimensions of U and V not compatible')
 		end
-		k = varargin{end};
 		if nargin == 3
 			S = varargin{3};
 			if size(S,1) ~= size(S,2) || size(S,1)~=size(U,2)
@@ -15,7 +14,7 @@ function B = hss_build_low_rank(varargin)
 		else
 			S = eye(size(U,2));
 		end
-		k = ceil(log2(size(U,1)/hssoption('block-size')));	
+		k = 1+ceil(log2(size(U,1)/hssoption('block-size')));	
 		B = hss_build_low_rank_ric(U, V, S, k);
 		B.topnode = 1;	
 		%B = rmfield(B, {'Rl', 'Rr', 'Wr', 'Wl'});

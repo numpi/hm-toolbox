@@ -1,3 +1,3 @@
 function M = full(A)
-n = A.ml+A.mr;
+n = size(A, 1);
 M = hss_mul(A, eye(n));

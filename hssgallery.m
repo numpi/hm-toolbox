@@ -14,7 +14,7 @@ switch name
         end
         
         H = hss('banded', ...
-            spdiags((n - 1)^2 * ones(n,1) * [ -1 2 -1 ], -1:1, n, n), 1, 1);
+            spdiags(ones(n,1) * [ -1 2 -1 ], -1:1, n, n), 1, 1);
     otherwise
         error('Unsupported example name');
 end
