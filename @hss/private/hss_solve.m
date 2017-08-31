@@ -72,14 +72,14 @@ if run == true
     % Compose the sparse matrix S out of the HSS representation
     % tic % time.composeS = cputime;
     [S, indb, indx, n] = hss_toSparse(hss,b,run,I, J, S);
-    time.composeS = toc; %cputime-time.composeS;
+    % time.composeS = toc; %cputime-time.composeS;
    
     % use \ to calculate x
     % tic %time.backslash = cputime;
     bHSS =  sparse(size(indb,1),size(b,2));
     bHSS(indb,:)=b;
     x=S\bHSS;
-    time.backslash = toc; %cputime-time.backslash;
+    % time.backslash = toc; %cputime-time.backslash;
    
    
     % Select the x

@@ -21,7 +21,7 @@ function A = blkdiag(A1, A2)
 	if A.hssl.leafnode == 1
 		A.hssl.U = zeros(A.ml, 0);
 		A.hssl.V = zeros(A.nl, 0);
-	else
+    else
 		A.hssl.Rl = zeros(hss_generator_size(A.hssl, 'left'), 0);
 		A.hssl.Rr = zeros(hss_generator_size(A.hssl, 'left'), 0);
 		A.hssl.Wl = zeros(hss_generator_size(A.hssl, 'right'), 0);
@@ -36,24 +36,8 @@ function A = blkdiag(A1, A2)
 		A.hssr.Rr = zeros(hss_generator_size(A.hssr, 'left'), 0);
 		A.hssr.Wl = zeros(hss_generator_size(A.hssr, 'right'), 0);
 		A.hssr.Wr = zeros(hss_generator_size(A.hssr, 'right'), 0);
-	end
-		
-	
-	function k = hss_generator_size(A, lr)
-		if A.leafnode == 1
-			switch lr
-				case 'left'
-					k = size(A.U, 2);
-				case 'right'
-					k = size(A.V, 2);
-			end
-		else
-			switch lr
-				case 'left'
-					k = size(A.hssl.Rl, 2);
-				case 'right'
-					k = size(A.hssl.Wl, 2);
-			end
-		end
-	end
+    end
+
 end
+
+
