@@ -24,6 +24,12 @@ if strcmp(method, 'sign')
 	return;
 end
 
+if strcmp(method, 'd&c')
+	X = dac_lyap(A,A,C);
+        X = compress_hmatrix(X);
+	return;
+end
+
 if strcmp(method, 'adi')
 	X = adi_lyap(A, C, 1e-6, 100);
 	return;
