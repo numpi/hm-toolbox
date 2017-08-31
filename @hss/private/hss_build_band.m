@@ -1,6 +1,11 @@
 function B = hss_build_band(A, bl, bu)
-	k = ceil(log2(size(A,1)/hssoption('block-size')));
-	B = hss_build_band_ric(A,bl,bu,k);
+	k = max(0, 1 + ceil(log2(size(A,1)/hssoption('block-size'))));
+    if k > 0
+        B = hss_build_band_ric(A,bl,bu,k);
+    else
+        B = hss();
+        B.D = A;
+    end
 	B.topnode = 1;
 	% B = rmfield(B, {'Rl', 'Rr', 'Wr', 'Wl'});
 end 
