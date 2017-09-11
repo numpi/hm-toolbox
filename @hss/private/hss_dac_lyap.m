@@ -24,7 +24,9 @@ X = blkdiag(...
 [CU,CV] = hss_offdiag(C);
 [AU,AV] = hss_offdiag(A);
 [BU,BV] = hss_offdiag(B);
-
+[size(X),size(BU)]
+X.ml
+X.nl
 u = [ CU , AU , X * BU ];
 v = [ CV , X' * AV, BV ];
 
@@ -32,8 +34,8 @@ v = [ CV , X' * AV, BV ];
 
 A.topnode = 1;
 B.topnode = 1;
-[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-% [Xu, Xv] = SylvKrylov(A, B, u, v, 10);
+%[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
+ [Xu, Xv] = SylvKrylov(A, B, u, v, 10);
 % norm(A * Xu * Xv' + Xu * (Xv' * B') - u * v') / norm(Xu * Xv')
 
 A.topnode = 0;

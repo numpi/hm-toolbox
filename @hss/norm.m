@@ -5,11 +5,11 @@ if ~exist('nrm_type', 'var')
     nrm_type = 2;
 end
 
-% Not yet implemented
-%if ischar(nrm_type) && strcmp(nrm_type, 'fro')
-%    nrm = norm_frobenius(A);
-%   return;
-%nd
+
+if ischar(nrm_type) && strcmp(nrm_type, 'fro')
+    nrm = norm_frobenius(A);
+   return;
+end
 
 n = size(A, 2);
 v = randn(n, 1);
