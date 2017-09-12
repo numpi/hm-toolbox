@@ -2,8 +2,17 @@ function [ Xu, Xv ] = SylvKrylov(A, B, u, v, k)
 %SYLVKRYLOV Summary of this function goes here
 %   Detailed explanation goes here
 
-    n = size(A);
-    n = n(1);
+n = size(A);
+n = n(1);
+
+bs = size(v, 2);
+
+% If the problem is small enough, solve it using the dense solver
+if n <= bs * k
+	Xu = lyap(full(A), full(B), -u*v');
+	Xv = eye(size(Xu));
+	return;
+end
 
 % k = 10; 
 
@@ -17,7 +26,6 @@ function [ Xu, Xv ] = SylvKrylov(A, B, u, v, k)
 QA = va;
 QB = vb;
 
-bs = size(va, 2);
 
 while size(QA, 2) < k * bs
 
@@ -43,7 +51,6 @@ while size(QA, 2) < k * bs
     wa = wa - QA * (QA' * wa);
     wb = wb - QB * (QB' * wb);
     
-    % norm(wa)
     % norm(wb)
     
     %wa = wa / norm(wa);
@@ -51,8 +58,10 @@ while size(QA, 2) < k * bs
     [wa, ~] = qr(wa, 0);
     [wb, ~] = qr(wb, 0);
     
-    QA = [ QA , wa ];
-    QB = [ QB , wb ];
+    %[QA,~] = qr([ QA , wa ], 0);
+    %[QB,~] = qr([ QB , wb ], 0);
+	QA = [ QA, wa ];
+	QB = [ QB, wb ];
 end
 
 % Theoretical best basis
@@ -60,11 +69,14 @@ end
 % QA = U(:,1:k);
 % QB = V(:,1:k);
 
+% norm(QA' * QA - eye(size(QA,2)))
+
 As = QA' * (A * QA);
 Bs = QB' * (B * QB);
 
 % Cs = zeros(k); Cs(1,1) = norm(u) * norm(v);
 Cs = zeros(k * bs); Cs(1:bs,1:bs) = RA * RB';
+% Cs = (QA' * u) * (QB' * v)';
 % Cs = (QA' * u) * (v' * QB);
 
 Xs = lyap(As, Bs, -Cs);
