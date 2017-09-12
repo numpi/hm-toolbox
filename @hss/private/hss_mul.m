@@ -70,7 +70,7 @@ if (hss.leafnode==0)   % parent node
     [vb.vbl, vb.gl] = upSweep(hss.hssl, x(1:hss.nl,:));
     [vb.vbr, vb.gr] = upSweep(hss.hssr, x(hss.nl+1:end,:));
     if hss.topnode==0    % not top node
-        g = hss.Wl'*vb.gl + hss.Wr'*vb.gr;      % (4)
+        	g = hss.Wl'*vb.gl + hss.Wr'*vb.gr;      % (4)
     end
 else        %leav node
     g = hss.V'*x;                           % (3)

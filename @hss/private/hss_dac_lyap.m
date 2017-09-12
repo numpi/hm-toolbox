@@ -1,6 +1,6 @@
 function X = hss_dac_lyap(A,B,C)
-% LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0 
-%          where all the matrices are represented in the HODLR format
+% HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0 
+%          where all the matrices are represented in the HSS format
 k = 2;
 
 debug = 0;
@@ -21,12 +21,12 @@ X = blkdiag(...
 	hss_dac_lyap(A.hssr, B.hssr, C.hssr) ...
 );
 
+
 [CU,CV] = hss_offdiag(C);
 [AU,AV] = hss_offdiag(A);
 [BU,BV] = hss_offdiag(B);
-[size(X),size(BU)]
-X.ml
-X.nl
+
+
 u = [ CU , AU , X * BU ];
 v = [ CV , X' * AV, BV ];
 
@@ -34,9 +34,14 @@ v = [ CV , X' * AV, BV ];
 
 A.topnode = 1;
 B.topnode = 1;
+%[LA,UA] = lu(full(A));
+%[LB,UB] = lu(full(B));
+%[Xu, Xv] = kpik_sylv(A, LA, UA, B, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
- [Xu, Xv] = SylvKrylov(A, B, u, v, 10);
-% norm(A * Xu * Xv' + Xu * (Xv' * B') - u * v') / norm(Xu * Xv')
+ %[Xu, Xv] = SylvKrylov(A, B, u, v, 2);
+XX = lyap(full(A),full(B), -u*v');
+[Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
+ norm(full(A) * Xu * Xv' + Xu * (Xv' * full(B)') - u * v') / norm(Xu * Xv')
 
 A.topnode = 0;
 B.topnode = 0;
