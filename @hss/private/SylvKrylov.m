@@ -9,12 +9,12 @@ bs = size(v, 2);
 
 % If the problem is small enough, solve it using the dense solver
 if n <= bs * k
-	fprintf('dense\n')
-	Xu = lyap(full(A), full(B), -u*v');
-	Xv = eye(size(Xu));
+	%fprintf('dense\n')
+	[Xu, Xs, Xv] = svd(lyap(full(A), full(B), u*v'));
+	sY = diag(Xs); is = sum(abs(sY) / sY(1) > 1e-12); Xu = Xu(:,1:is) * diag(sqrt(sY(1:is))); Xv = Xv(:,1:is)* diag(sqrt(sY(1:is)));
 	return;
 end
-
+%fprintf('NON dense\n')
 % k = 10; 
 
 % va = u / norm(u);
@@ -22,7 +22,6 @@ end
 [va, RA] = qr(u, 0);
 [vb, RB] = qr(v, 0);
 
-size(va)
 
 % Cs = RA * RB';
 
@@ -87,9 +86,10 @@ Cs = (QA' * u) * (QB' * v)';
 
 Xs = lyap(As, Bs, -Cs);
 % [Us,Ss,Vs] = svd(Xs);
+% reduce solution rank if needed 
+[Us,Ss,Vs] = svd(Xs); sY = diag(Ss); is = sum(abs(sY) / sY(1) > 1e-12); Y0 = Us(:,1:is)*diag(sqrt(sY(1:is)));
+Xu = -QA * Us(:,1:is) * diag(sqrt(sY(1:is))); Xv = QB * Vs(:,1:is) * diag(sqrt(sY(1:is)));
 
-Xu = QA * Xs;
-Xv = QB;
 % res = norm(A*X + X*B - u*v');
 % res = 1;
 % X = Xs;

@@ -36,14 +36,12 @@ A.topnode = 1;
 B.topnode = 1;
 [LA,UA] = lu(sA);
 [LB,UB] = lu(sB);
-[size(A),size(u)]
-[Xu, Xv] = kpik_sylv(sA, LA, UA, sB, LB, UB, -u, v, 100, tol);
-norm(u)
+%[Xu, Xv] = kpik_sylv(sA, LA, UA, sB, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-%[Xu, Xv] = SylvKrylov(sA, sB, u, v, k);
+[Xu, Xv] = SylvKrylov(sA, sB, u, v, 3);
 % XX = lyap(full(A),full(B), -u*v');
 % [Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
- norm(full(sA * Xu * Xv' + Xu * (Xv' * sB') - u * v')) / norm(u * v')
+ %norm(full(sA * Xu * Xv' + Xu * (Xv' * sB') - u * v')) / norm(u * v')
 
 A.topnode = 0;
 B.topnode = 0;

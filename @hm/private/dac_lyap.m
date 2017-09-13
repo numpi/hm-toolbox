@@ -1,7 +1,7 @@
 function X = dac_lyap(A,B,C)
 % LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0 
 %          where all the matrices are represented in the HODLR format
-k = 2;
+k = 3;
 X = A;
 debug = 0;
 if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
