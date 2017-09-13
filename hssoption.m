@@ -9,7 +9,7 @@ global hss_block_size
 global hss_threshold
 
 if isempty(hss_block_size)
-	hss_block_size = 32;
+	hss_block_size = 96;
 end
 
 if isempty(hss_threshold)
