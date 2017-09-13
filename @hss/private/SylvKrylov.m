@@ -22,6 +22,8 @@ end
 [va, RA] = qr(u, 0);
 [vb, RB] = qr(v, 0);
 
+size(va)
+
 % Cs = RA * RB';
 
 QA = va;
@@ -70,14 +72,17 @@ end
 % QA = U(:,1:k);
 % QB = V(:,1:k);
 
+[QA,~] = qr(QA, 0);
+[QB,~] = qr(QB, 0);
+
 % norm(QA' * QA - eye(size(QA,2)))
 
 As = QA' * (A * QA);
 Bs = QB' * (B * QB);
 
 % Cs = zeros(k); Cs(1,1) = norm(u) * norm(v);
-Cs = zeros(k * bs); Cs(1:bs,1:bs) = RA * RB';
-% Cs = (QA' * u) * (QB' * v)';
+% Cs = zeros(k * bs); Cs(1:bs,1:bs) = RA * RB';
+Cs = (QA' * u) * (QB' * v)';
 % Cs = (QA' * u) * (v' * QB);
 
 Xs = lyap(As, Bs, -Cs);
