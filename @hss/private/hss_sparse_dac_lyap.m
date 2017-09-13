@@ -34,8 +34,8 @@ v = [ CV , X' * AV, BV ];
 
 A.topnode = 1;
 B.topnode = 1;
-[LA,UA] = lu(sA);
-[LB,UB] = lu(sB);
+%[LA,UA] = lu(sA);
+%[LB,UB] = lu(sB);
 %[Xu, Xv] = kpik_sylv(sA, LA, UA, sB, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
 [Xu, Xv] = SylvKrylov(sA, sB, u, v, 3);
@@ -46,4 +46,4 @@ B.topnode = 1;
 A.topnode = 0;
 B.topnode = 0;
 
-X = X - hss('low-rank', Xu, Xv);
+X = X + hss('low-rank', Xu, Xv);

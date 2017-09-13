@@ -1,7 +1,7 @@
 function C = hss_sum(A,B)
 tol = hssoption('threshold');
 C = hss_sum_ric(A,B);
-C = hss_compress(C,tol);
+%C = hss_compress(C,tol);
 end
 
 function C = hss_sum_ric(A,B)
