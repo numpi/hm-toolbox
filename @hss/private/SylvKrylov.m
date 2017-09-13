@@ -9,6 +9,7 @@ bs = size(v, 2);
 
 % If the problem is small enough, solve it using the dense solver
 if n <= bs * k
+	fprintf('dense\n')
 	Xu = lyap(full(A), full(B), -u*v');
 	Xv = eye(size(Xu));
 	return;

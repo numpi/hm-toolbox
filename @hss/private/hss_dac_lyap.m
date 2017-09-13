@@ -1,10 +1,10 @@
 function X = hss_dac_lyap(A,B,C)
 % HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0 
 %          where all the matrices are represented in the HSS format
-k = 2;
+kmax = 65;
 
 debug = 0;
-tol = 1e-9;
+tol = 1e-6;
 
 if A.leafnode == 1
 	X = hss();
@@ -38,10 +38,17 @@ B.topnode = 1;
 %[LB,UB] = lu(full(B));
 %[Xu, Xv] = kpik_sylv(A, LA, UA, B, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-[Xu, Xv] = SylvKrylov(A, B, u, v, 15);
+for k = 1:kmax
+	[Xu, Xv] = SylvKrylov(A, B, u, v, k);
+	norm(A * Xu * Xv' + Xu * (Xv' * B') - u * v') 
+	if norm(A * Xu * Xv' + Xu * (Xv' * B') - u * v') / norm(Xu * Xv') < tol
+		k
+		break
+	end
+end
 % XX = lyap(full(A),full(B), -u*v');
 % [Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
-% norm(full(A) * Xu * Xv' + Xu * (Xv' * full(B)') - u * v') / norm(Xu * Xv')
+ norm(full(A) * Xu * Xv' + Xu * (Xv' * full(B)') - u * v') / norm(Xu * Xv')
 
 A.topnode = 0;
 B.topnode = 0;

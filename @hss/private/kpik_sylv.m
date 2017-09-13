@@ -69,6 +69,9 @@ rhsB=UB\(LLB\rhs2);
 
 % Sequence in A
 [U(1:n,1:s),beta]=qr([rhs1,rhsA],0);
+sum(diag(abs(beta))>eps)
+size([rhs1,rhsA])
+pause
 ibeta=inv(beta);
 beta = beta(1:sh,1:sh); 
 H=zeros((m+1)*s,m*s); L=zeros((m+1)*s,m*s);
