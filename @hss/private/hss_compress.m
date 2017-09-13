@@ -1,7 +1,7 @@
 % function that performs the compression of an HSS matrix
-function B = hss_compress(A,tol)
+function B = hss_compress(A, tol)
 	B = hss_proper(A);
-	B = backward_stage(B,tol);
+	B = backward_stage(B, tol * size(B, 1));
 end
 
 function A = backward_stage(A,tol,S,T)
