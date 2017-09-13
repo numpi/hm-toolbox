@@ -53,6 +53,8 @@ classdef hss
 						obj = hss_build_low_rank(varargin{2:end});
 					case 'banded'
 						obj = hss_build_band(varargin{2:end});
+					case 'chebfun2'
+						obj = hm2hss(hm('chebfun2', varargin{2:end}));
 					otherwise
 						error('Unsupported constructor mode');
 				end
