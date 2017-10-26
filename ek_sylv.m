@@ -1,57 +1,28 @@
 function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug)
-%SYLVKRYLOV2 Approximate the solution of a Lyapunov equation. 
-
-% Check if the Sylvester equation is really a Lyapunov equation. 
-% FIXME: Notice the sign change, due to the different handling of the
-% constant term in LyapKrylov and SylvKrylov.
+%EK_SYLV Approximate the solution of a Sylvester equation AX + XB' = U*V'.
+%
+% [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the 
+%     Sylvester equation in the factored form XU * XV'. 
+%
+% [XU, VA] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA 
+%     and VB, and the optional parameters TOL and DEBUG control the 
+%     stopping criterion and the debugging during the iteration. 
 
 if ~exist('debug', 'var')
     debug = false;
 end
 
-nrmA = normest(A,1e-2);
-nrmB = normest(B,1e-2);
+nrmA = normest(A, 1e-2);
+nrmB = normest(B, 1e-2);
 
-if normest(A - B') < eps * max(nrmA, nrmB) && false
-    % Determine if A is posdef or negdef
-    xx = randn(size(A,1), 1);
-    s = sign(xx' * A * xx);
-    
-	if norm(u + v, 1) < eps * length(u)
-		disp('lyap -1')
-		[Xu, VA] = LyapKrylov2(A, u, k, tol, nrmA);
-		Xv = -s * Xu;
-		VB = VA;
-		return;
-	elseif norm(u - v, 1) < eps * length(u)
-        disp('lyap 1')
-		[Xu, VA] = LyapKrylov2(A, u, k, tol, nrmA);
-		Xv = s * Xu;
-		VB = VA;
-		return;
-	end
-end
-
-%disp('sylv')
-
-if ~isstruct(A) 
-	[LA, UA, pA, qA] = lu(A);
-	AA = struct(... 
-	'solve', @(nu, mu ,x) (nu * A - mu * eye(size(A), 'like', A)) \ x, ... 
-    'solve_new', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x, A), ... 
-    'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
-    'isreal', true);
+if ~isstruct(A)
+	AA = build_rk_struct(A);
 else
 	AA = A;
 end
 
 if ~isstruct(B) 
-	[LB, UB, pB, qB] = lu(B');
-	BB = struct(... 
-	'solve', @(nu, mu ,x) (nu * B' - mu * eye(size(B), 'like', B)) \ x, ... 
-	'solve_new', @(nu, mu, x) sparse_solve(nu, mu, LB, UB, pB, qB, x, B'), ... 
-	'multiply', @(rho, eta, x) rho * B' * x - eta * x, ...
-	'isreal', true);
+	BB = build_rk_struct(B');
 else
 	BB = B';
 end
@@ -85,9 +56,6 @@ while max(sa-2*bsa, sb-2*bsb) < k
     As = HA(1:end-bsa,:) / KA(1:end-bsa,:);
     Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:);
     Cs = zeros(size(As, 1), size(Bs, 1));
-    
-    % FIXME: The above steps can be carried out much more efficiently, just
-    % computing the new columns and rows of As and Bs. 
     
     Cs(1:size(u,2), 1:size(v,2)) = Cprojected;    
     

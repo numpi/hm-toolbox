@@ -1,4 +1,4 @@
-function [Y, res] = lyap_galerkin(HA, HB, C, bsa, bsb)
+function [Y, res] = lyap_galerkin(varargin)
 %LYAP_GALERKIN Solve the reduced Lyapunov equation and check the residual. 
 %
 % Y = LYAP_GALERKIN(HA, HB, C, bsa, bsb) solves the (projected) Lyapunov
@@ -12,22 +12,44 @@ function [Y, res] = lyap_galerkin(HA, HB, C, bsa, bsb)
 %        Krylov-type method and that the action of A on the basis excluding
 %        the last BSA (resp. BSB) columns is contained in the full basis. 
 
+if length(varargin) == 3
+	HA = varargin{1};
+	C = varargin{2};
+	bsa = varargin{3};
+	is_lyapunov = true;
+else
+	HA = varargin{1};
+	HB = varargin{2};
+	C = varargin{3};
+	bsa = varargin{4};
+	bsb = varargin{5};
+	is_lyapunov = false;
+end
+
 % Consider the projected matrices at the previous step, which is needed to
 % check the Galerking condition
 HA1 = HA(1 : end - bsa, 1 : end - bsa);
-HB1 = HB(1 : end - bsb, 1 : end - bsb);
+
+if ~is_lyapunov
+	HB1 = HB(1 : end - bsb, 1 : end - bsb);
+end
 
 % Compute the solution of the Lyapunov equation (word of warning: please
 % check the sign of C in the implementation of SylvKrylov).
-if norm(HA1 - HB1', 1) > 0
+if ~is_lyapunov
 	Y = lyap(HA1, HB1', -C(1:end-bsa,1:end-bsb));
 else
-	Y = lyap(HA1, -C(1:end-bsa,1:end-bsb));
+	Y = lyap(HA1, -C(1:end-bsa,1:end-bsa));
 end
 
 % Check the residual
-res = max(norm(HA(end-bsa+1:end, 1 : end - bsa) * Y), ...
-          norm(Y * HB(end-bsb+1 : end, 1 : end - bsb)'));
+if ~is_lyapunov
+	res = max(norm(HA(end-bsa+1:end, 1 : end - bsa) * Y), ...
+			norm(Y * HB(end-bsb+1 : end, 1 : end - bsb)'));
+else
+	res = max(norm(HA(end-bsa+1:end, 1 : end - bsa) * Y), ...
+			norm(Y * HA(end-bsa+1 : end, 1 : end - bsa)'));
+end
 
 end
 
