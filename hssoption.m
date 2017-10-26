@@ -4,12 +4,18 @@ function opt = hssoption(key, value)
 % Valid options are: 
 %   'block-size': Integer representing the minimum block size. 
 %   'threshold': Value used for off-diagonal truncation. 
+%   'compression': String indicating the strategy of compression (qr or svd)
 
 global hss_block_size
 global hss_threshold
+global hss_compression
 
 if isempty(hss_block_size)
 	hss_block_size = 96;
+end
+
+if isempty(hss_compression)
+	hss_compression = 'qr';
 end
 
 if isempty(hss_threshold)
@@ -26,6 +32,8 @@ if ~exist('value', 'var')
 			opt = hss_block_size;
 		case 'threshold'
 			opt = hss_threshold;
+		case 'compression'
+			opt = hss_compression;
 		otherwise
 			error('Unsupported option specified');
 	end
@@ -42,6 +50,12 @@ else
 				error('threshold has to be positive');
 			else
 				hss_threshold = max(eps, value);
+			end
+		case 'compression'
+			if strcmp(value,'qr') || strcmp(value, 'svd')
+				hss_compression = value;
+			else
+				error('Unsupported type of compression');
 			end
 		otherwise
 			error('Unsupported option specified');
