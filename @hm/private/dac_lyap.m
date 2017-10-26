@@ -1,7 +1,7 @@
 function X = dac_lyap(A,B,C)
 % LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0 
 %          where all the matrices are represented in the HODLR format
-k = 3;
+tol = 1e-8;
 X = A;
 debug = 0;
 if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
@@ -34,11 +34,10 @@ if debug
 	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
 	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
 end
-[ Xu, Xv ] = SylvKrylov(A, B, u, v, k);	% Solve with Krylov methods for the low-rank update
-%[LA, UA] = lu(A);
-%[LB, UB] = lu(B);
-%[Xu,Xv,res]=kpik_sylv(A,LA,UA,B,LB,UB,u,v,20,1e-9,1e-12);
-%XX=hm(lyap(full(A),full(B),u*v'));
+
+% Solve with Krylov methods for the low-rank update
+[ Xu, Xv ] = ek_sylv(A, B, u, v, inf, tol);	
+
 if debug 
 	XX=hm('low-rank',Xu,Xv);
 	norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))

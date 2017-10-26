@@ -38,7 +38,7 @@ B.topnode = 1;
 %[LB,UB] = lu(sB);
 %[Xu, Xv] = kpik_sylv(sA, LA, UA, sB, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-[Xu, Xv] = SylvKrylov2(sA, sB, u, v, inf, tol);
+[Xu, Xv] = ek_sylv(sA, sB, u, v, inf, tol);
 % XX = lyap(full(A),full(B), -u*v');
 % [Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
  %norm(full(sA * Xu * Xv' + Xu * (Xv' * sB') - u * v')) / norm(u * v')

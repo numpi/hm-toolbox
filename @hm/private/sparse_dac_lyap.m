@@ -43,12 +43,10 @@ if debug
 	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
 	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
 end
-%[ Xu, Xv ] = SylvKrylov(sA, sB, u, v, k);	% Solve with Krylov methods for the low-rank update
-[ Xu, Xv ] = SylvKrylov2(sA, sB, -u, v, inf, tol);
-%[LA, UA] = lu(A);
-%[LB, UB] = lu(B);
-%[Xu,Xv,res]=kpik_sylv(A,LA,UA,B,LB,UB,u,v,20,1e-9,1e-12);
-%XX=hm(lyap(full(A),full(B),u*v'));
+
+% Solve with Krylov methods for the low-rank update
+[ Xu, Xv ] = ek_sylv(sA, sB, -u, v, inf, tol);
+
 if debug 
 	XX=hm('low-rank',Xu,Xv);
 	norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))

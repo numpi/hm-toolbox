@@ -1,4 +1,4 @@
-function [Xu, Xv, VA, VB] = SylvKrylov2(A, B, u, v, k, tol, debug)
+function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug)
 %SYLVKRYLOV2 Approximate the solution of a Lyapunov equation. 
 
 % Check if the Sylvester equation is really a Lyapunov equation. 

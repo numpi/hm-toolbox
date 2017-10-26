@@ -4,7 +4,7 @@ function X = hss_dac_lyap(A,B,C)
 kmax = 65;
 
 debug = 0;
-tol = 1e-12;
+tol = 1e-8;
 
 if A.leafnode == 1
 	X = hss();
@@ -38,7 +38,7 @@ B.topnode = 1;
 %[LB,UB] = lu(full(B));
 %[Xu, Xv] = kpik_sylv(A, LA, UA, B, LB, UB, -u, v, 100, tol);
 %[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-[Xu, Xv] = SylvKrylov(A, B, u, v, 3);
+[Xu, Xv] = ek_sylv(A, B, u, v, inf, tol);
 % XX = lyap(full(A),full(B), -u*v');
 % [Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
  %norm(full(A) * Xu * Xv' + Xu * (Xv' * full(B)') - u * v') / norm(Xu * Xv')
