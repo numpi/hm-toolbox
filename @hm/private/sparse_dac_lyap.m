@@ -6,6 +6,7 @@ X = A;
 n = size(A,1);
 tol = 1e-8;
 debug = 0;
+
 if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
 	X.F = lyap(A.F, B.F, C.F);
 	return
@@ -43,7 +44,7 @@ if debug
 	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
 end
 %[ Xu, Xv ] = SylvKrylov(sA, sB, u, v, k);	% Solve with Krylov methods for the low-rank update
-[ Xu, Xv ] = SylvKrylov2(sA, sB, -u, v , inf, tol);
+[ Xu, Xv ] = SylvKrylov2(sA, sB, -u, v, inf, tol);
 %[LA, UA] = lu(A);
 %[LB, UB] = lu(B);
 %[Xu,Xv,res]=kpik_sylv(A,LA,UA,B,LB,UB,u,v,20,1e-9,1e-12);

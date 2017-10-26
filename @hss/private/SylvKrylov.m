@@ -95,4 +95,3 @@ Xu = -QA * Us(:,1:is) * diag(sqrt(sY(1:is))); Xv = QB * Vs(:,1:is) * diag(sqrt(s
 % X = Xs;
 
 end
-

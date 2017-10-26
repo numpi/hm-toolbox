@@ -5,12 +5,21 @@ N = 32;
 
 [x, w] = hm_legpts(N);
 
+if ~isempty(varargin) && ~ischar(varargin{1})
+	nrmA = norm(A, 'fro');
+	
+	X = sparse_dac_lyap(A / nrmA, A / nrmA, C / nrmA, ...
+		varargin{1} / nrmA, varargin{2} / nrmA);
+	
+	return;
+end
+
 p = inputParser;
 
-addOptional(p, 'debug', false, @islogical);
-addOptional(p, 'expm',  'pade', @ischar);
-addOptional(p, 'method', 'expm', @ischar);
-addOptional(p, 'parallel', false, @islogical);
+addParameter(p, 'debug', false, @islogical);
+addParameter(p, 'expm',  'pade', @ischar);
+addParameter(p, 'method', 'expm', @ischar);
+addParameter(p, 'parallel', false, @islogical);
 
 parse(p, varargin{:});
 

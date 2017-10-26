@@ -1,8 +1,9 @@
 % function that performs the compression of an HSS matrix
 function B = hss_compress(A, tol)
+	% The norm has the side-effect of making the matrix proper
 	B = hss_proper(A);
 	
-	% Select the correct pivoting strategy according to the user selection
+	% Select the compression strategy according to the user's choice
 	switch hssoption('compression')
 		case 'qr'
 			tcomp = @tqr;
@@ -22,7 +23,7 @@ function A = backward_stage(A, tol, S, T, tcomp)
 	if (A.topnode == 1)
 		[U,Su,V] = tcomp(A.Bu, tol);
 		A.Bu = Su; Tl = Su.';
-		if A.hssl.leafnode ==0
+		if A.hssl.leafnode == 0
 			A.hssl.Rl = A.hssl.Rl * U;
 			A.hssl.Rr = A.hssl.Rr * U;
 			A.hssr.Wl = A.hssr.Wl * V;

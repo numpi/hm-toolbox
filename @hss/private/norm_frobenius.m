@@ -1,7 +1,8 @@
-function nrm = norm_frobenius(A)
+function [nrm, A] = norm_frobenius(A)
 	A = hss_proper(A);
 	nrm = sqrt(norm_frobenius_ric(A));
 end
+
 function nrm = norm_frobenius_ric(A)
 	if A.leafnode == 1
 		nrm = norm(A.D,'fro')^2;
