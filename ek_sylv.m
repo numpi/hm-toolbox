@@ -12,20 +12,21 @@ if ~exist('debug', 'var')
     debug = false;
 end
 
-nrmA = normest(A, 1e-2);
-nrmB = normest(B, 1e-2);
 
 if ~isstruct(A)
-	AA = build_rk_struct(A);
+	AA = ek_struct(A);
 else
 	AA = A;
 end
 
 if ~isstruct(B) 
-	BB = build_rk_struct(B');
+	BB = ek_struct(B');
 else
 	BB = B';
 end
+
+nrmA = AA.nrm;
+nrmB = BB.nrm;
 
 % Start with the initial basis
 [VA, KA, HA] = rat_krylov(AA, u, inf);
@@ -73,6 +74,8 @@ while max(sa-2*bsa, sb-2*bsb) < k
 end
 
 % it
+
+% fprintf('lyap its = %d, nrmA = %e\n', it, nrmA)
 [UU,SS,VV] = svd(Y);
 
 rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));

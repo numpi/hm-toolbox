@@ -4,7 +4,6 @@ function X = sparse_dac_lyap(A,B,C,sA,sB)
 %k = 3;
 X = A;
 n = size(A,1);
-tol = 1e-8;
 debug = 0;
 
 if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
@@ -45,7 +44,9 @@ if debug
 end
 
 % Solve with Krylov methods for the low-rank update
-[ Xu, Xv ] = ek_sylv(sA, sB, -u, v, inf, tol);
+tol = hmoption('threshold');
+[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
+[ Xu, Xv ] = ek_sylv(sA, sB, -u, v, inf, tol / norm(ru * rv'));
 
 if debug 
 	XX=hm('low-rank',Xu,Xv);

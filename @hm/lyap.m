@@ -6,7 +6,7 @@ N = 32;
 [x, w] = hm_legpts(N);
 
 if ~isempty(varargin) && ~ischar(varargin{1})
-	nrmA = norm(A, 'fro');
+	nrmA = norm(A);
 	
 	X = sparse_dac_lyap(A / nrmA, A / nrmA, C / nrmA, ...
 		varargin{1} / nrmA, varargin{2} / nrmA);

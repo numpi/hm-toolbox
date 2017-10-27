@@ -1,4 +1,4 @@
-function [Xu, VA] = ek_lyap(A, u, k, tol, debug)
+function [Xu, VA, AA] = ek_lyap(A, u, k, tol, debug)
 %EK_LYAP Approximate the solution of a AX + XA' = u * u'
 %
 % XU = EK_LYAP(A, U, K) approximates the solution of the Lyapunov equation
@@ -12,12 +12,13 @@ if ~exist('debug', 'var')
     debug = false;
 end
 
-nrmA = normest(A, 1e-2);
-
 if ~isstruct(A)
-	AA = build_rk_struct(A);
+	AA = ek_struct(A, true);
+	nrmA = normest(A, 1e-2);
+	AA.nrm = nrmA;
 else
 	AA = A;
+	nrmA = AA.nrm;
 end
 
 % Start with the initial basis
@@ -62,8 +63,6 @@ while sa - 2*bsa < k
     end        
 it = it + 1;   
 end
-
-% it
 
 [QQ, DD] = eig(Y);
 ii = find(diag(DD) > max(diag(DD)) * tol / nrmA);

@@ -1,16 +1,10 @@
-function X = hss_sparse_dac_lyap(A, B, C, sA, sB)
+function X = hss_sparse_dac_lyap(A, C, sA, use_sylv)
 % HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0 
 %          where the coefficient matrices are represented both in the HSS format and in sparse format
-kmax = 65;
-
-debug = 0;
-tol = 1e-8;
-
-n = size(A, 1);
 
 if A.leafnode == 1
 	X = hss();
-	X.D = lyap(A.D, B.D, C.D);
+	X.D = lyap(A.D, C.D);
 
 	X.topnode = 1;
 	X.leafnode = 1;
@@ -18,32 +12,64 @@ if A.leafnode == 1
 	return;
 end
 
+if ~exist('use_sylv', 'var')
+	use_sylv = true;
+end
+
 X = blkdiag(...
-	hss_sparse_dac_lyap(A.hssl, B.hssl, C.hssl, sA(1:A.ml, 1:A.nl), sB(1:A.ml, 1:A.nl)), ...
-	hss_sparse_dac_lyap(A.hssr, B.hssr, C.hssr, sA(A.ml+1:end, A.nl+1:end), sB(A.ml+1:end, A.nl+1:end)) ...
+	hss_sparse_dac_lyap(A.hssl, C.hssl, sA(1:A.ml, 1:A.nl), use_sylv), ...
+	hss_sparse_dac_lyap(A.hssr, C.hssr, sA(A.ml+1:end, A.nl+1:end), use_sylv) ...
 );
 
 [CU,CV] = hss_offdiag(C);
 [AU,AV] = hss_offdiag(A);
-[BU,BV] = hss_offdiag(B);
 
-u = [ CU , AU , X * BU ];
-v = [ CV , X' * AV, BV ];
+u = [ CU , AU , X * AU ];
+v = [ CV , X' * AV, AV ];
 
-[u, v] = compress_factors(u, v, 1.0);
+tol = hssoption('threshold');
+[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
+tol = tol / norm(ru * rv');
 
-A.topnode = 1;
-B.topnode = 1;
-%[LA,UA] = lu(sA);
-%[LB,UB] = lu(sB);
-%[Xu, Xv] = kpik_sylv(sA, LA, UA, sB, LB, UB, -u, v, 100, tol);
-%[Xu, Xv] = kpik_sylv(A, speye(size(A)), A, B, speye(size(B)), B, -u, v, 100, tol);
-[Xu, Xv] = ek_sylv(sA, sB, u, v, inf, tol);
-% XX = lyap(full(A),full(B), -u*v');
-% [Xu,D,Xv] = tsvd(XX,1e-12); Xu=Xu*D;
- %norm(full(sA * Xu * Xv' + Xu * (Xv' * sB') - u * v')) / norm(u * v')
+if use_sylv
+	if issymmetric(sA)
+		AA = ek_struct(sA, true);
+		AT = AA;
+	else
+		[AA, AT] = ek_struct(sA);
+	end
+	
+	[u, v] = compress_factors(u, v, 1.0);
+	
+	[Xu,Xv] = ek_sylv(AA, AT, -u, v, inf, tol);
+else
+	% Find a symmetric definite decomposition u*v'= Up*Up' - Un*Un'
+	[Up, Un] = ek_definite_splitting(-u, v, tol);
+
+	A.topnode = 1;
+
+	if ~isempty(Up)
+		[Xup,~,AA] = ek_lyap(sA, Up, inf, tol);
+	else
+		Xup = Up;
+	end
+
+	if ~isempty(Un)
+		if exist('AA', 'var')
+			Xun = ek_lyap(AA, Un, inf, tol);
+		else
+			Xun = ek_lyap(sA, Un, inf, tol);
+		end
+	else
+		Xun = Un;
+	end
+
+	Xu = [ Xup,  Xun ];
+	Xv = [ Xup, -Xun ];
+end
+
+% norm(full(sA * Xu * Xv' + Xu * (Xv' * sA') + u * v')) / norm(Xu * Xv')
 
 A.topnode = 0;
-B.topnode = 0;
 
 X = X + hss('low-rank', Xu, Xv);
