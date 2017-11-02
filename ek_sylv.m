@@ -7,6 +7,10 @@ function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug)
 % [XU, VA] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA 
 %     and VB, and the optional parameters TOL and DEBUG control the 
 %     stopping criterion and the debugging during the iteration. 
+%
+% The tolerance TOL can also be specified as a function TOL(R, N) that
+% takes as input the residual norm and the norm of the solution (R and N,
+% respectively), and returns true if the solution can be accepted. 
 
 if ~exist('debug', 'var')
     debug = false;
@@ -49,6 +53,13 @@ if ~exist('tol', 'var')
     tol = 1e-8;
 end
 
+% tol can be function tol(r, n) that is given the residual and the norm, or
+% a scalar. In the latter case, we turn it into a function
+if isfloat(tol)
+    tol_eps = tol;
+    tol = @(r, n) r < tol_eps * n;
+end
+
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
     [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
@@ -71,10 +82,10 @@ while max(sa-2*bsa, sb-2*bsb) < k
         fprintf('%d Residue: %e\n', it, res / norm(Y));
     end
 
-    if res < norm(Y) * tol
+    if tol(res, norm(Y)) % res < norm(Y) * tol
         break
     end        
- it=it+1;   
+ it=it+1;
 end
 
 % it
@@ -82,7 +93,8 @@ end
 % fprintf('lyap its = %d, nrmA = %e\n', it, nrmA)
 [UU,SS,VV] = svd(Y);
 
-rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
+% rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
+rk = sum(arrayfun(@(s) tol(s, SS(1,1) \ max(nrmA, nrmB)), diag(SS)) == false);
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
