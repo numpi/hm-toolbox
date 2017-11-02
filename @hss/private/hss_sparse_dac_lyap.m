@@ -24,12 +24,13 @@ X = blkdiag(...
 [CU,CV] = hss_offdiag(C);
 [AU,AV] = hss_offdiag(A);
 
-u = [ CU , AU , X * AU ];
-v = [ CV , X' * AV, AV ];
+u = [ CU , AU , X * AV ];
+v = [ CV , X' * AV, AU ];
 
 tol = hssoption('threshold');
 [~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
 tol = tol / norm(ru * rv');
+
 
 if use_sylv
 	if issymmetric(sA)
@@ -41,7 +42,8 @@ if use_sylv
 	
 	[u, v] = compress_factors(u, v, 1.0);
 	
-	[Xu,Xv] = ek_sylv(AA, AT, -u, v, inf, tol);
+	[Xu,Xv] = ek_sylv(AA, AA, -u, v, inf, tol);
+	
 else
 	% Find a symmetric definite decomposition u*v'= Up*Up' - Un*Un'
 	[Up, Un] = ek_definite_splitting(-u, v, tol);
