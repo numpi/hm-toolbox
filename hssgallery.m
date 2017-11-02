@@ -53,7 +53,7 @@ switch name
 		varargout{1} = hss('banded', A, 6, 6);
 		varargout{2} = compress(hss('banded', P, 11, 11));
 		varargout{3} = A;
-		
+		varargout{4} = P;
     otherwise
         error('Unsupported example name');
 end

@@ -35,7 +35,7 @@ if it == 1
 else
     mu=1;
 end
-    G = .5 * (As.' * G * As / mu + G * mu);
+    G = .5 * (As * G * As.' / mu + G * mu);
     A = .5 * (mu * A + As / mu);        
 
     

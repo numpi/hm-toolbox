@@ -8,7 +8,7 @@ N = 32;
 if ~isempty(varargin) && ~ischar(varargin{1})
 	nrmA = norm(A);
 	
-	X = sparse_dac_lyap(A / nrmA, A / nrmA, C / nrmA, ...
+	X = sparse_dac_lyap(A / nrmA, A' / nrmA, C / nrmA, ...
 		varargin{1} / nrmA, varargin{2} / nrmA);
 	
 	return;
@@ -34,7 +34,7 @@ if strcmp(method, 'sign')
 end
 
 if strcmp(method, 'd&c')
-	X = dac_lyap(A,A,C);
+	X = dac_lyap(A,A',C);
         X = compress_hmatrix(X);
 	return;
 end
