@@ -1,7 +1,11 @@
-function H = compress(H)
+function H = compress(H, tol)
 %COMPRESS Recompress the HSS representation
 
-H = hss_compress(H, hssoption('threshold'));
+if ~exist('tol', 'var')
+    tol = hssoption('threshold');
+end
+
+H = hss_compress(H, tol);
 
 end
 

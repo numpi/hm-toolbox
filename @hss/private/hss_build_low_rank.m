@@ -14,6 +14,12 @@ function B = hss_build_low_rank(varargin)
 		else
 			S = eye(size(U,2));
 		end
+
+                if size(U,1) < hssoption('block-size')
+                       B = hss(U*V');
+                       return;
+                end
+
 		k = 1+ceil(log2(size(U,1)/hssoption('block-size')));	
 		B = hss_build_low_rank_ric(U, V, S, k);
 		B.topnode = 1;	
