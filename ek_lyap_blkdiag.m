@@ -1,4 +1,4 @@
-function [Xu, VA, AA] = ek_lyap(A, u, k, tol, debug)
+function [Xu, VA, AA] = ek_lyap_blkdiag(A, u, k, tol, debug)
 %EK_LYAP Approximate the solution of a AX + XA' = u * u'
 %
 % XU = EK_LYAP(A, U, K) approximates the solution of the Lyapunov equation
@@ -16,11 +16,14 @@ end
 if ~exist('rat_krylov', 'file')
     error('rktoolbox not found. Did you forget to add it to the path?');
 end
-
-if ~isstruct(A)
-	AA = ek_struct(A, true);
-	nrmA = normest(A, 1e-2);
+n = size(A,1);
+m = ceil(n/2);
+if ~isstruct(A) % Per il momento  gestito solo il caso in cui A è sparsa (possibile inghippo)
+	S = blkdiag(A(1:m,1:m), A(m+1:end,m+1:end));
+	AA = ek_struct(S, true);
+	nrmA = normest(S, 1e-2);
 	AA.nrm = nrmA;
+	dA = [sparse(m,m), A(1:m,m+1:end); A(m+1:end,1:m), sparse(n-m,n-m)]; 
 else
 	AA = A;
 	nrmA = AA.nrm;
@@ -56,7 +59,7 @@ while sa - 2*bsa < k
     
     Cs(1:size(u,2), 1:size(u,2)) = Cprojected;    
     
-    [Y, res] = lyap_galerkin(As, Cs, 2*bsa);
+    [Y, res] = lyap_galerkin(As + VA' * dA * VA, Cs, 2*bsa);
 
     % You might want to enable this for debugging purposes
     if debug

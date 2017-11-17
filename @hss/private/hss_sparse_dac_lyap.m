@@ -2,6 +2,8 @@ function X = hss_sparse_dac_lyap(A, C, sA, use_sylv)
 % HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0 
 %          where the coefficient matrices are represented both in the HSS format and in sparse format
 
+diagblk = 1; % enables the trick suggested by Beckermann for the correction equation
+
 if A.leafnode == 1
 	X = hss();
 	X.D = lyap(A.D, C.D);
@@ -42,7 +44,11 @@ if use_sylv
 	
 	[u, v] = compress_factors(u, v, 1.0);
 	
-	[Xu,Xv] = ek_sylv(AA, AA, -u, v, inf, tol);
+	if ~diagblk
+		[Xu,Xv] = ek_sylv(AA, AA, -u, v, inf, tol);
+	else
+		[Xu,Xv] = ek_sylv_blkdiag(sA, sA, -u, v, inf, tol);
+	end
 	
 else
 	% Find a symmetric definite decomposition u*v'= Up*Up' - Un*Un'

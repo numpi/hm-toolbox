@@ -11,7 +11,7 @@ global hss_threshold
 global hss_compression
 
 if isempty(hss_block_size)
-	hss_block_size = 96;
+	hss_block_size = 256;
 end
 
 if isempty(hss_compression)

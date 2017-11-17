@@ -1,13 +1,19 @@
 function X = dac_lyap(A,B,C)
 % LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0 
 %          where all the matrices are represented in the HODLR format
-tol = 1e-8;
 X = A;
+n = size(A,1);
 debug = 0;
 if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
 	X.F = lyap(A.F, B.F, C.F);
 	return
 end
+
+if n <= 256
+	X = hm(lyap(full(A),full(B),full(C)));
+	return
+end
+
 X.A11 = dac_lyap(A.A11, B.A11, C.A11); % Recursive solution on the diagonal blocks
 X.A22 = dac_lyap(A.A22, B.A22, C.A22);
 X.U21 = zeros(size(A.U21,1),0);
@@ -34,9 +40,11 @@ if debug
 	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
 	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
 end
-
+n
 % Solve with Krylov methods for the low-rank update
-[ Xu, Xv ] = ek_sylv(A, B, u, v, inf, tol);	
+tol = hmoption('threshold');
+[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
+[ Xu, Xv ] = ek_sylv(A, B', -u, v, inf, tol / norm(ru * rv'));
 
 if debug 
 	XX=hm('low-rank',Xu,Xv);
