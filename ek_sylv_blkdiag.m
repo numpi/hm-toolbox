@@ -25,34 +25,55 @@ n = size(A,1);
 m = ceil(n/2);
 if ~isstruct(A)	% Per il momento  gestito solo il caso in cui A e B sono matrici sparse (possibile inghippo)
 	AA = ek_struct(blkdiag(A(1:m,1:m), A(m+1:end,m+1:end)));
+    % AA = ek_struct(A);
 	dA = [sparse(m,m), A(1:m,m+1:end); A(m+1:end,1:m), sparse(n-m,n-m)]; 
-else	
+else
 	AA = A;
 end
 
 if ~isstruct(B) 
-	BB = ek_struct(blkdiag(B(1:m,1:m)',B(m+1:end,m+1:end)'));
+	BB = ek_struct(blkdiag(B(1:m,1:m)',B(m+1:end,m+1:end)'));    
+    % BB = ek_struct(B');
 	dB = [sparse(m,m), B(m+1:end,1:m)'; B(1:m,m+1:end)', sparse(n-m,n-m)];
-else	
+else
 	BB = B';
 end
 
 nrmA = AA.nrm;
 nrmB = BB.nrm;
 
+% Find out the maximum bandwidth of the off-diagonal blocks
+bw = bandwidth(A);
+
+% And insert appropriate generators into the basis
+z = zeros(n, 2*bw);
+z(m-bw+1:m+bw,:) = eye(2 * bw);
+
+u2 = [ u, z ];
+v2 = [ v, z ];
+
+% Recompress the basis
+[qu2, ru2] = qr(u2, 0);
+[qv2, rv2] = qr(v2, 0);
+
+[u2, s2, v2] = svd(ru2 * rv2');
+rk = sum(diag(s2) > s2(1,1) * eps);
+u2 = qu2 * u2(:,1:rk) * sqrt(s2(1:rk,1:rk));
+v2 = qv2 * v2(:,1:rk) * sqrt(s2(1:rk,1:rk));
+
 % Start with the initial basis
-[VA, KA, HA] = rat_krylov(AA, u, inf);
-[VB, KB, HB] = rat_krylov(BB, v, inf);
+[VA, KA, HA] = rat_krylov(AA, u2, inf);
+[VB, KB, HB] = rat_krylov(BB, v2, inf);
 
 % Dimension of the space
-sa = size(u, 2);
-sb = size(v, 2);
+sa = size(u2, 2);
+sb = size(v2, 2);
 
 bsa = sa;
 bsb = sb;
 
-Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
-	
+Cprojected = ( VA(:,1:size(u2,2))' * u ) * ( v' * VB(:,1:size(v2,2)) );
+
 if ~exist('tol', 'var')
     tol = 1e-8;
 end
@@ -68,17 +89,17 @@ it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
     [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
     [VB, KB, HB] = rat_krylov(BB, VB, KB, HB, [0 inf]);
-    
+
     sa = size(VA, 2);
     sb = size(VB, 2);
-    
+
     % Compute the solution and residual of the projected Lyapunov equation
-    As = HA(1:end-bsa,:) / KA(1:end-bsa,:) + VA(:, 1: size(HA,1)-bsa)' * dA * VB(:, 1: size(KA,2));
-    Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:) + VA(:, 1: size(HB,1)-bsa)' * dB * VB(:, 1: size(KB,2));
+    As = HA(1:end-bsa,:) / KA(1:end-bsa,:) + VA(:, 1: size(HA,1)-bsa)' * dA * VA(:, 1: size(KA,2));
+    Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:) + VB(:, 1: size(HB,1)-bsa)' * dB * VB(:, 1: size(KB,2));
+
     Cs = zeros(size(As, 1), size(Bs, 1));
-    
-    Cs(1:size(u,2), 1:size(v,2)) = Cprojected;    
-    
+    Cs(1:size(u2,2), 1:size(v2,2)) = Cprojected;
+
     [Y, res] = lyap_galerkin(As, Bs, Cs, 2*bsa, 2*bsb);
 
     % You might want to enable this for debugging purposes
@@ -88,7 +109,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
 
     if tol(res, norm(Y)) % res < norm(Y) * tol
         break
-    end        
+    end
  it=it+1;
 end
 
