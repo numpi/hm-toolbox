@@ -26,6 +26,13 @@ else
 	nrmA = AA.nrm;
 end
 
+% tol can be function tol(r, n) that is given the residual and the norm, or
+% a scalar. In the latter case, we turn it into a function
+if isfloat(tol)
+    tol_eps = tol;
+    tol = @(r, n) r < tol_eps * n;
+end
+
 % Start with the initial basis
 [VA, KA, HA] = rat_krylov(AA, u, inf);
 
@@ -63,14 +70,18 @@ while sa - 2*bsa < k
         fprintf('%d Residue: %e\n', it, res / norm(Y));
     end
 
-    if res < norm(Y) * tol
+    if tol(res, norm(Y)) % res < norm(Y) * tol		
         break
     end        
 it = it + 1;   
 end
 
+it
 [QQ, DD] = eig(Y);
-ii = find(diag(DD) > max(diag(DD)) * tol / nrmA);
+nn = max(abs(diag(DD)));
+ii = find(arrayfun(@(s) tol(s, nrmA), nn \ diag(DD)) == false );
+%ii = find(arrayfun(@(i) tol(
+%diag(DD) > max(diag(DD)) * tol / nrmA);
 
 Xu = VA(:,1:size(QQ,1)) * QQ(:,ii) * sqrt(DD(ii,ii));
 
