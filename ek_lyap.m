@@ -79,7 +79,7 @@ end
 it
 [QQ, DD] = eig(Y);
 nn = max(abs(diag(DD)));
-ii = find(arrayfun(@(s) tol(s, nrmA), nn \ diag(DD)) == false );
+ii = find(arrayfun(@(s) tol(s, nn / nrmA), diag(DD)) == false );
 %ii = find(arrayfun(@(i) tol(
 %diag(DD) > max(diag(DD)) * tol / nrmA);
 
