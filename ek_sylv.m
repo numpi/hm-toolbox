@@ -90,14 +90,12 @@ while max(sa-2*bsa, sb-2*bsb) < k
     end        
  it=it+1;
 end
-
-% it
-
+ it
 % fprintf('lyap its = %d, nrmA = %e\n', it, nrmA)
 [UU,SS,VV] = svd(Y);
 
 % rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
-rk = sum(arrayfun(@(s) tol(s, SS(1,1) \ max(nrmA, nrmB)), diag(SS)) == false);
+rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
