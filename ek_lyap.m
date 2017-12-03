@@ -18,7 +18,7 @@ if ~exist('rat_krylov', 'file')
 end
 
 if ~isstruct(A)
-	AA = ek_struct(A, true);
+	AA = ek_struct(A, issymmetric(A));
 	nrmA = normest(A, 1e-2);
 	AA.nrm = nrmA;
 else

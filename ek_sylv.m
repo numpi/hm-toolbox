@@ -16,19 +16,23 @@ if ~exist('debug', 'var')
     debug = false;
 end
 
+if ~exist('tol', 'var')
+    tol = 1e-8;
+end
+
 % Check if the rktoolbox is in the path
 if ~exist('rat_krylov', 'file')
     error('rktoolbox not found. Did you forget to add it to the path?');
 end
 
 if ~isstruct(A)
-	AA = ek_struct(A);
+	AA = ek_struct(A, issymmetric(A));
 else
 	AA = A;
 end
 
 if ~isstruct(B) 
-	BB = ek_struct(B');
+	BB = ek_struct(B', issymmetric(B));
 else
 	BB = B';
 end
@@ -37,8 +41,11 @@ nrmA = AA.nrm;
 nrmB = BB.nrm;
 
 % Start with the initial basis
-[VA, KA, HA] = rat_krylov(AA, u, inf);
-[VB, KB, HB] = rat_krylov(BB, v, inf);
+[VA, KA, HA, param_A] = rat_krylov(AA, u, inf);
+[VB, KB, HB, param_B] = rat_krylov(BB, v, inf);
+
+param_A.deflation_tol = tol;
+param_B.deflation_tol = tol;
 
 % Dimension of the space
 sa = size(u, 2);
@@ -48,10 +55,6 @@ bsa = sa;
 bsb = sb;
 
 Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
-	
-if ~exist('tol', 'var')
-    tol = 1e-8;
-end
 
 % tol can be function tol(r, n) that is given the residual and the norm, or
 % a scalar. In the latter case, we turn it into a function
@@ -62,8 +65,8 @@ end
 
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
-    [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
-    [VB, KB, HB] = rat_krylov(BB, VB, KB, HB, [0 inf]);
+    [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, [0 inf], param_A);
+    [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, [0 inf], param_B);
     
     sa = size(VA, 2);
     sb = size(VB, 2);
