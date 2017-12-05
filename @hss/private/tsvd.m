@@ -5,7 +5,7 @@ end
 [U,S,V] = svd(A);
 
 t = diag(S);
-t = cumsum(t(end:-1:1));
+% t = cumsum(t(end:-1:1));
 
 r = sum(t > tol);
 

@@ -20,7 +20,7 @@ else
 	
 	% Frobenius norm of the residuals after truncation
 	t = diag(S);
-	t = cumsum(t(end:-1:1));
+	% t = cumsum(t(end:-1:1));
 	
 	% Numerical rank of the outer product
 	rk = sum(t > nrm * threshold);
