@@ -13,7 +13,7 @@ function B = hss_compress(A, tol)
 			error('unsupported compression method selected');
 	end
 	
-	B = backward_stage(B, tol * size(B, 1), [], [], tcomp);
+	B = backward_stage(B, tol * norm(A, 'fro'), [], [], tcomp);
 end
 
 function A = backward_stage(A, tol, S, T, tcomp)

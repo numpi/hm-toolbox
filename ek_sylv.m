@@ -44,9 +44,6 @@ nrmB = BB.nrm;
 [VA, KA, HA, param_A] = rat_krylov(AA, u, inf);
 [VB, KB, HB, param_B] = rat_krylov(BB, v, inf);
 
-param_A.deflation_tol = tol;
-param_B.deflation_tol = tol;
-
 % Dimension of the space
 sa = size(u, 2);
 sb = size(v, 2);
@@ -90,7 +87,9 @@ while max(sa-2*bsa, sb-2*bsb) < k
     end        
  it=it+1;
 end
- it
+
+% fprintf('SYLV : it = %d\n', it);
+
 % fprintf('lyap its = %d, nrmA = %e\n', it, nrmA)
 [UU,SS,VV] = svd(Y);
 
