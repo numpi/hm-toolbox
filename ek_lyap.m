@@ -76,7 +76,6 @@ while sa - 2*bsa < k
 it = it + 1;   
 end
 
-it
 [QQ, DD] = eig(Y);
 nn = max(abs(diag(DD)));
 ii = find(arrayfun(@(s) tol(s, nn / nrmA), diag(DD)) == false );
