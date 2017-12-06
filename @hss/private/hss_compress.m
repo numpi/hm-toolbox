@@ -13,7 +13,7 @@ function B = hss_compress(A, tol)
 			error('unsupported compression method selected');
 	end
 	
-	B = backward_stage(B, tol * norm(A, 2) * size(A, 1), [], [], tcomp);
+	B = backward_stage(B, tol * norm(A, 2), [], [], tcomp);
 end
 
 function A = backward_stage(A, tol, S, T, tcomp)
@@ -21,7 +21,7 @@ function A = backward_stage(A, tol, S, T, tcomp)
 		return
 	end
 	if (A.topnode == 1)
-		[U,Su,V] = tcomp(A.Bu, tol / size(A, 1));
+		[U,Su,V] = tcomp(A.Bu, tol);
 		A.Bu = Su; Tl = Su.';
 		if A.hssl.leafnode == 0
 			A.hssl.Rl = A.hssl.Rl * U;
@@ -32,7 +32,7 @@ function A = backward_stage(A, tol, S, T, tcomp)
 			A.hssl.U = A.hssl.U * U;
 			A.hssr.V = A.hssr.V * V;
 		end
-		[U,Sl,V] = tcomp(A.Bl, tol / size(A, 1));
+		[U,Sl,V] = tcomp(A.Bl, tol);
 		A.Bl = Sl; Tu = Sl.';
 		if A.hssl.leafnode ==0
 			A.hssr.Rl = A.hssr.Rl * U;
@@ -48,8 +48,8 @@ function A = backward_stage(A, tol, S, T, tcomp)
 	else
 		Su = [A.Bu, A.Rl * S];		
 		Tl = [A.Bu.', A.Wr * T]; % possibile inghippo
-		[Us,Su,Vs] = tcomp(Su, tol / size(A, 1));
-		[Ut,Tl,Vt] = tcomp(Tl, tol / size(A, 1));
+		[Us,Su,Vs] = tcomp(Su, tol);
+		[Ut,Tl,Vt] = tcomp(Tl, tol);
 		k = size(A.Bu,2);
 		A.Bu = Su * Vs(1:k, :)' * Ut;
 		A.Rl = Us' * A.Rl; 
@@ -66,8 +66,8 @@ function A = backward_stage(A, tol, S, T, tcomp)
 
 		Sl = [A.Bl, A.Rr * S];		
 		Tu = [A.Bl.', A.Wl * T]; % possibile inghippo
-		[Us,Sl,Vs] = tcomp(Sl, tol / size(A, 1));
-		[Ut,Tu,Vt] = tcomp(Tu, tol / size(A, 1));
+		[Us,Sl,Vs] = tcomp(Sl, tol);
+		[Ut,Tu,Vt] = tcomp(Tu, tol);
 		k = size(A.Bl,2);
 		A.Bl = Sl * Vs(1:k, :)' * Ut;
 		A.Rr = Us' * A.Rr; 

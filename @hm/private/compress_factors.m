@@ -18,7 +18,7 @@ else
 	%rk = sum(diag(S) > threshold);
 	%rk = min(sum(diag(S) > S(1,1) * threshold),50);
 	
-	% Frobenius norm of the residuals after truncation
+	% 2 norm of the residuals after truncation
 	t = diag(S);
 	% t = cumsum(t(end:-1:1));
 	
