@@ -4,7 +4,13 @@ function [S, ST] = ek_struct(A, cholesky)
 
 if issparse(A)	
 	if exist('cholesky', 'var') && cholesky
-		[R, ~, pA] = chol(A);
+		[R, g, pA] = chol(A);
+		
+		if (g ~= 0)
+			% warning('Matrix is not posdef, resorting to LU');
+			[S, ST] = ek_struct(A, false);
+			return;
+		end
 		
 		S = struct(... 
 			'solve', @(nu, mu, x) sparse_solve(nu, mu, R', R, pA', pA, x), ... 
