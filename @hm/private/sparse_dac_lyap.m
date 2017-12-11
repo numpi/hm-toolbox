@@ -31,28 +31,32 @@ end
 
 u1 = [C.U21, A.U21, X.A22 * B.U21];	% Compute low rank factorization of the right hand-side
 v1 = [C.V21, X.A11' * A.V21, B.V21];
-[u1, v1] = compress_factors(u1, v1, 1);
+[u1, v1] = compress_factors(u1, v1, 1);%lr_norm(u1, v1)
+
 u2 = [C.U12, A.U12, X.A11 * B.U12];
 v2 = [C.V12, X.A22' * A.V12, B.V12];
-[u2, v2] = compress_factors(u2, v2, 1);
-u = [zeros(size(u2,1), size(u1, 2)), u2; u1, zeros(size(u1,1), size(u2, 2))];
-v = [ v1, zeros(size(v1,1), size(v2, 2));zeros(size(v2,1), size(v1, 2)), v2];
-if debug
-	dA = A; dA.A11=hm(zeros(size(A.A11))); dA.A22=hm(zeros(size(A.A22))); dB = B; dB.A11=hm(zeros(size(B.A11))); dB.A22=hm(zeros(size(B.A22)));
-	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
-	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
+[u2, v2] = compress_factors(u2, v2, 1);%lr_norm(u2, v2)
+if size(u1,2) > 0 && size(u2,2) > 0
+	u = [zeros(size(u2,1), size(u1, 2)), u2; u1, zeros(size(u1,1), size(u2, 2))];
+	v = [ v1, zeros(size(v1,1), size(v2, 2));zeros(size(v2,1), size(v1, 2)), v2];
+	if debug
+		dA = A; dA.A11=hm(zeros(size(A.A11))); dA.A22=hm(zeros(size(A.A22))); dB = B; dB.A11=hm(zeros(size(B.A11))); dB.A22=hm(zeros(size(B.A22)));
+		dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
+		norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
+	end
+
+	% Solve with Krylov methods for the low-rank update
+	tol = hmoption('threshold');
+	%[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
+	%[ Xu, Xv ] = ek_sylv(sA, sB', -u, v, inf, tol / norm(ru * rv'));
+	[ Xu, Xv ] = ek_sylv(sA, sB', -u, v, inf, tol);
+	if debug 
+		XX=hm('low-rank',Xu,Xv);
+		norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))
+	end
+	%X=X-XX;
+	X = hmatrix_rank_update(X, Xu, Xv);
 end
 
-% Solve with Krylov methods for the low-rank update
-tol = hmoption('threshold');
-[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
-[ Xu, Xv ] = ek_sylv(sA, sB', -u, v, inf, tol / norm(ru * rv'));
-
-if debug 
-	XX=hm('low-rank',Xu,Xv);
-	norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))
-end
-%X=X-XX;
-X = hmatrix_rank_update(X, Xu, Xv);
 
 

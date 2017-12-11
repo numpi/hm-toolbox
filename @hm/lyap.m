@@ -8,9 +8,8 @@ N = 32;
 if ~isempty(varargin) && ~ischar(varargin{1})
 	nrmA = norm(A);
 	
-	X = sparse_dac_lyap(A / nrmA, A' / nrmA, C / nrmA, ...
+	X = sparse_dac_lyap(A / nrmA, A' / nrmA, C / nrmA , ...
 		varargin{1} / nrmA, varargin{2} / nrmA);
-	
 	return;
 end
 

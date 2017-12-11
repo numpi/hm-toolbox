@@ -18,7 +18,7 @@ else
 			hss('low-rank', UU, VV);
 end
 
-A = compress(A);
+%A = compress(A);
 
 end
 

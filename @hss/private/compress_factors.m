@@ -1,7 +1,7 @@
 function [ U, V ] = compress_factors(Uold, Vold, nrm)
 %COMPRESS_FACTORS Compress a low-rank representation U*V'. 
 
-threshold = hmoption('threshold');
+threshold = hssoption('threshold');
 
 % f = fopen('/tmp/compress_factors.txt', 'a');
 % fprintf(f, '%d\n', size(Uold, 1));

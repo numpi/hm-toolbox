@@ -15,7 +15,7 @@ if isempty(hss_block_size)
 end
 
 if isempty(hss_compression)
-	hss_compression = 'qr';
+	hss_compression = 'svd';
 end
 
 if isempty(hss_threshold)
