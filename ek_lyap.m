@@ -18,8 +18,14 @@ if ~exist('rat_krylov', 'file')
 end
 
 if ~isstruct(A)
-	AA = ek_struct(A, issymmetric(A));
-	nrmA = normest(A, 1e-2);
+	if issparse(A)
+		AA = ek_struct(A, issymmetric(A));
+		nrmA = normest(A, 1e-2);		
+	else
+		AA = ek_struct(A, false);
+		nrmA = norm(A);
+	end
+	
 	AA.nrm = nrmA;
 else
 	AA = A;

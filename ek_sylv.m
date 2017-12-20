@@ -26,13 +26,21 @@ if ~exist('rat_krylov', 'file')
 end
 
 if ~isstruct(A)
-	AA = ek_struct(A, issymmetric(A));
+	if issparse(A)
+		AA = ek_struct(A, issymmetric(A));
+	else
+		AA = ek_struct(A, false);
+	end
 else
 	AA = A;
 end
 
 if ~isstruct(B) 
-	BB = ek_struct(B', issymmetric(B));
+	if issparse(B)
+		BB = ek_struct(B', issymmetric(B));
+	else
+		BB = ek_struct(B', false);
+	end
 else
 	BB = B';
 end
