@@ -54,6 +54,8 @@ classdef hm
 						obj = create_sparse_h_matrix(obj, varargin{2});
                     case 'chebfun2'
                         obj = create_chebfun2_h_matrix(obj, varargin{2:end});
+					case 'toeplitz'
+						obj = create_toeplitz_h_matrix(obj, varargin{2:end});
 					otherwise
 						error('Unsupported constructor mode');
 				end
@@ -245,7 +247,77 @@ classdef hm
 			end
 			
 			obj = compress_hmatrix(obj);
-        end
+		end
+		
+		function obj = create_toeplitz_h_matrix(obj, am, ap, n)
+			block_size = hmoption('block-size');
+			obj.sz = [ n, n ];
+			
+			if length(am) > n
+				am = am(1:n);
+				warning('Negative symbol is longer than n: truncation has been applied');
+			end
+			
+			if length(ap) > n
+				ap = ap(1:n);
+				warning('Positive symbol is longer than n: truncation has been applied');
+			end			
+			
+			if length(am) < n
+				am(n) = 0;
+			end
+			
+			if length(ap) < n
+				ap(n) = 0;
+			end			
+			
+			if n <= block_size
+				obj.F = toeplitz(am, ap);
+			else
+				% obj.A11 = create_toeplitz_h_matrix(hm(), am, ap, block_size);
+				% obj.A22 = obj.A11;
+				
+				mp = ceil(n / 2);
+				np = mp;
+				
+				tol = hmoption('threshold');
+				
+				[tU21,S21,tV21] = lanczos_svd(@(v,trasp) toepmult_afun(...
+					am(mp+1:end), am(mp+1:-1:2), ...
+					n - mp, np, v, trasp), n - mp, np, tol);
+				[tU12,S12,tV12] = lanczos_svd(@(v,trasp) toepmult_afun(...
+					ap(np+1:-1:2), ap(np+1:end), ...
+					mp, n - np, v, trasp), mp, n - np, tol);
+				
+				tU21 = tU21 * sqrt(S21);
+				tV21 = tV21 * sqrt(S21);
+				tU12 = tU12 * sqrt(S12);
+				tV12 = tV12 * sqrt(S12);
+				
+				obj = initialize_toeplitz_h_matrix(obj, am, ap, n, ...
+					tU12, tV12, tU21, tV21);
+			end
+			
+		end
+		
+		function obj = initialize_toeplitz_h_matrix(obj, am, ap, n, tU12, tV12, tU21, tV21)
+			obj.sz = [ n n ];
+			
+			if n <= hmoption('block-size')
+				obj.F = toeplitz(am(1:n), ap(1:n));
+			else
+				mp = ceil(n / 2);
+				np = ceil(n / 2);
+				
+				obj.U21 = tU21(1:(n-mp), :);
+				obj.V21 = tV21(end-np+1:end,:);
+				obj.U12 = tU12(end-mp+1:end,:);
+				obj.V12 = tV12(1:(n-np), :);
+				
+				obj.A11 = initialize_toeplitz_h_matrix(hm(), am, ap, mp, tU12, tV12, tU21, tV21);				
+				obj.A22 = initialize_toeplitz_h_matrix(hm(), am, ap, n-mp, tU12, tV12, tU21, tV21);
+			end
+		end
 
 		
 	end
