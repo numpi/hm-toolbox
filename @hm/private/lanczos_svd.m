@@ -1,5 +1,5 @@
 function [U, S, V] = lanczos_svd(Afun, m, n, tol)
-%LANCZOS_SVD Two-sided Lanczos for SVD. 
+%LANCZOS_SVD Two-sided Lanczos for SVD.
 
 V = randn(n, 1);
 V(:,1) = V(:,1) / norm(V);

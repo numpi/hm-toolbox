@@ -279,9 +279,12 @@ classdef hm
 				
 				mp = ceil(n / 2);
 				np = mp;
-				
+								
 				tol = hmoption('threshold');
 				
+				% Here the truncation is made relatively to the norm of the
+				% off-diagonal blocks: we might want to do it relatively to
+				% the norm of the big matrix. 
 				[tU21,S21,tV21] = lanczos_svd(@(v,trasp) toepmult_afun(...
 					am(mp+1:end), am(mp+1:-1:2), ...
 					n - mp, np, v, trasp), n - mp, np, tol);

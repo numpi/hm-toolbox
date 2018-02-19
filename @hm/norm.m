@@ -17,7 +17,7 @@ At = A';
 
 s = 0;
 
-for i = 1 : 30
+for i = 1 : 10
 	olds = s;
 	s = norm(v);
 	
