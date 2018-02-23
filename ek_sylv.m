@@ -1,4 +1,4 @@
-function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug)
+function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrm_type)
 %EK_SYLV Approximate the solution of a Sylvester equation AX + XB' = U*V'.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the 
@@ -18,6 +18,10 @@ end
 
 if ~exist('tol', 'var')
     tol = 1e-8;
+end
+
+if ~exist('nrm_type', 'var')
+    nrm_type = 2;
 end
 
 % Check if the rktoolbox is in the path
@@ -90,7 +94,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
         fprintf('%d Residue: %e\n', it, res / norm(Y));
     end
 
-    if tol(res, norm(Y)) % res < norm(Y) * tol
+    if tol(res, norm(Y, nrm_type)) % res < norm(Y) * tol
         break
     end        
  it=it+1;

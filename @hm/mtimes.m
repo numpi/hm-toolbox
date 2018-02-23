@@ -31,9 +31,7 @@ end
 if isfloat(H1)
 	if isscalar(H1)
 		H = H2 * H1;
-	else
-		% H = hmatrix_mtimes_dense(H2.', H1.');
-		% H = H.';
+    else
 		H = dense_mtimes_hmatrix(H1, H2);
 	end
 	

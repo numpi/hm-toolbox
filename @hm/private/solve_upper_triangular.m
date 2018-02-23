@@ -17,8 +17,19 @@ else % case of dense right-hand side
 		H = H1.F\H2;
 	else
 		mp = size(H1.A11,2);
-		x2 = H1.A22\H2(mp+1:end,:);
-		x1 = H1.A11\(H2(1:mp,:) - H1.U12 * (H1.V12' * x2));
+        
+        if isempty(H1.A22.F) && isempty(H1.A22.U21)
+            x2 = solve_upper_triangular(H1.A22, H2(mp+1:end, :));
+        else
+            x2 = H1.A22\H2(mp+1:end,:);
+        end
+        
+        if isempty(H1.A11.F) && isempty(H1.A11.U21)
+            x1 = solve_upper_triangular(H1.A11, H2(1:mp,:) - H1.U12 * (H1.V12' * x2));
+        else
+            x1 = H1.A11\(H2(1:mp,:) - H1.U12 * (H1.V12' * x2));
+        end
+        
 		H = [x1; x2];
 	end
 end

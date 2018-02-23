@@ -13,7 +13,6 @@ else
     w2 = hmatrix_mtimes_dense(H1.A22, v2);
     w2 = w2 + H1.U21 * (H1.V21' * v1);
     w1 = w1 + H1.U12 * (H1.V12' * v2);
-    % w2 = w2 + hmatrix_mtimes_dense(H1.A22, v2);
     
     v = [ w1 ; w2 ];
 end
