@@ -3,5 +3,5 @@ function [HL, HU] = lu(H)
 
 [HL, HU] = hmatrix_lu(H);
 
-%HL = compress_hmatrix(HL);
-%HU = compress_hmatrix(HU);
+% HL = compress_hmatrix(HL);
+% HU = compress_hmatrix(HU);

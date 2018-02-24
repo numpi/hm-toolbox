@@ -3,10 +3,6 @@ function [ U, V ] = compress_factors(Uold, Vold, nrm)
 
 threshold = hmoption('threshold');
 
-% f = fopen('/tmp/compress_factors.txt', 'a');
-% fprintf(f, '%d\n', size(Uold, 1));
-% fclose(f);
-
 if isempty(Uold)
 	U = Uold;
 	V = Vold;
@@ -15,6 +11,11 @@ else
 	[QV, RV] = qr(Vold, 0);
 
 	[U,S,V] = svd(RU * RV');
+	
+	if ~exist('nrm', 'var')
+		nrm = S(1,1);
+	end
+	
 	%rk = sum(diag(S) > threshold);
 	%rk = min(sum(diag(S) > S(1,1) * threshold),50);
 	

@@ -31,15 +31,15 @@ else % case of dense right-hand side
 	if ~isempty(H1.F)
 		H = H1.F\H2;
 	else
-		mp = size(H1.A11, 2);
+		mp = H1.A11.sz(2);
         
-        if isempty(H1.A11.U12) && isempty(H1.A11.F)
+        if isempty(H1.A11.U12)
             x2 = solve_lower_triangular(H1.A11, H2(1:mp, :));
         else
             x2 = H1.A11 \ H2(1:mp,:);
         end
         
-        if isempty(H1.A22.U12) && isempty(H1.A22.F)
+        if isempty(H1.A22.U12)
             x1 = solve_lower_triangular(H1.A22, H2(mp+1:end,:) - H1.U21 * (H1.V21' * x2));
         else
             x1 = H1.A22 \ (H2(mp+1:end,:) - H1.U21 * (H1.V21' * x2));
