@@ -44,8 +44,7 @@ classdef hss
 			end
 
 			if nargin == 1
-				n=size(varargin{1},1);
-				obj = hss_buildA(varargin{1},hssoption('threshold'),1+ceil(log2(n/hssoption('block-size'))),1);
+				obj = hss_from_full(varargin{1});
 				return;
 			end
 
