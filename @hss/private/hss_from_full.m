@@ -16,17 +16,8 @@ H = build_hss_tree(m, n, block_size);
 H.topnode = 1;
 
 % Create the stack
-if exist('java', 'file')
-    % rs = java.util.Stack();
-    % cs = java.util.Stack();
-	rs = createStack();
-	cs = createStack();
-else
-	rs = createStack();
-	cs = createStack();
-    % rs = javaObject('java.util.Stack');
-    % cs = javaObject('java.util.Stack');
-end
+rs = createStack();
+cs = createStack();
 
 row_offsets = [];
 col_offsets = [];
@@ -53,7 +44,7 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         B = A(mh+1:mh+m, nh+n+1:end);
         
         for j = length(col_offsets) - 1 : -1 : 0
-            Z = elementAt(cs, j);
+            Z = hss_elementAt(cs, j);
             
             % FIXME: We should preallocate B
             B = [ Z(col_offsets(j+1)+1:col_offsets(j+1)+m,:) , B ];
@@ -64,9 +55,9 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         % Push Z in the stack, and updates the elements in the as well
         counter = 0;
         for j = 0 : length(col_offsets) - 1
-            W = elementAt(cs, j);
+            W = hss_elementAt(cs, j);
             
-            cs = setElementAt(cs, [ W(1:col_offsets(j+1), :) ; ...
+            cs = hss_setElementAt(cs, [ W(1:col_offsets(j+1), :) ; ...
                 Z(counter+1:counter+size(W, 2), :)' ; ...
                 W(col_offsets(j+1)+m+1:end,:) ], j);
             
@@ -77,14 +68,14 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         
         % Last but not least, push the new compressed stuff into the stack,
         % and add an offset entry for it
-        rs = push(rs, Z(counter+1:end, :));
+        rs = hss_push(rs, Z(counter+1:end, :));
 		rs1 = size(Z, 2);
         
         % And now do the columns 
         B = A(mh+m+1:end, nh+1:nh+n)';
         
         for j = length(row_offsets) - 1 : -1 : 0
-            Z = elementAt(rs, j);
+            Z = hss_elementAt(rs, j);
             
             % FIXME: We should preallocate B
             B = [ Z(row_offsets(j+1)+1:row_offsets(j+1)+m,:) , B ];
@@ -95,9 +86,9 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         % Push Z in the stack, and updates the elements in the as well
         counter = 0;
 		for j = 0 : length(row_offsets) - 1
-			W = elementAt(rs, j);
+			W = hss_elementAt(rs, j);
 
-			rs = setElementAt(rs, [ W(1:row_offsets(j+1), :) ; ...
+			rs = hss_setElementAt(rs, [ W(1:row_offsets(j+1), :) ; ...
 				Z(counter+1:counter+size(W, 2), :)' ; ...
 				W(row_offsets(j+1)+n+1:end,:) ], j);
 
@@ -107,7 +98,7 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         
         % Last but not least, push the new compressed stuff into the stack,
         % and add an offset entry for it
-        cs = push(cs, Z(counter+1:end, :));
+        cs = hss_push(cs, Z(counter+1:end, :));
 		cs1 = size(Z, 2);
 		
         col_offsets = [ col_offsets , 0 ];
@@ -126,8 +117,8 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
             mh + size(H.hssl, 1), nh + size(H.hssl, 2));
 		        
         % Extract Bl and Bu from the stacks, and merge the children
-        [row1, rs] = pop(rs); [row2, rs] = pop(rs);
-        [col1, cs] = pop(cs); [col2, cs] = pop(cs);
+        [row1, rs] = hss_pop(rs); [row2, rs] = hss_pop(rs);
+        [col1, cs] = hss_pop(cs); [col2, cs] = hss_pop(cs);
 		
 		rs1 = size(row2, 1) - size(row1, 1);
 		cs1 = size(col2, 1) - size(col1, 1);
@@ -160,7 +151,7 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
         B = [ row2(rrV+1:end, :), row1 ]';
 		
 		for j = length(col_offsets) - 1 : -1 : 0
-			Z = elementAt(cs, j);
+			Z = hss_elementAt(cs, j);
 
 			% FIXME: We should preallocate B
 			B = [ Z(col_offsets(j+1)+1:col_offsets(j+1)+rU,:) , B ];
@@ -174,9 +165,9 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
 		% Push Z in the stack, and updates the elements in the as well
         counter = 0;
 		for j = 0 : length(col_offsets) - 1
-			W = elementAt(cs, j);
+			W = hss_elementAt(cs, j);
 
-			cs = setElementAt(cs, [ W(1:col_offsets(j+1), :) ; ...
+			cs = hss_setElementAt(cs, [ W(1:col_offsets(j+1), :) ; ...
 				Z(counter+1:counter+size(W, 2), :)' ; ...
 				W(col_offsets(j+1)+rU+1:end,:) ], j);
 
@@ -184,12 +175,12 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
 			col_offsets(j+1) = col_offsets(j+1) + size(Z, 2);
 		end
 		
-		rs = push(rs, Z(counter+1:end, :));
+		rs = hss_push(rs, Z(counter+1:end, :));
         
         B = [ col2(rrU+1:end, :), col1 ]';
 		
 		for j = length(row_offsets) - 1 : -1 : 0
-			Z = elementAt(rs, j);
+			Z = hss_elementAt(rs, j);
 
 			% FIXME: We should preallocate B
 			B = [ Z(row_offsets(j+1)+1:row_offsets(j+1)+rV,:) , B ];
@@ -203,9 +194,9 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
 		% Push Z in the stack, and updates the elements in the as well
         counter = 0;
 		for j = 0 : length(row_offsets) - 1
-			W = elementAt(rs, j);
+			W = hss_elementAt(rs, j);
 
-			rs = setElementAt(rs, [ W(1:row_offsets(j+1), :) ; ...
+			rs = hss_setElementAt(rs, [ W(1:row_offsets(j+1), :) ; ...
 				Z(counter+1:counter+size(W, 2), :)' ; ...
 				W(row_offsets(j+1)+rV+1:end,:) ], j);
 
@@ -213,7 +204,7 @@ function [H, rs, cs, row_offsets, col_offsets, rs1, cs1] = BuildHSS_iter(...
 			row_offsets(j+1) = row_offsets(j+1) + size(Z, 2);
 		end
 		
-		cs = push(cs, Z(counter+1:end, :));
+		cs = hss_push(cs, Z(counter+1:end, :));
         
 		row_offsets = [ row_offsets, 0 ];
         col_offsets = [ col_offsets, 0 ];
@@ -278,40 +269,55 @@ function [U, Z] = compress_hss_block(B, tol)
 		Z = zeros(0, size(B, 2));
 		return
 	end
+	
+	switch hssoption('compression')
+		case 'qr'	
+			[Q, R, P] = qr(B, 0);
+	
+			% Select only the important columns out of Q
+			rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
+			IP = zeros(1, length(P)); IP(P) = 1 : length(P); 
+			U = Q(:, 1:rk);
+			Z = R(1:rk, IP)';
+			
+		case 'svd'
+		   [U, B, Z] = svd(B, 'econ');
 
+		   if tol == 0
+			   rk = size(B, 1);
+		   else   
+			   rk = sum(diag(B) > tol * B(1,1));
+		   end
 
-   [U, B, Z] = svd(B, 'econ');
-   
-   if tol == 0
-       rk = size(B, 1);
-   else   
-       rk = sum(diag(B) > tol * B(1,1));
-   end
-   
-   U = U(:, 1:rk);
-   B = B(1:rk, 1:rk);
-   
-   Z = Z(:, 1:rk) * B;
+		   U = U(:, 1:rk);
+		   B = B(1:rk, 1:rk);
+
+		   Z = Z(:, 1:rk) * B;
+	end
 end
+
+% Simple home-made implementation of a stack -- if we really want to use
+% this is still open for discussion. It does not matter much
+% performance-wise in this context anyway.
 
 function s = createStack()
 	s = {};
 end
 
-function s = push(s, el)
+function s = hss_push(s, el)
 	s{end+1} = el;
 end
 
-function [el, s] = pop(s)
+function [el, s] = hss_pop(s)
 	el = s{end};
 	s = { s{1:end-1} };
 end
 
-function el = elementAt(s, j)
+function el = hss_elementAt(s, j)
 	el = s{j+1};
 end
 
-function s = setElementAt(s, el, j)
+function s = hss_setElementAt(s, el, j)
 	s{j+1} = el;
 end
 
