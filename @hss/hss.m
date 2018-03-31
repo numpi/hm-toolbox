@@ -30,6 +30,8 @@ classdef hss
 
 		hssl
 		hssr
+        
+        % parent
 		
 	end
 	

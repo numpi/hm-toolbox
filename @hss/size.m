@@ -1,5 +1,16 @@
-function sz = size(H, idx)
-%SIZE Size of an HSS matrix. ù
+function [sz, sz2] = size(H, idx)
+%SIZE Size of an HSS matrix. 
+
+if nargout == 2
+    if exist('idx', 'var')
+        error('The dimension cannot be specified if two outputs are expected');
+    end
+    
+    sz  = size(H, 1);
+    sz2 = size(H, 2);
+    
+    return;
+end
 
 if ~isempty(H.ml)
     m = H.ml + H.mr;
