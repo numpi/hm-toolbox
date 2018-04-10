@@ -11,3 +11,17 @@ Routines to compute matrix functions and to solve matrix equations are included.
 Some features depend on external packages, namely chebfun for the construction of 
 HODLR / HSS matrices which sample regular functions on a grid, and rktoolbox to
 solve Lyapunov / Sylvester equations with D&C methods. 
+
+# Installation instructions
+
+To install the toolbox download the latest revision from Github by running
+
+ git clone https://github.com/numpi/hm-toolbox.git
+
+or downloading the ZIP file from the webpage [github.com/numpi/hm-toolbox](https://github.com/numpi/hm-toolbox). 
+Rename the folder to <code>hm-toolbox</code> if needed. Then, add it to your MATLAB path by running
+
+ >> addpath /path/to/hm-toolbox
+
+You are now ready to create new @hm and @hss objects. Check some examples in the
+<code>examples/</code> folder. 
