@@ -22,16 +22,20 @@ x = A \ b;
 
 r = norm(A * x - b); 
 fprintf(' - Residue of the linear system: %e\n', r);
-fprintf('   Time needed to solve the system: %1.3f seconds\n\n', ...
+
+if exist('timeit')
+  fprintf('   Time needed to solve the system: %1.3f seconds\n\n', ...
     timeit(@() A \ b, 1));
+ end
 
 % If more solutions are needed, it might be useful to precompute the LU
 % factorization. 
 [L, U] = lu(A);
 x = U \ (L \ b);
 
-fprintf(' - Time needed to solve the system by backsubstution: %1.3f seconds\n', ...
-    timeit(@() U \ (L \ b), 1));
-fprintf('   Time needed for the LU: %1.3f seconds\n', timeit(@() lu(A), 2));
-
+if exist('timeit')
+  fprintf(' - Time needed to solve the system by backsubstution: %1.3f seconds\n', ...
+      timeit(@() U \ (L \ b), 1));
+  fprintf('   Time needed for the LU: %1.3f seconds\n', timeit(@() lu(A), 2));
+end
 
