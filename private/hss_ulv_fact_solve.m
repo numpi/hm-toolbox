@@ -1,10 +1,7 @@
-function x = hss_fact_solve(F,b)
-% HSS_ULV_SOLV computes the  ULV factorization
-%	       of A  taken from the paper:
+function x = hss_ulv_fact_solve(F,b)
+% HSS_ULV_FACT_SOLV computes the solution of the linear system A X =B
+%	       where F contains ULV decomposition of A
 %
-%	       Chandrasekaran, Shiv, Ming Gu, and Timothy Pals. 
-%	       "A fast ULV decomposition solver for hierarchically semiseparable representations." 
-%	       SIAM Journal on Matrix Analysis and Applications 28.3 	(2006): 603-622.
 %
 
 
@@ -15,13 +12,13 @@ end
 
 idx = [ 1 1 1 ];
 
-x = hss_fact_solve_rec(F, F.A, [1:size(F.A,1)], b, idx);
+x = hss_ulv_fact_solve_rec(F, F.A, [1:size(F.A,1)], b, idx);
 
 end
 
 
 
-function [x, F, ind, cind, b, idx] = hss_fact_solve_rec(F, A, cur_ind, b, idx)
+function [x, F, ind, cind, b, idx] = hss_ulv_fact_solve_rec(F, A, cur_ind, b, idx)
 %------------------------------------------------------------------------------------------------------------------------------------------------
 % Recursively compute the solution of the linear system 
 % 
@@ -58,9 +55,9 @@ function [x, F, ind, cind, b, idx] = hss_fact_solve_rec(F, A, cur_ind, b, idx)
 		% Reduce the columns of the diagonal block
 
 	else    % NOT A LEAF
-		[xl, F,   indl, cindl, bl, idx] = hss_fact_solve_rec(F, A.hssl,  cur_ind(1:A.nl), b(1:A.ml, :), idx);                    % recursive call on left  child
+		[xl, F,   indl, cindl, bl, idx] = hss_ulv_fact_solve_rec(F, A.hssl,  cur_ind(1:A.nl), b(1:A.ml, :), idx);                    % recursive call on left  child
 
-		[xr, F,   indr, cindr, br, idx] = hss_fact_solve_rec(F, A.hssr,  cur_ind(A.nl+1:end), b(A.ml + 1:A.ml + A.mr, :), idx);  % recursive call on right child
+		[xr, F,   indr, cindr, br, idx] = hss_ulv_fact_solve_rec(F, A.hssr,  cur_ind(A.nl+1:end), b(A.ml + 1:A.ml + A.mr, :), idx);  % recursive call on right child
 
 		x = [xl; xr]; % Store the computed variables
 

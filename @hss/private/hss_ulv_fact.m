@@ -25,9 +25,9 @@ end
 
 function [F, D, U, V, ind, cind,  ort, ort_ind] = hss_ulv_fact_rec(F, A, ort, ort_ind, cur_ind)
 %------------------------------------------------------------------------------------------------------------------------------------------------
-% Recursively compute the solution of the linear system 
+% Recursively compute the facators of ULV decomposition 
 % 
-% INPUT  : A coefficient matrix (HSS format), b right hand side, ort and ort_ind see description of outputs, cur_ind indices of the current submatrix
+% INPUT  : A coefficient matrix (HSS format), ort and ort_ind see description of outputs, cur_ind indices of the current submatrix
 %
 % OUTPUT : if the function is called on the root then it returns only the solution x
 %	   otherwise it returns: 

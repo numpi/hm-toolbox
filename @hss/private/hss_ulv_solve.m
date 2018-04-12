@@ -1,4 +1,4 @@
-function x = hss_ulv_solv(A, b)
+function x = hss_ulv_solve(A, b)
 % HSS_ULV_SOLV computes the solution of the linear system A x = b
 %              where A is a HSS matrix and b a block colum. The 
 %	       procedure is based on the implicit ULV factorization
@@ -13,13 +13,13 @@ if A.leafnode == 1
 	return
 end
 
-x = hss_ulv_solv_rec(A,b,{},{}, [1:size(A,1)]);
+x = hss_ulv_solve_rec(A,b,{},{}, [1:size(A,1)]);
 end
 
 %TODO Check whether it is the most efficient implementation, for example it seems that at the moment we re-construct the generators for the columns (the Vs)
 %     See if there is some redundant data (e.g.: set of indices) that can be avoided
 
-function [x, D, U, V, b, ind, cind,  ort, ort_ind] = hss_ulv_solv_rec(A, b, ort, ort_ind, cur_ind)
+function [x, D, U, V, b, ind, cind,  ort, ort_ind] = hss_ulv_solve_rec(A, b, ort, ort_ind, cur_ind)
 %------------------------------------------------------------------------------------------------------------------------------------------------
 % Recursively compute the solution of the linear system 
 % 
@@ -71,9 +71,9 @@ function [x, D, U, V, b, ind, cind,  ort, ort_ind] = hss_ulv_solv_rec(A, b, ort,
 		D = D(:,end-k+1:end);
 
 	else    % NOT A LEAF
-		[xl,  Dl, Ul, Vl, bl, indl, cindl, ort, ort_ind] = hss_ulv_solv_rec(A.hssl, b(1:A.ml, :), ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
+		[xl,  Dl, Ul, Vl, bl, indl, cindl, ort, ort_ind] = hss_ulv_solve_rec(A.hssl, b(1:A.ml, :), ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
 
-		[xr,  Dr, Ur, Vr, br, indr, cindr, ort, ort_ind] = hss_ulv_solv_rec(A.hssr, b(A.ml + 1:A.ml + A.mr, :), ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
+		[xr,  Dr, Ur, Vr, br, indr, cindr, ort, ort_ind] = hss_ulv_solve_rec(A.hssr, b(A.ml + 1:A.ml + A.mr, :), ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
 
 		x = [xl; xr]; % Store the computed variables
 

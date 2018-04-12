@@ -9,6 +9,6 @@ function X = mldivide(A,B)
 		%[D,U,R,BB,W,V,tr] = hss2xia(A);
 		%X = hssulvsol(tr,D,U,R,BB,W,V,length(tr),B);
 		% X = hss_solve(A, B);
-		X = hss_ulv_solv(A,B);
+		X = hss_ulv_solve(A,B);
 	end
 end
