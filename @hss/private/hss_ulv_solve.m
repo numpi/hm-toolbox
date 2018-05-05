@@ -71,17 +71,17 @@ function [x, D, U, V, b, ind, cind,  ort, ort_ind] = hss_ulv_solve_rec(A, b, ort
 		D = D(:,end-k+1:end);
 
 	else    % NOT A LEAF
-		[xl,  Dl, Ul, Vl, bl, indl, cindl, ort, ort_ind] = hss_ulv_solve_rec(A.hssl, b(1:A.ml, :), ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
+		[xl,  Dl, Ul, Vl, bl, indl, cindl, ort, ort_ind] = hss_ulv_solve_rec(A.A11, b(1:A.ml, :), ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
 
-		[xr,  Dr, Ur, Vr, br, indr, cindr, ort, ort_ind] = hss_ulv_solve_rec(A.hssr, b(A.ml + 1:A.ml + A.mr, :), ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
+		[xr,  Dr, Ur, Vr, br, indr, cindr, ort, ort_ind] = hss_ulv_solve_rec(A.A22, b(A.ml + 1:A.ml + A.mr, :), ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
 
 		x = [xl; xr]; % Store the computed variables
 
 		% Reduce the columns in the system
-		bl = bl - Ul * A.Bu * (Vr(indr,:)'* xr(indr, :));
-		br = br - Ur * A.Bl * (Vl(indl,:)'* xl(indl, :));
+		bl = bl - Ul * A.B12 * (Vr(indr,:)'* xr(indr, :));
+		br = br - Ur * A.B21 * (Vl(indl,:)'* xl(indl, :));
 		% Merge nodes
-		D = [Dl, Ul * A.Bu * Vr(cindr, :)'; Ur * A.Bl * Vl(cindl, :)', Dr];
+		D = [Dl, Ul * A.B12 * Vr(cindr, :)'; Ur * A.B21 * Vl(cindl, :)', Dr];
 		b = [bl; br];
 
 		if A.topnode == 1 % If we are in the root we solve the remaining dense sytem and we apply right transformations

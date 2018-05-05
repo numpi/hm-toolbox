@@ -73,16 +73,16 @@ function [F, D, U, V, ind, cind,  ort, ort_ind] = hss_ulv_fact_rec(F, A, ort, or
 		D = D(:,end-k+1:end);
 
 	else    % NOT A LEAF
-		[F,  Dl, Ul, Vl, indl, cindl, ort, ort_ind] = hss_ulv_fact_rec(F, A.hssl, ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
+		[F,  Dl, Ul, Vl, indl, cindl, ort, ort_ind] = hss_ulv_fact_rec(F, A.A11, ort, ort_ind, cur_ind(1:A.nl));                    % recursive call on left  child
 
-		[F,  Dr, Ur, Vr, indr, cindr, ort, ort_ind] = hss_ulv_fact_rec(F, A.hssr, ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
+		[F,  Dr, Ur, Vr, indr, cindr, ort, ort_ind] = hss_ulv_fact_rec(F, A.A22, ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
 
 		% Reduce the columns in the system
 		
-		F.L = [F.L, Ul , A.Bu * Vr(indr,:)'];
-		F.L = [F.L, Ur , A.Bl * Vl(indl,:)'];
+		F.L = [F.L, Ul , A.B12 * Vr(indr,:)'];
+		F.L = [F.L, Ur , A.B21 * Vl(indl,:)'];
 		% Merge nodes
-		D = [Dl, Ul * A.Bu * Vr(cindr, :)'; Ur * A.Bl * Vl(cindl, :)', Dr];
+		D = [Dl, Ul * A.B12 * Vr(cindr, :)'; Ur * A.B21 * Vl(cindl, :)', Dr];
 
 		if A.topnode == 1 % If we are in the root we solve the remaining dense sytem and we apply right transformations
 			F.L = [F.L, D];

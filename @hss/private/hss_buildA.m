@@ -142,12 +142,12 @@ if (length(m)>2 && length(n)>2 && p>rand(1) && k<kMax) % parent node
     Bl = Ur'*U12(m(1):m(1)+size(Ur,1)-1,:)*S3;
     Bu = Ul'*U21(m(1):m(1)+size(Ul,1)-1,:)*S4;
    
-    obj.Bl=Bl;
-    obj.Bu=Bu;
+    obj.B21=Bl;
+    obj.B12=Bu;
    
     %recursion part
-    obj.hssl = hss_buildA_iter(A,tol, kMax, p,k,ml,nl,Ul,Vl);
-    obj.hssr = hss_buildA_iter(A,tol, kMax, p,k,mr,nr,Ur,Vr);
+    obj.A11 = hss_buildA_iter(A,tol, kMax, p,k,ml,nl,Ul,Vl);
+    obj.A22 = hss_buildA_iter(A,tol, kMax, p,k,mr,nr,Ur,Vr);
 
 
     if k ~=1  % not top node

@@ -8,12 +8,12 @@ function [D,U,R,B,W,V,tr] = hss2xia(A)
 		tr = [ 0 ];
 		B = {};
 	else
-		[Dl,Ul,Rl,Bl,Wl,Vl,trl] = hss2xia(A.hssl);
-		[Dr,Ur,Rr,Br,Wr,Vr,trr] = hss2xia(A.hssr);
+		[Dl,Ul,Rl,Bl,Wl,Vl,trl] = hss2xia(A.A11);
+		[Dr,Ur,Rr,Br,Wr,Vr,trr] = hss2xia(A.A22);
 
 		[D,U,V,tr] = mergetree(Dl,Ul,Vl,trl,Dr,Ur,Vr,trr);
 
-		B = { Bl{:}, A.Bu, Br{:}, A.Bl };
+		B = { Bl{:}, A.B12, Br{:}, A.B21 };
 
 		if A.topnode == 1
 			W = { Wl{:}, [], Wr{:} };

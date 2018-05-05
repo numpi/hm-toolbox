@@ -140,22 +140,22 @@ end
 
 
 if hss.leafnode==false
-    [I, J, S, n, indb, indxl, x0, y0, xBl0, yBu0] = hss_toSparse_iter(hss.hssl,b(1:hss.ml),run,I, J, S, n,indb,x0,y0);
-    [I, J, S, n, indb, indxr, x0, y0, xBu0, yBl0] = hss_toSparse_iter(hss.hssr,b(hss.ml+1:end),run,I, J, S, n,indb,x0,y0);
+    [I, J, S, n, indb, indxl, x0, y0, xBl0, yBu0] = hss_toSparse_iter(hss.A11,b(1:hss.ml),run,I, J, S, n,indb,x0,y0);
+    [I, J, S, n, indb, indxr, x0, y0, xBu0, yBl0] = hss_toSparse_iter(hss.A22,b(hss.ml+1:end),run,I, J, S, n,indb,x0,y0);
 
     indx = [indxl; indxr];
 
-    y1 = size(hss.Bu,1);
-    y2 = size(hss.Bl,1);
-    x1 = size(hss.Bl,2);
-    x2 = size(hss.Bu,2);
+    y1 = size(hss.B12,1);
+    y2 = size(hss.B21,1);
+    x1 = size(hss.B21,2);
+    x2 = size(hss.B12,2);
 
     %Bu
-    %oldS(yBu0:yBu0+y1-1 , xBu0:xBu0+x2-1) = hss.Bu;
-    [I, J, S, n] = addSparce(I, J, S, n, yBu0:yBu0+y1-1, xBu0:xBu0+x2-1, hss.Bu,run);
+    %oldS(yBu0:yBu0+y1-1 , xBu0:xBu0+x2-1) = hss.B12;
+    [I, J, S, n] = addSparce(I, J, S, n, yBu0:yBu0+y1-1, xBu0:xBu0+x2-1, hss.B12,run);
     %Bl
-    %oldS(yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1) = hss.Bl;
-    [I, J, S, n] = addSparce(I, J, S, n, yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1, hss.Bl,run);
+    %oldS(yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1) = hss.B21;
+    [I, J, S, n] = addSparce(I, J, S, n, yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1, hss.B21,run);
 
 
     if hss.topnode==false

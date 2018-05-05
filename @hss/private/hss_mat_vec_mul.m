@@ -23,8 +23,8 @@ g = struct();
 
 if (A.leafnode == 0)   % not a leaf
    
-    g.gl = bottom_up(A.hssl, v(1:A.nl,:));
-    g.gr = bottom_up(A.hssr, v(A.nl+1:end,:));
+    g.gl = bottom_up(A.A11, v(1:A.nl,:));
+    g.gr = bottom_up(A.A22, v(A.nl+1:end,:));
     if A.topnode == 0    % not root
         	g.Vv = A.Wl' * g.gl.Vv + A.Wr' * g.gr.Vv;     
     end
@@ -38,15 +38,15 @@ function x = up_bottom(A, v, g, f)
 
 if (A.leafnode==0)   % not a leaf
     if A.topnode == 1 % root
-        fl = A.Bu * g.gr.Vv;
-        fr = A.Bl * g.gl.Vv;
+        fl = A.B12 * g.gr.Vv;
+        fr = A.B21 * g.gl.Vv;
     else % not top node
-        fl = A.Bu * g.gr.Vv + A.Rl * f;
-        fr = A.Bl * g.gl.Vv + A.Rr * f;
+        fl = A.B12 * g.gr.Vv + A.Rl * f;
+        fr = A.B21 * g.gl.Vv + A.Rr * f;
     end
    
-    xl = up_bottom(A.hssl, v(1:A.nl,:), g.gl, fl);
-    xr = up_bottom(A.hssr, v(A.nl+1:end,:), g.gr, fr);
+    xl = up_bottom(A.A11, v(1:A.nl,:), g.gl, fl);
+    xr = up_bottom(A.A22, v(A.nl+1:end,:), g.gr, fr);
     x = [xl; xr];
    
 else        %leaf node

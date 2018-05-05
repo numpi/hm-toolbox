@@ -68,14 +68,14 @@ function [F, D, U, ind, cind] = hss_chol_fact_rec(A, F, cur_ind)
 		%b = b(end-k+1:end, :);
 
 	else    % NOT A LEAF
-		[F, Dl, Ul, indl, cindl] = hss_chol_fact_rec(A.hssl,  F, cur_ind(1:A.nl));                    % recursive call on left  child
+		[F, Dl, Ul, indl, cindl] = hss_chol_fact_rec(A.A11,  F, cur_ind(1:A.nl));                    % recursive call on left  child
 
-		[F, Dr, Ur, indr, cindr] = hss_chol_fact_rec(A.hssr,  F, cur_ind(A.nl+1:end));  % recursive call on right child
+		[F, Dr, Ur, indr, cindr] = hss_chol_fact_rec(A.A22,  F, cur_ind(A.nl+1:end));  % recursive call on right child
 
 		%x = [xl; xr]; % Store the computed variables
 
 		% Merge nodes
-		D = [Dl, Ul * A.Bu * Ur'; Ur * A.Bl * Ul', Dr];
+		D = [Dl, Ul * A.B12 * Ur'; Ur * A.B21 * Ul', Dr];
 		%b = [bl; br];
 
 		if A.topnode == 1 % If we are in the root we solve the remaining dense sytem and we apply right transformations

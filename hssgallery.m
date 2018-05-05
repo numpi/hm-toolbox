@@ -6,6 +6,22 @@ function varargout = hssgallery(name, varargin)
 % Dirichlet boundary conditions. 
 
 switch name
+	case 'rand'
+		if isempty(varargin)
+			n = 2048;
+		else
+			n = varargin{1};
+		end
+		
+		if length(varargin) < 2
+			k = 1;
+		else
+			k = varargin{2};
+		end
+		
+		varargout{1} = create_random_hss(n, k);
+		varargout{1}.topnode = 1;
+		
     case 'laplacian'
         if isempty(varargin)
             n = 2048;
@@ -57,6 +73,37 @@ switch name
     otherwise
         error('Unsupported example name');
 end
+
+	function H = create_random_hss(n, k)
+		H = hss();
+		
+		if n <= hssoption('block-size')
+			H.D = rand(n);
+			[H.U, ~] = qr(rand(n, k), 0);
+			[H.V, ~] = qr(rand(n, k), 0);			
+			
+			H.leafnode = 1;
+		else
+			H.leafnode = 0;
+			H.B12 = randn(k);
+			H.B21 = randn(k);
+			
+			H.Rr = randn(k);
+			H.Rl = randn(k);
+			H.Wl = randn(k);
+			H.Wr = randn(k);
+			
+			H.ml = ceil(n / 2);
+			H.nl = H.ml;
+			H.mr = n - H.ml;
+			H.nr = n - H.nl;
+			
+			H.A11 = create_random_hss(H.ml, k);
+			H.A22 = create_random_hss(H.mr, k);
+		end
+		
+		H.topnode  = 0;
+	end
 
 
 end

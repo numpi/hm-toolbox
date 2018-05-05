@@ -7,7 +7,7 @@ end
 
 
 if ischar(nrm_type) && strcmp(nrm_type, 'fro')
-    nrm = norm_frobenius(A);
+   nrm = norm_frobenius(A);
    return;
 end
 
@@ -24,7 +24,12 @@ for i = 1 : 30
 	
 	if abs(olds - s) < abs(s) * 1e-3
 		break;
-	end
+    end
+    
+    if s == 0
+        nrm = 0;
+        return;
+    end
 	
 	v = v / s;
 	w = v;

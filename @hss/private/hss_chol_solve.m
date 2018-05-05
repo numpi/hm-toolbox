@@ -12,6 +12,8 @@ if A.leafnode == 1
 	return
 end
 
+A = hss_symmetrize(A);
+
 x = hss_chol_solve_rec(A,b,{},{},{}, [1:size(A,1)]);
 end
 
@@ -65,14 +67,13 @@ function [x, D, U, b, ind, cind,  ort, right_ind, triang] = hss_chol_solve_rec(A
 		b = b(end-k+1:end, :);
 
 	else    % NOT A LEAF
-		[xl,  Dl, Ul, bl, indl, cindl, ort, right_ind, triang] = hss_chol_solve_rec(A.hssl, b(1:A.ml, :), ort, right_ind, triang, cur_ind(1:A.nl));                    % recursive call on left  child
-
-		[xr,  Dr, Ur, br, indr, cindr, ort, right_ind, triang] = hss_chol_solve_rec(A.hssr, b(A.ml + 1:A.ml + A.mr, :), ort, right_ind, triang, cur_ind(A.nl+1:end));  % recursive call on right child
+		[xl,  Dl, Ul, bl, indl, cindl, ort, right_ind, triang] = hss_chol_solve_rec(A.A11, b(1:A.ml, :), ort, right_ind, triang, cur_ind(1:A.nl));                    % recursive call on left  child
+		[xr,  Dr, Ur, br, indr, cindr, ort, right_ind, triang] = hss_chol_solve_rec(A.A22, b(A.ml + 1:A.ml + A.mr, :), ort, right_ind, triang, cur_ind(A.nl+1:end));  % recursive call on right child
 
 		x = [xl; xr]; % Store the computed variables
 
 		% Merge nodes
-		D = [Dl, Ul * A.Bu * Ur'; Ur * A.Bl * Ul', Dr];
+		D = [Dl, Ul * A.B12 * Ur'; Ur * A.B21 * Ul', Dr]; % possibile inghippo 2.0
 		b = [bl; br];
 
 		if A.topnode == 1 % If we are in the root we solve the remaining dense sytem and we apply right transformations

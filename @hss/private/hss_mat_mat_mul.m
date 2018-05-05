@@ -19,8 +19,8 @@ g = struct();
 
 if (A.leafnode == 0)   % not a leaf
    
-    g.gl = bottom_up(A.hssl, B.hssl);
-    g.gr = bottom_up(A.hssr, B.hssr);
+    g.gl = bottom_up(A.A11, B.A11);
+    g.gr = bottom_up(A.A22, B.A22);
     if A.topnode == 0    % not root
         	g.VU = A.Wl' * g.gl.VU * B.Rl + A.Wr' * g.gr.VU * B.Rr;     
     end
@@ -34,25 +34,25 @@ function C = up_bottom(A, B, g, f, C)
 
 if (A.leafnode==0)   % not a leaf
     if A.topnode == 1 % root
-        fl = A.Bu * g.gr.VU * B.Bl;
-        fr = A.Bl * g.gl.VU * B.Bu;
+        fl = A.B12 * g.gr.VU * B.B21;
+        fr = A.B21 * g.gl.VU * B.B12;
     else % not top node
-        fl = A.Bu * g.gr.VU * B.Bl + A.Rl * f * B.Wl';
-        fr = A.Bl * g.gl.VU * B.Bu + A.Rr * f * B.Wr';
+        fl = A.B12 * g.gr.VU * B.B21 + A.Rl * f * B.Wl';
+        fr = A.B21 * g.gl.VU * B.B12 + A.Rr * f * B.Wr';
     end
 if A.topnode == 1
-    C.Bl = blkdiag(A.Bl, B.Bl);
-    C.Bu = blkdiag(A.Bu, B.Bu);
+    C.B21 = blkdiag(A.B21, B.B21);
+    C.B12 = blkdiag(A.B12, B.B12);
 else
-    C.Bl = [A.Bl A.Rr * f * B.Wl'; zeros(size(B.Bl,1),size(A.Bl,2)) B.Bl];
-    C.Bu = [A.Bu A.Rl * f * B.Wr'; zeros(size(B.Bu,1), size(A.Bu,2)) B.Bu];
-    C.Wl = [A.Wl zeros(size(A.Wl,1),size(B.Wl,2)); B.Bl' * g.gr.VU' * A.Wr B.Wl];
-    C.Wr = [A.Wr zeros(size(A.Wr,1),size(B.Wr,2)); B.Bu' * g.gl.VU' * A.Wl B.Wr];
-    C.Rl = [A.Rl A.Bu * g.gr.VU * B.Rr; zeros(size(B.Rl,1),size(A.Rl,2)) B.Rl];
-    C.Rr = [A.Rr A.Bl * g.gl.VU * B.Rl; zeros(size(B.Rr,1),size(A.Rr,2)) B.Rr];
+    C.B21 = [A.B21 A.Rr * f * B.Wl'; zeros(size(B.B21,1),size(A.B21,2)) B.B21];
+    C.B12 = [A.B12 A.Rl * f * B.Wr'; zeros(size(B.B12,1), size(A.B12,2)) B.B12];
+    C.Wl = [A.Wl zeros(size(A.Wl,1),size(B.Wl,2)); B.B21' * g.gr.VU' * A.Wr B.Wl];
+    C.Wr = [A.Wr zeros(size(A.Wr,1),size(B.Wr,2)); B.B12' * g.gl.VU' * A.Wl B.Wr];
+    C.Rl = [A.Rl A.B12 * g.gr.VU * B.Rr; zeros(size(B.Rl,1),size(A.Rl,2)) B.Rl];
+    C.Rr = [A.Rr A.B21 * g.gl.VU * B.Rl; zeros(size(B.Rr,1),size(A.Rr,2)) B.Rr];
 end
-    C.hssl = up_bottom(A.hssl, B.hssl, g.gl, fl, C.hssl);
-    C.hssr = up_bottom(A.hssr, B.hssr, g.gr, fr, C.hssr);
+    C.A11 = up_bottom(A.A11, B.A11, g.gl, fl, C.A11);
+    C.A22 = up_bottom(A.A22, B.A22, g.gr, fr, C.A22);
    
 else        %leaf node
     C.D = A.D * B.D + A.U * f * B.V';

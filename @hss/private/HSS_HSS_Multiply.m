@@ -47,8 +47,8 @@ if hssA.leafnode == 1 %if leaf node
     gtree= struct;
 else %if not leaf node
 
-    [gtreeL, gl] = get_gtree(hssA.hssl,hssB.hssl);
-    [gtreeR, gr] = get_gtree(hssA.hssr,hssB.hssr);
+    [gtreeL, gl] = get_gtree(hssA.A11,hssB.A11);
+    [gtreeR, gr] = get_gtree(hssA.A22,hssB.A22);
     
     %Compute new g
 	if hssA.topnode == 0
@@ -89,45 +89,45 @@ if hssA.leafnode == 1
 else
     %compute f
 	if hssA.topnode == 0
-		ftreeL.f = hssA.Bu*gtree.gtreeR.g*hssB.Bl + hssA.Rl*ftree.f*hssB.Wl';
-		ftreeR.f = hssA.Bl*gtree.gtreeL.g*hssB.Bu + hssA.Rr*ftree.f*hssB.Wr';
+		ftreeL.f = hssA.B12*gtree.gtreeR.g*hssB.B21 + hssA.Rl*ftree.f*hssB.Wl';
+		ftreeR.f = hssA.B21*gtree.gtreeL.g*hssB.B12 + hssA.Rr*ftree.f*hssB.Wr';
 	else
-		ftreeL.f = hssA.Bu*gtree.gtreeR.g*hssB.Bl;
-		ftreeR.f = hssA.Bl*gtree.gtreeL.g*hssB.Bu;
+		ftreeL.f = hssA.B12*gtree.gtreeR.g*hssB.B21;
+		ftreeR.f = hssA.B21*gtree.gtreeL.g*hssB.B12;
 
 	end
     
     %left call
-    [hssL, ftreeL] = HSS_HSS_Multiply_iter(hssA.hssl,hssB.hssl,ftreeL,gtree.gtreeL); 
+    [hssL, ftreeL] = HSS_HSS_Multiply_iter(hssA.A11,hssB.A11,ftreeL,gtree.gtreeL); 
     
     %right call
-    [hssR, ftreeR] = HSS_HSS_Multiply_iter(hssA.hssr,hssB.hssr,ftreeR,gtree.gtreeR);
+    [hssR, ftreeR] = HSS_HSS_Multiply_iter(hssA.A22,hssB.A22,ftreeR,gtree.gtreeR);
     
     %store f's in tree
     ftree.ftreeL = ftreeL;
     ftree.ftreeR = ftreeR;
     
     %store recursive HSS structure
-    hssC.hssl = hssL;
-    hssC.hssr = hssR;
+    hssC.A11 = hssL;
+    hssC.A22 = hssR;
     
     %Store new B's
 	if hssA.topnode == 1
-		hssC.Bl = blkdiag(hssA.Bl, hssB.Bl);
-		hssC.Bu = blkdiag(hssA.Bu, hssB.Bu);
+		hssC.B21 = blkdiag(hssA.B21, hssB.B21);
+		hssC.B12 = blkdiag(hssA.B12, hssB.B12);
 	else
-		hssC.Bl = [hssA.Bl hssA.Rr*ftree.f*hssB.Wl'; zeros(size(hssB.Bl,1),size(hssA.Bl,2)) hssB.Bl];
-		hssC.Bu = [hssA.Bu hssA.Rl*ftree.f*hssB.Wr'; zeros(size(hssB.Bu,1), size(hssA.Bu,2)) hssB.Bu];
+		hssC.B21 = [hssA.B21 hssA.Rr*ftree.f*hssB.Wl'; zeros(size(hssB.B21,1),size(hssA.B21,2)) hssB.B21];
+		hssC.B12 = [hssA.B12 hssA.Rl*ftree.f*hssB.Wr'; zeros(size(hssB.B12,1), size(hssA.B12,2)) hssB.B12];
 	end
     
     %Store new W's
 	if hssA.topnode == 0
-		hssC.Wl = [hssA.Wl zeros(size(hssA.Wl,1),size(hssB.Wl,2)); hssB.Bl'*gtree.gtreeR.g'*hssA.Wr hssB.Wl];
-		hssC.Wr = [hssA.Wr zeros(size(hssA.Wr,1),size(hssB.Wr,2)); hssB.Bu'*gtree.gtreeL.g'*hssA.Wl hssB.Wr];
+		hssC.Wl = [hssA.Wl zeros(size(hssA.Wl,1),size(hssB.Wl,2)); hssB.B21'*gtree.gtreeR.g'*hssA.Wr hssB.Wl];
+		hssC.Wr = [hssA.Wr zeros(size(hssA.Wr,1),size(hssB.Wr,2)); hssB.B12'*gtree.gtreeL.g'*hssA.Wl hssB.Wr];
 
 		%Store new R's
-		hssC.Rl = [hssA.Rl hssA.Bu*gtree.gtreeR.g*hssB.Rr; zeros(size(hssB.Rl,1),size(hssA.Rl,2)) hssB.Rl];
-		hssC.Rr = [hssA.Rr hssA.Bl*gtree.gtreeL.g*hssB.Rl; zeros(size(hssB.Rr,1),size(hssA.Rr,2)) hssB.Rr];
+		hssC.Rl = [hssA.Rl hssA.B12*gtree.gtreeR.g*hssB.Rr; zeros(size(hssB.Rl,1),size(hssA.Rl,2)) hssB.Rl];
+		hssC.Rr = [hssA.Rr hssA.B21*gtree.gtreeL.g*hssB.Rl; zeros(size(hssB.Rr,1),size(hssA.Rr,2)) hssB.Rr];
 	end
     
     hssC.leafnode = 0;

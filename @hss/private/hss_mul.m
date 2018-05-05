@@ -67,8 +67,8 @@ vb = struct();
 
 if (hss.leafnode==0)   % parent node
    
-    [vb.vbl, vb.gl] = upSweep(hss.hssl, x(1:hss.nl,:));
-    [vb.vbr, vb.gr] = upSweep(hss.hssr, x(hss.nl+1:end,:));
+    [vb.vbl, vb.gl] = upSweep(hss.A11, x(1:hss.nl,:));
+    [vb.vbr, vb.gr] = upSweep(hss.A22, x(hss.nl+1:end,:));
     if hss.topnode==0    % not top node
         	g = hss.Wl'*vb.gl + hss.Wr'*vb.gr;      % (4)
     end
@@ -93,15 +93,15 @@ function [b] = downSweep(vb, hss, f, x)
 
 if (hss.leafnode==0)   % parent node
     if hss.topnode==1 % top node
-        fl = hss.Bu*vb.gr;
-        fr = hss.Bl*vb.gl;
+        fl = hss.B12*vb.gr;
+        fr = hss.B21*vb.gl;
     else % not top node
-        fl = hss.Bu*vb.gr+hss.Rl*f;
-        fr = hss.Bl*vb.gl+hss.Rr*f;
+        fl = hss.B12*vb.gr+hss.Rl*f;
+        fr = hss.B21*vb.gl+hss.Rr*f;
     end
    
-    bl = downSweep(vb.vbl, hss.hssl, fl, x(1:hss.nl,:));
-    br = downSweep(vb.vbr, hss.hssr, fr, x(hss.nl+1:end,:));
+    bl = downSweep(vb.vbl, hss.A11, fl, x(1:hss.nl,:));
+    br = downSweep(vb.vbr, hss.A22, fr, x(hss.nl+1:end,:));
     b = [bl; br];
    
 else        %leaf node

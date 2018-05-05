@@ -40,11 +40,11 @@ function B = hss_build_low_rank_ric(U, V, S, k)
 		nmid = ceil(size(V,1)/2);
 		B.ml = mmid; B.nl = nmid;
 		B.mr = size(U,1) - mmid; B.nr = size(V,1) - nmid;
-		B.Bu = S;
-		B.Bl = S;
+		B.B12 = S;
+		B.B21 = S;
 		B.Rl = eye(size(S,1)); B.Rr = eye(size(S,1));
 		B.Wl = eye(size(S,1)); B.Wr = eye(size(S,1));
-		B.hssl = hss_build_low_rank_ric( U(1:mmid,:) , V(1:nmid,:), S, k-1);
-		B.hssr = hss_build_low_rank_ric(U(mmid+1:end,:), V(nmid+1:end,:), S, k-1);
+		B.A11 = hss_build_low_rank_ric( U(1:mmid,:) , V(1:nmid,:), S, k-1);
+		B.A22 = hss_build_low_rank_ric(U(mmid+1:end,:), V(nmid+1:end,:), S, k-1);
 	end
 end
