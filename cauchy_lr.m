@@ -94,9 +94,9 @@ else
             mpy = ny;
         end
 
-        [U11, V11] = cauchy_lr(x(1:mpx), y(1:mpy));
-        [U, V2]    = cauchy_lr(x, y(mpy+1:end));
-        [U21, V21] = cauchy_lr(x(mpx+1:end), y(1:mpy));
+        [U11, V11] = cauchy_lr(x(1:mpx), y(1:mpy), tol);
+        [U, V2]    = cauchy_lr(x, y(mpy+1:end), tol);
+        [U21, V21] = cauchy_lr(x(mpx+1:end), y(1:mpy), tol);
 
         % Reconstruct the global low-rank representation
         U = [ ...

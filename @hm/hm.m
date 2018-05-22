@@ -342,8 +342,8 @@ classdef hm
                 mp = ceil(n / 2);
 				np = ceil(n / 2);
                 
-                [obj.U21, obj.V21] = cauchy_lr(x(mp+1:end), y(1:np));
-                [obj.U12, obj.V12] = cauchy_lr(x(1:mp), y(np+1:end));
+                [obj.U21, obj.V21] = cauchy_lr(x(mp+1:end), y(1:np), hmoption('threshold'));
+                [obj.U12, obj.V12] = cauchy_lr(x(1:mp), y(np+1:end), hmoption('threshold'));
                 
                 obj.A11 = hm();
                 obj.A22 = hm();
