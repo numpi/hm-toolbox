@@ -44,10 +44,10 @@ function B = hss_build_band_ric(A,bl,bu,k)
 		B.Rr = zeros(bl+bu); B.Rr(end-bu+1:end,end-bu+1:end) = eye(bu); 
 		B.Wl = zeros(bl+bu); B.Wl(1:bu,1:bu) = eye(bu); 		
 		B.Wr = zeros(bl+bu); B.Wr(end-bl+1:end,end-bl+1:end) = eye(bl); 
-		B.Bl = [zeros(bl,bu),full(A(mmid + 1:mmid + bl, nmid - bl + 1:nmid));zeros(bu,bl+bu)];
-		B.Bu = [ zeros(bl, bl + bu);full(A(mmid-bu+1:mmid,nmid+1:nmid+bu)),zeros(bu,bl); ];
-		B.hssl = hss_build_band_ric(A(1:mmid,1:nmid), bl, bu, k-1);
-		B.hssr = hss_build_band_ric(A(mmid+1:end,nmid+1:end), bl, bu, k-1);
+		B.B21 = [zeros(bl,bu),full(A(mmid + 1:mmid + bl, nmid - bl + 1:nmid));zeros(bu,bl+bu)];
+		B.B12 = [ zeros(bl, bl + bu);full(A(mmid-bu+1:mmid,nmid+1:nmid+bu)),zeros(bu,bl); ];
+		B.A11 = hss_build_band_ric(A(1:mmid,1:nmid), bl, bu, k-1);
+		B.A22 = hss_build_band_ric(A(mmid+1:end,nmid+1:end), bl, bu, k-1);
 
 	end
 end

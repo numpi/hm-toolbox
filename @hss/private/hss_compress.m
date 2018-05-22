@@ -21,68 +21,68 @@ function A = backward_stage(A, tol, S, T, tcomp)
 		return
 	end
 	if (A.topnode == 1)
-		[U,Su,V] = tcomp(A.Bu, tol);
-		A.Bu = Su; Tl = Su.';
-		if A.hssl.leafnode == 0
-			A.hssl.Rl = A.hssl.Rl * U;
-			A.hssl.Rr = A.hssl.Rr * U;
-			A.hssr.Wl = A.hssr.Wl * V;
-			A.hssr.Wr = A.hssr.Wr * V;
+		[U,Su,V] = tcomp(A.B12, tol);
+		A.B12 = Su; Tl = Su.';
+		if A.A11.leafnode == 0
+			A.A11.Rl = A.A11.Rl * U;
+			A.A11.Rr = A.A11.Rr * U;
+			A.A22.Wl = A.A22.Wl * V;
+			A.A22.Wr = A.A22.Wr * V;
 		else
-			A.hssl.U = A.hssl.U * U;
-			A.hssr.V = A.hssr.V * V;
+			A.A11.U = A.A11.U * U;
+			A.A22.V = A.A22.V * V;
 		end
-		[U,Sl,V] = tcomp(A.Bl, tol);
-		A.Bl = Sl; Tu = Sl.';
-		if A.hssl.leafnode ==0
-			A.hssr.Rl = A.hssr.Rl * U;
-			A.hssr.Rr = A.hssr.Rr * U;
-			A.hssl.Wl = A.hssl.Wl * V;
-			A.hssl.Wr = A.hssl.Wr * V;
-			A.hssl = backward_stage(A.hssl, tol, Su, Tu, tcomp);
-			A.hssr = backward_stage(A.hssr, tol, Sl, Tl, tcomp);
+		[U,Sl,V] = tcomp(A.B21, tol);
+		A.B21 = Sl; Tu = Sl.';
+		if A.A11.leafnode ==0
+			A.A22.Rl = A.A22.Rl * U;
+			A.A22.Rr = A.A22.Rr * U;
+			A.A11.Wl = A.A11.Wl * V;
+			A.A11.Wr = A.A11.Wr * V;
+			A.A11 = backward_stage(A.A11, tol, Su, Tu, tcomp);
+			A.A22 = backward_stage(A.A22, tol, Sl, Tl, tcomp);
 		else
-			A.hssr.U = A.hssr.U * U;
-			A.hssl.V = A.hssl.V * V;
+			A.A22.U = A.A22.U * U;
+			A.A11.V = A.A11.V * V;
 		end
 	else
-		Su = [A.Bu, A.Rl * S];		
-		Tl = [A.Bu.', A.Wr * T]; % possibile inghippo
+		Su = [A.B12, A.Rl * S];		
+		Tl = [A.B12.', A.Wr * T]; % possibile inghippo
 		[Us,Su,Vs] = tcomp(Su, tol);
 		[Ut,Tl,Vt] = tcomp(Tl, tol);
-		k = size(A.Bu,2);
-		A.Bu = Su * Vs(1:k, :)' * Ut;
+		k = size(A.B12,2);
+		A.B12 = Su * Vs(1:k, :)' * Ut;
 		A.Rl = Us' * A.Rl; 
 		A.Wr = Ut' * A.Wr;
-		if A.hssl.leafnode == 0
-			A.hssl.Rl = A.hssl.Rl * Us;
-			A.hssl.Rr = A.hssl.Rr * Us;
-			A.hssr.Wl = A.hssr.Wl * Ut;
-			A.hssr.Wr = A.hssr.Wr * Ut;
+		if A.A11.leafnode == 0
+			A.A11.Rl = A.A11.Rl * Us;
+			A.A11.Rr = A.A11.Rr * Us;
+			A.A22.Wl = A.A22.Wl * Ut;
+			A.A22.Wr = A.A22.Wr * Ut;
 		else
-			A.hssl.U = A.hssl.U * Us;
-			A.hssr.V = A.hssr.V * Ut;
+			A.A11.U = A.A11.U * Us;
+			A.A22.V = A.A22.V * Ut;
 		end
 
-		Sl = [A.Bl, A.Rr * S];		
-		Tu = [A.Bl.', A.Wl * T]; % possibile inghippo
+		Sl = [A.B21, A.Rr * S];		
+		Tu = [A.B21.', A.Wl * T]; % possibile inghippo
 		[Us,Sl,Vs] = tcomp(Sl, tol);
 		[Ut,Tu,Vt] = tcomp(Tu, tol);
-		k = size(A.Bl,2);
-		A.Bl = Sl * Vs(1:k, :)' * Ut;
+		k = size(A.B21,2);
+		A.B21 = Sl * Vs(1:k, :)' * Ut;
 		A.Rr = Us' * A.Rr; 
 		A.Wl = Ut' * A.Wl;
-		if A.hssr.leafnode == 0
-			A.hssr.Rl = A.hssr.Rl * Us;
-			A.hssr.Rr = A.hssr.Rr * Us;
-			A.hssl.Wl = A.hssl.Wl * Ut;
-			A.hssl.Wr = A.hssl.Wr * Ut;
-			A.hssl = backward_stage(A.hssl, tol, Su, Tu, tcomp);
-			A.hssr = backward_stage(A.hssr, tol, Sl, Tl, tcomp);
+		if A.A22.leafnode == 0
+			A.A22.Rl = A.A22.Rl * Us;
+			A.A22.Rr = A.A22.Rr * Us;
+			A.A11.Wl = A.A11.Wl * Ut;
+			A.A11.Wr = A.A11.Wr * Ut;
+			A.A11 = backward_stage(A.A11, tol, Su, Tu, tcomp);
+			A.A22 = backward_stage(A.A22, tol, Sl, Tl, tcomp);
 		else		
 
-			A.hssr.U = A.hssr.U * Us;
-			A.hssl.V = A.hssl.V * Ut;
+			A.A22.U = A.A22.U * Us;
+			A.A11.V = A.A11.V * Ut;
 		end
 	end
 end

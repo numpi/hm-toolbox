@@ -7,24 +7,24 @@ function B = hss_ctranspose(A)
 		B.nl = A.ml;
 		B.mr = A.nr;
 		B.nr = A.mr;
-		B.Bu = A.Bl';
-		B.Bl = A.Bu';
-		if B.hssl.leafnode == 0
-			B.hssl.Rl = A.hssl.Wl;
-			B.hssl.Rr = A.hssl.Wr;
-			B.hssl.Wl = A.hssl.Rl;
-			B.hssl.Wr = A.hssl.Rr;
-			B.hssr.Rl = A.hssr.Wl;
-			B.hssr.Rr = A.hssr.Wr;
-			B.hssr.Wl = A.hssr.Rl;
-			B.hssr.Wr = A.hssr.Rr;
+		B.B12 = A.B21';
+		B.B21 = A.B12';
+		if B.A11.leafnode == 0
+			B.A11.Rl = A.A11.Wl;
+			B.A11.Rr = A.A11.Wr;
+			B.A11.Wl = A.A11.Rl;
+			B.A11.Wr = A.A11.Rr;
+			B.A22.Rl = A.A22.Wl;
+			B.A22.Rr = A.A22.Wr;
+			B.A22.Wl = A.A22.Rl;
+			B.A22.Wr = A.A22.Rr;
 		else
-			B.hssl.U = A.hssl.V;
-			B.hssl.V = A.hssl.U;
-			B.hssr.U = A.hssr.V;
-			B.hssr.V = A.hssr.U;
+			B.A11.U = A.A11.V;
+			B.A11.V = A.A11.U;
+			B.A22.U = A.A22.V;
+			B.A22.V = A.A22.U;
 		end
-		B.hssl = hss_ctranspose(B.hssl);
-		B.hssr = hss_ctranspose(B.hssr);
+		B.A11 = hss_ctranspose(B.A11);
+		B.A22 = hss_ctranspose(B.A22);
 	end
 end

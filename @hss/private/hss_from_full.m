@@ -123,13 +123,13 @@ if H.leafnode
 else
 	% fprintf('> Non-leafnode, mh = %d, nh = %d, m = %d, n = %d\n', mh, nh, m, n);
 	% Call the constructor recursively on the left and right childs
-	[H.hssl, rs, cs, row_offsets, col_offsets] = BuildHSS_iter(...
-		H.hssl, A, tol, rs, cs, ...
+	[H.A11, rs, cs, row_offsets, col_offsets] = BuildHSS_iter(...
+		H.A11, A, tol, rs, cs, ...
 		row_offsets, col_offsets, mh, nh);
 	
-	[H.hssr, rs, cs, row_offsets, col_offsets] = BuildHSS_iter(...
-		H.hssr, A, tol, rs, cs, row_offsets, col_offsets, ...
-		mh + size(H.hssl, 1), nh + size(H.hssl, 2));
+	[H.A22, rs, cs, row_offsets, col_offsets] = BuildHSS_iter(...
+		H.A22, A, tol, rs, cs, row_offsets, col_offsets, ...
+		mh + size(H.A11, 1), nh + size(H.A11, 2));
 	
 	% Extract Bl and Bu from the stacks, and merge the children
 	[row1, rs] = hss_pop(rs); [row2, rs] = hss_pop(rs);
@@ -143,8 +143,8 @@ else
 	assert(rs1 == rrV)
 	assert(cs1 == rrU)
 	
-	H.Bu = row2(1:rrV, 1:rlU)';
-	H.Bl = col2(1:rrU, 1:rlV);
+	H.B12 = row2(1:rrV, 1:rlU)';
+	H.B21 = col2(1:rrU, 1:rlV);
 	
 	if H.topnode
 		return;
@@ -227,20 +227,20 @@ end
 end
 
 function [rU, rV, rlU, rlV, rrU, rrV] = generatorsRank(H)
-if H.hssl.leafnode
-	rlU = size(H.hssl.U, 2);
-	rlV = size(H.hssl.V, 2);
+if H.A11.leafnode
+	rlU = size(H.A11.U, 2);
+	rlV = size(H.A11.V, 2);
 else
-	rlU = size(H.hssl.Rl, 2);
-	rlV = size(H.hssl.Wl, 2);
+	rlU = size(H.A11.Rl, 2);
+	rlV = size(H.A11.Wl, 2);
 end
 
-if H.hssr.leafnode
-	rrU = size(H.hssr.U, 2);
-	rrV = size(H.hssr.V, 2);
+if H.A22.leafnode
+	rrU = size(H.A22.U, 2);
+	rrV = size(H.A22.V, 2);
 else
-	rrU = size(H.hssr.Rl, 2);
-	rrV = size(H.hssr.Wl, 2);
+	rrU = size(H.A22.Rl, 2);
+	rrV = size(H.A22.Wl, 2);
 end
 
 rU = rlU + rrU;
@@ -263,8 +263,8 @@ if n > block_size
 	H.ml = m1; H.mr = m2;
 	H.nl = n1; H.nr = n2;
 	
-	H.hssl = build_hss_tree(m1, n1, block_size);
-	H.hssr = build_hss_tree(m2, n2, block_size);
+	H.A11 = build_hss_tree(m1, n1, block_size);
+	H.A22 = build_hss_tree(m2, n2, block_size);
 	
 	H.leafnode = 0;
 else

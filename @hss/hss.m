@@ -2,8 +2,8 @@ classdef hss
 	
 	properties
 		% top and bottom blocks of the matrix. 
-		Bu
-		Bl
+		B12
+		B21
 		
 		% Factorization of the upper triangular block as U12 * V12'
 		U
@@ -28,8 +28,8 @@ classdef hss
 		topnode
 		leafnode
 
-		hssl
-		hssr
+		A11
+		A22
         
         % parent
 		

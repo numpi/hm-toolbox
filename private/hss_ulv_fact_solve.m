@@ -55,9 +55,9 @@ function [x, F, ind, cind, b, idx] = hss_ulv_fact_solve_rec(F, A, cur_ind, b, id
 		% Reduce the columns of the diagonal block
 
 	else    % NOT A LEAF
-		[xl, F,   indl, cindl, bl, idx] = hss_ulv_fact_solve_rec(F, A.hssl,  cur_ind(1:A.nl), b(1:A.ml, :), idx);                    % recursive call on left  child
+		[xl, F,   indl, cindl, bl, idx] = hss_ulv_fact_solve_rec(F, A.A11,  cur_ind(1:A.nl), b(1:A.ml, :), idx);                    % recursive call on left  child
 
-		[xr, F,   indr, cindr, br, idx] = hss_ulv_fact_solve_rec(F, A.hssr,  cur_ind(A.nl+1:end), b(A.ml + 1:A.ml + A.mr, :), idx);  % recursive call on right child
+		[xr, F,   indr, cindr, br, idx] = hss_ulv_fact_solve_rec(F, A.A22,  cur_ind(A.nl+1:end), b(A.ml + 1:A.ml + A.mr, :), idx);  % recursive call on right child
 
 		x = [xl; xr]; % Store the computed variables
 

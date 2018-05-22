@@ -7,24 +7,24 @@ function B = hss_transpose(A)
 		B.nl = A.ml;
 		B.mr = A.nr;
 		B.nr = A.mr;
-		B.Bu = A.Bl.';
-		B.Bl = A.Bu.';
-		if B.hssl.leafnode == 0
-			B.hssl.Rl = conj(A.hssl.Wl);
-			B.hssl.Rr = conj(A.hssl.Wr);
-			B.hssl.Wl = conj(A.hssl.Rl);
-			B.hssl.Wr = conj(A.hssl.Rr);
-			B.hssr.Rl = conj(A.hssr.Wl);
-			B.hssr.Rr = conj(A.hssr.Wr);
-			B.hssr.Wl = conj(A.hssr.Rl);
-			B.hssr.Wr = conj(A.hssr.Rr);
+		B.B12 = A.B21.';
+		B.B21 = A.B12.';
+		if B.A11.leafnode == 0
+			B.A11.Rl = conj(A.A11.Wl);
+			B.A11.Rr = conj(A.A11.Wr);
+			B.A11.Wl = conj(A.A11.Rl);
+			B.A11.Wr = conj(A.A11.Rr);
+			B.A22.Rl = conj(A.A22.Wl);
+			B.A22.Rr = conj(A.A22.Wr);
+			B.A22.Wl = conj(A.A22.Rl);
+			B.A22.Wr = conj(A.A22.Rr);
 		else
-			B.hssl.U = conj(A.hssl.V);
-			B.hssl.V = conj(A.hssl.U);
-			B.hssr.U = conj(A.hssr.V);
-			B.hssr.V = conj(A.hssr.U);
+			B.A11.U = conj(A.A11.V);
+			B.A11.V = conj(A.A11.U);
+			B.A22.U = conj(A.A22.V);
+			B.A22.V = conj(A.A22.U);
 		end
-		B.hssl = hss_transpose(B.hssl);
-		B.hssr = hss_transpose(B.hssr);
+		B.A11 = hss_transpose(B.A11);
+		B.A22 = hss_transpose(B.A22);
 	end
 end

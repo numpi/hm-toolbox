@@ -47,4 +47,12 @@ H = hss('low-rank', U, V, B);
 CheckTestResult(norm(U * B *(V'*v) - H*v), '<', norm(v) * sqrt(n) * norm(U) * norm(V) * eps, ...
 	'Generation of an HSS representation for U * B * V^T ');
 
+n = 1024;
+k = 3;
+H = hss(diag(rand(n, 1)) + tril(rand(n, k) * rand(k, n)) + triu(rand(n, k) * rand(k, n)));
+
+CheckTestResult(hssrank(H), '<=', 2*k, ...
+	'Checking the rank of dense matrices (dense constructor)');
+
+
 end
