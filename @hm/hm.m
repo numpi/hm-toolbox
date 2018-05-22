@@ -56,6 +56,9 @@ classdef hm
                         obj = create_chebfun2_h_matrix(obj, varargin{2:end});
 					case 'toeplitz'
 						obj = create_toeplitz_h_matrix(obj, varargin{2:end});
+                    case 'cauchy'
+                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
+                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
 					otherwise
 						error('Unsupported constructor mode');
 				end
@@ -320,7 +323,35 @@ classdef hm
 				obj.A11 = initialize_toeplitz_h_matrix(hm(), am, ap, mp, tU12, tV12, tU21, tV21);				
 				obj.A22 = initialize_toeplitz_h_matrix(hm(), am, ap, n-mp, tU12, tV12, tU21, tV21);
 			end
-		end
+        end
+        
+        function obj = create_cauchy_h_matrix(obj, x, y)
+            n = length(x);
+            
+            obj.sz = [ n n ];
+            
+            x = reshape(x, length(x), 1);
+            y = reshape(y, length(y), 1);
+            
+            if n <= hmoption('block-size')
+                obj.F = 1 ./ (x + y.');
+                for i = 1 : n
+                    obj.F(i,i) = 0;
+                end
+            else
+                mp = ceil(n / 2);
+				np = ceil(n / 2);
+                
+                [obj.U21, obj.V21] = cauchy_lr(x(mp+1:end), y(1:np));
+                [obj.U12, obj.V12] = cauchy_lr(x(1:mp), y(np+1:end));
+                
+                obj.A11 = hm();
+                obj.A22 = hm();
+                
+                obj.A11 = create_cauchy_h_matrix(obj.A11, x(1:mp), y(1:np));
+                obj.A22 = create_cauchy_h_matrix(obj.A22, x(mp+1:end), y(np+1:end));
+            end
+        end
 
 		
     end
