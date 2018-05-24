@@ -4,6 +4,12 @@ function X = hss_sparse_dac_sylv(A, B, C, sA, sB)
 
 if A.leafnode == 1
 	X = hss();
+    
+    A.D
+    B.D
+    
+    keyboard
+    
 	X.D = lyap(A.D, B.D, C.D);
 
 	X.topnode = 1;
