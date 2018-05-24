@@ -3,7 +3,7 @@ function hm_RunAllTests
 
 addpath ../
 
-hm_TestHmCreation;
+hm_TestCreation;
 
 rmpath ../
 

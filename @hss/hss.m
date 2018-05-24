@@ -30,8 +30,6 @@ classdef hss
 
 		A11
 		A22
-        
-        % parent
 		
 	end
 	
