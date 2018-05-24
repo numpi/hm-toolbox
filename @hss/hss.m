@@ -46,7 +46,7 @@ classdef hss
       obj = hss();
 
 			if nargin == 1
-				obj = obj.hss_from_full_constructor(varargin{1});
+				obj = hss_from_full(varargin{1});
 				return;
 			end
 
@@ -55,7 +55,7 @@ classdef hss
 					case 'low-rank'
 						obj = hss_build_low_rank(varargin{2:end});
 					case 'banded'
-						obj = obj.hss_from_banded_constructor(varargin{2:end});
+						obj = hss_from_banded(varargin{2:end});
 					case 'chebfun2'
 						obj = hm2hss(hm('chebfun2', varargin{2:end}));
 					otherwise
@@ -70,14 +70,6 @@ classdef hss
 	% Start of the private methods used to instantiate the HSS objects
 	%
 	methods (Access = private)
-  
-    function obj = hss_from_full_constructor(obj, A)
-      obj = obj.hss_from_full(A);
-    end
-    
-    function obj = hss_from_banded_constructor(obj, varargin)
-      obj = obj.hss_from_banded(varargin{:});
-    end
   
 	end
 end
