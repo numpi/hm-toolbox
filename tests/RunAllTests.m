@@ -1,11 +1,8 @@
 function RunAllTests
-%RUNALLTESTS Run all the unit tests.
+%RUNALLTESTS Run all the unit tests
 
-addpath ../
-
-TestHmCreation;
-
-rmpath ../
+hm_RunAllTests;
+hss_RunAllTests;
 
 end
 

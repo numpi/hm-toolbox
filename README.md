@@ -1,4 +1,7 @@
 # Hierarchical matrix toolbox
+
+[![Build status](https://api.travis-ci.org/numpi/hm-toolbox.svg?branch=master)](https://travis-ci.org/numpi/hm-toolbox)
+
 The <code>hm-toolbox</code> is a toolbox implementing the arithmetic of H-matrices in MATLAB. 
 
 Only the simplest case of the so-called HODLR matrices is handled, where the partitioning

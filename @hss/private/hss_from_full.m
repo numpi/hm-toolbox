@@ -1,10 +1,13 @@
-function H = hss_from_full(A)
+function H = hss_from_full(obj, A)
 %HSS_FROM_FULL Build an HSS representation of a dense matrix.
 %
 % H = HSS_FROM_FULL(A) returns the HSS representation of A, where
 %     truncation is done at the relative tolerance indicated by
 %     hssoption('tolerance'), using the compression method indicated by
 %     hssoption('svd').
+%
+% This functions is equivalent to calling H = HSS(A) with no other options, 
+% which is the preferred syntax. 
 %
 % The implemenetation and the algorithm is based on the one presented in
 % the paper
@@ -15,6 +18,12 @@ function H = hss_from_full(A)
 %
 % The complexity of the algorithm, assuming a low HSS rank, is quadratic in
 % the dimension.
+
+% When called with one variable only we are not invoked as a method, therefore, 
+% we shall set A equal to the first parameter. 
+if ~exist('A', 'var')
+  A = obj;
+end
 
 m = size(A, 1);
 n = size(A, 2);

@@ -38,7 +38,7 @@ y = reshape(y, ny, 1);
 % fprintf(' => Cauchy(%d, %d)\n', nx, ny);
 
 if max(nx, ny) <= bs
-    C = 1 ./ (x + y.');
+    C = 1 ./ (x * ones(1, ny) + ones(nx, 1) * y.');
     
     [U, S, V] = svd(C, 'econ');
     

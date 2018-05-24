@@ -1,4 +1,35 @@
-function B = hss_build_band(A, bl, bu)
+function B = hss_from_banded(varargin)
+%HSS_FROM_BANDED Build an HSS matrix from a banded one. 
+% 
+% B = HSS_FROM_BANDED(A) builds an HSS representation of the banded matrix A. 
+%     The bandwidth is determined automatically. If possible, consider passing 
+%     arguments indicating the lower and upper bandwidth, in the form
+%
+%        B = HSS_FROM_BANDED(A, BL, BU); 
+%
+
+switch nargin
+  case 1
+    A = varargin{1};
+    A
+    [bl, bu] = bandwidth(A);
+    
+  case 3
+    A = varargin{1};
+    bl = varargin{2};
+    bu = varargin{3};
+    
+  case 4
+    A = varargin{2};
+    bl = varargin{3};
+    bu = varargin{4};
+    
+  otherwise
+    error('Unsupported number of parameters');
+end
+    
+    
+  
     if size(A,1) < hssoption('block-size')
         B = hss(A);
         return;

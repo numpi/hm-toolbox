@@ -1,4 +1,4 @@
-function TestHmCreation
+function hm_TestCreation
 %
 % Test the correction generation of HM matrices. 
 %

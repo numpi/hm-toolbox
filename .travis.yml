@@ -1,0 +1,12 @@
+language: generic
+sudo: enabled
+before_install:
+  - sudo add-apt-repository ppa:alexlarsson/flatpak -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq -y flatpak
+  - wget https://flathub.org/repo/appstream/org.octave.Octave.flatpakref
+  - sudo flatpak install -y org.octave.Octave.flatpakref
+
+dist: xenial
+
+script: flatpak run org.octave.Octave --no-gui --eval "addpath tests; RunAllTests;"

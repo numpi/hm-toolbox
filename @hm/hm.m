@@ -334,7 +334,7 @@ classdef hm
             y = reshape(y, length(y), 1);
             
             if n <= hmoption('block-size')
-                obj.F = 1 ./ (x + y.');
+                obj.F = 1 ./ (x * ones(1, n) + ones(n, 1) * y.');
                 for i = 1 : n
                     obj.F(i,i) = 0;
                 end
