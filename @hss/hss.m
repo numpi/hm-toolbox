@@ -56,6 +56,8 @@ classdef hss
 						obj = hss_from_banded(varargin{2:end});
 					case 'chebfun2'
 						obj = hm2hss(hm('chebfun2', varargin{2:end}));
+					case 'cauchy'
+						obj = hm2hss(hm('cauchy', varargin{2:end}));
 					otherwise
 						error('Unsupported constructor mode');
 				end

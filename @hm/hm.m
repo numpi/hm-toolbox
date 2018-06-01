@@ -56,9 +56,9 @@ classdef hm
                         			obj = create_chebfun2_h_matrix(obj, varargin{2:end});
 					case 'toeplitz'
 						obj = create_toeplitz_h_matrix(obj, varargin{2:end});
-                    case 'cauchy'
-                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
-                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
+                    			case 'cauchy'
+                        			warning('The CAUCHY constructor is not (yet) efficiently implemented');
+                        			obj = create_cauchy_h_matrix(obj, varargin{2:end});
 					otherwise
 						error('Unsupported constructor mode');
 				end
@@ -340,7 +340,7 @@ classdef hm
                 end
             else
                 mp = ceil(n / 2);
-				np = ceil(n / 2);
+		np = ceil(n / 2);
                 
                 [obj.U21, obj.V21] = cauchy_lr(x(mp+1:end), y(1:np), hmoption('threshold'));
                 [obj.U12, obj.V12] = cauchy_lr(x(1:mp), y(np+1:end), hmoption('threshold'));

@@ -38,6 +38,7 @@ y = reshape(y, ny, 1);
 % fprintf(' => Cauchy(%d, %d)\n', nx, ny);
 
 if max(nx, ny) <= bs
+
     C = 1 ./ (x * ones(1, ny) + ones(nx, 1) * y.');
     
     [U, S, V] = svd(C, 'econ');
@@ -51,10 +52,11 @@ else
     xm = mean(x);
     ym = mean(y);
     
-    if max(x - xm) < .5 * min(xm + y)
+    if max(abs(x - xm)) < .5 * min(abs(xm + y))
+
         % Perform a Taylor expansion in the variable x around the point xm        
-        k = -floor(log(tol) / log(min(xm+y) / max(abs(x-xm))));
-        scl = 1 ./ max(x - xm);
+        k = -floor(log(tol) / log(min(abs(xm+y)) / max(abs(x-xm))));
+        scl = 1 ./ max(abs(x - xm));
         
         U = ones(nx, k + 1);
         V = ones(ny,  k + 1);
@@ -65,10 +67,12 @@ else
             U(:,j+1) = -U(:,j) .* (x - xm) .* scl;
             V(:,j+1) = V(:,j) ./ (y + xm) ./ scl;
         end
-    elseif max(y - ym) < .5 * min(ym + x)
+	V = conj(V);
+    elseif max(abs(y - ym)) < .5 * min(abs(ym + x))
+
         % Perform a Taylor expansion in the variable y around the point ym
-        k = -floor(log(tol) / log(min(ym+x) / max(abs(y-ym))));
-        scl = 1 ./ max(y - ym);
+        k = -floor(log(tol) / log(min(abs(ym+x)) / max(abs(y-ym))));
+        scl = 1 ./ max(abs(y - ym));
         
         U = ones(nx, k + 1);
         V = ones(ny, k + 1);
@@ -77,8 +81,9 @@ else
         
         for j = 1 : k
             U(:,j+1) = -U(:,j) ./ (x + ym) .* scl;
-            V(:,j+1) = V(:,j) .* (y - ym) ./ scl;
+            V(:,j+1) = V(:,j) .* (y - ym) ./ scl ;
         end
+	V = conj(V);
     else
         % If no expansion is possible with a fast decay, further subdivided
         % the domain, until that condition is met. 
@@ -115,7 +120,6 @@ else
          if compress
              [QU, RU] = qr(U, 0);
              [QV, RV] = qr(V, 0);
-
              [U, S, V] = svd(RU * RV', 'econ');
 
              rk = sum(diag(S) > tol * S(1,1));
