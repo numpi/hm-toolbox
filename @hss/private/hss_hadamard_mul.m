@@ -26,10 +26,12 @@ C = hss();
 		C.D = A.D .* B.D;
 		C.U = [];
 		C.V = [];
-		for j = 1:size(A.V,2)  % Is there a better way?
+		for j = 1:size(A.U,2)  % Is there a better way?
 			C.U = [C.U, diag(A.U(:,j)) * B.U];
-			C.V = [C.V, diag(A.V(:,j)) * B.V];
 		end
+		for j = 1:size(A.V,2)  % Is there a better way?
+			C.V = [C.V, diag(A.V(:,j)) * B.V];
+		end		
 	else 
 		C.B12 = kron(A.B12, B.B12);
 		C.B21 = kron(A.B21, B.B21);

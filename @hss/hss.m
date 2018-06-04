@@ -52,6 +52,8 @@ classdef hss
 				switch varargin{1}
 					case 'low-rank'
 						obj = hss_build_low_rank(varargin{2:end});
+					case 'diagonal'
+						obj = hss_build_diagonal(varargin{2:end});
 					case 'banded'
 						obj = hss_from_banded(varargin{2:end});
 					case 'chebfun2'
