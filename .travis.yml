@@ -10,4 +10,9 @@ install:
 
 dist: xenial
 
+notifications:
+  email:
+    - leo@robol.it
+    - stefano.massei@epfl.ch
+
 script: flatpak run org.octave.Octave --no-gui --eval "addpath tests; RunAllTests;"
