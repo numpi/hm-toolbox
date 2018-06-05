@@ -11,7 +11,7 @@ function B = hss_from_banded(varargin)
 switch nargin
   case 1
     A = varargin{1};
-    A
+    %A
     [bl, bu] = bandwidth(A);
     
   case 3
