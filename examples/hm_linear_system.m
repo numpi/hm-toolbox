@@ -1,4 +1,4 @@
-%HM_LINEAR_SYSTEM
+%% Solving a rank structured linear system
 %
 % Solve a linear system defined by the sum of a banded matrix with a
 % low-rank one, using the HODLR representation. 
