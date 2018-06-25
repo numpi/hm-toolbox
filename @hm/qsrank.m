@@ -4,12 +4,5 @@ function rk = qsrank(H)
 % RK = QSRANK(H) returns the maximum rank in the representation of the
 % off-diagonal blocks. 
 
-if ~isempty(H.F)
-	rk = 0;
-else
-	rk = max([ qsrank(H.A11), qsrank(H.A22), ...
-			   size(H.U12, 2), size(H.U21, 2) ]);
-end
-
-end
-
+warning('QSRANK is deprecated, please use HMRANK instead');
+rk = hmrank(H);

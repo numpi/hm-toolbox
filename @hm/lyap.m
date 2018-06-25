@@ -1,7 +1,32 @@
 function X = lyap(A, C, varargin)
 %LYAP Solve the Lyapounov equation AX + XA' + C = 0
+%
+% X = LYAP(A, C) solves the Lyapunov equation using a divide and conquer
+%     method. 
+%
+% X = LYAP(A, C, SA) uses the D&C method exploiting the sparse version of
+%     A, passed as the argument SA, to construct the Krylov spaces. 
+%
+% X = LYAP(A, C, 'method', METHOD) uses the method specified. The available
+%     options are: 
+%      - 'd&c': The D&C approach of [2]. 
+%      - 'sign': The sign function iteration, see [1,3] (works only if
+%         A has eigenvalue on the open left or right half-planes).
+%      - 'expm': Uses a quadrature formula to approimate the solution [3]. 
+%         Works for positive definite matrices. 
+% 
+% [1] Grasedyck, L., Hackbusch, W., & Khoromskij, B. N. (2003). Solution
+%     of large scale algebraic matrix Riccati equations by use of 
+%     hierarchical matrices. Computing, 70(2), 121-165.
+% 
+% [2] Kressner, D., Massei, S., & Robol, L. (2017). Low-rank updates 
+%     and a divide-and-conquer method for linear matrix equations. 
+%     arXiv preprint arXiv:1712.04349.
+%
+% [3] Massei, S., Palitta, D., & Robol, L. (2017). Solving rank structured
+%     Sylvester and Lyapunov equations. arXiv preprint arXiv:1711.05493.
 
-N = 32;
+N = 64;
 
 [x, w] = hm_legpts(N);
 
@@ -17,7 +42,7 @@ p = inputParser;
 
 addParameter(p, 'debug', false, @islogical);
 addParameter(p, 'expm',  'pade', @ischar);
-addParameter(p, 'method', 'expm', @ischar);
+addParameter(p, 'method', 'd&c', @ischar);
 addParameter(p, 'parallel', false, @islogical);
 
 parse(p, varargin{:});
@@ -34,7 +59,7 @@ end
 
 if strcmp(method, 'd&c')
 	X = dac_lyap(A,A',C);
-        X = compress_hmatrix(X);
+    X = compress_hmatrix(X);
 	return;
 end
 

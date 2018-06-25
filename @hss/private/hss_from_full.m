@@ -71,12 +71,12 @@ if H.leafnode
 		Z = hss_elementAt(cs, j);
 		
 		% FIXME: We should preallocate B
-		B = [ Z(col_offsets(j+1)+1:col_offsets(j+1)+m,:) , B ];
+        B = [ Z(col_offsets(j+1)+1:col_offsets(j+1)+m,:) , B ];
 	end
 	
 	[H.U, Z] = compress_hss_block(B, tol);
 	
-	% Push Z in the stack, and updates the elements in the as well
+	% Push Z in the stack, and updates the elements in there as well
 	counter = 0;
 	for j = 0 : length(col_offsets) - 1
 		W = hss_elementAt(cs, j);
@@ -186,7 +186,7 @@ else
 	H.Rl = U(1:rlU, :);
 	H.Rr = U(rlU+1:end, :);
 	
-	% Push Z in the stack, and updates the elements in the as well
+	% Push Z in the stack, and updates the elements in there as well
 	counter = 0;
 	for j = 0 : length(col_offsets) - 1
 		W = hss_elementAt(cs, j);
@@ -288,9 +288,10 @@ n2 = n - n1;
 end
 
 function [U, Z] = compress_hss_block(B, tol)
+
 if isempty(B)
 	U = zeros(size(B, 1), 0);
-	Z = zeros(0, size(B, 2));
+	Z = zeros(size(B, 2), 0);
 	return
 end
 

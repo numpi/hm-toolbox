@@ -29,6 +29,8 @@ X = blkdiag(...
 u = [ CU , AU , X * AV ];
 v = [ CV , X' * AV, AU ];
 
+size(u, 2)
+
 tol = hssoption('threshold');
 %[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
 %tol = tol / norm(ru * rv');
@@ -42,11 +44,12 @@ if use_sylv
 		[AA, AT] = ek_struct(sA);
 	end
 	
-	[u, v] = compress_factors(u, v, 1);%lr_norm(u,v)
+	[u, v] = compress_factors(u, v, 1.0);
+    % norm(u) * norm(v)
 	if size(u,2) > 0	
 		if ~diagblk
 			[Xu,Xv] = ek_sylv(AA, AA, -u, v, inf, tol);
-    		else
+    	else
 			[Xu,Xv] = ek_sylv_blkdiag2(sA, sA, -u, v, inf, tol);
 		end
 		A.topnode = 0;

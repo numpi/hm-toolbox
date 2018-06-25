@@ -53,7 +53,7 @@ end
 	
     % Enable for sign method debugging
     % fprintf ('SIGN :: Iteration %d, Relative correction: %e\n', it, corr);  
-    % fprintf('SIGN :: Iteration %d, qsrank %d\n', it, qsrank(A));
+    % fprintf('SIGN :: Iteration %d, hmrank %d\n', it, hmrank(A));
     it = it + 1;
 end
 

@@ -40,11 +40,10 @@ if debug
 	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
 	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
 end
-n
+
 % Solve with Krylov methods for the low-rank update
 tol = hmoption('threshold');
-[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
-[ Xu, Xv ] = ek_sylv(A, B', -u, v, inf, tol / norm(ru * rv'));
+[ Xu, Xv ] = ek_sylv(A, B', -u, v, inf, tol);
 
 if debug 
 	XX=hm('low-rank',Xu,Xv);

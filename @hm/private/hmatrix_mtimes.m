@@ -7,9 +7,6 @@ if ~isempty(H1.F)
 	H.F = H1.F * H2.F;
 else		
 	H.A11 = hmatrix_mtimes(H1.A11, H2.A11);
-	% if qsrank(H.A11) > 3
-	%	qsrank(H.A11)
-	%end
 	U = H1.U12 * (H1.V12.' * H2.U21);
 	H.A11 = hmatrix_rank_update(H.A11, U, H2.V21);	
 	

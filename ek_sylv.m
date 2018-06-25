@@ -74,6 +74,35 @@ end
 
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
+    if ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
+            ( size(VB, 2) + 2 * bsb >= size(VB, 1) )
+        
+        warning('HM:EK_SYLV', ...
+            'Extended Krylov space is equal to the whole space: using dense solver');
+        
+        na = size(VA, 1);
+        nb = size(VB, 1);
+        
+        A = AA.multiply(1.0, 0.0, eye(na));
+        B = BB.multiply(1.0, 0.0, eye(nb));
+        
+        Y = lyap(A, B, u * v');
+        
+        [UU,SS,VV] = svd(Y);
+
+        % rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
+        rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
+
+        Xu = UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
+        Xv = VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
+        
+        if debug
+            fprintf('%d Dense solver: rank %d, size %d\n', it, rk, max(na,nb));
+        end
+        
+        return;
+    end
+    
     [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, [0 inf], param_A);
     [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, [0 inf], param_B);
     

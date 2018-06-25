@@ -52,13 +52,13 @@ classdef hm
 						obj = create_diagonal_h_matrix(obj, varargin{2:end});
 					case 'sparse'
 						obj = create_sparse_h_matrix(obj, varargin{2});
-                    			case 'chebfun2'
-                        			obj = create_chebfun2_h_matrix(obj, varargin{2:end});
+                    case 'chebfun2'
+                    	obj = create_chebfun2_h_matrix(obj, varargin{2:end});
 					case 'toeplitz'
 						obj = create_toeplitz_h_matrix(obj, varargin{2:end});
-                    			case 'cauchy'
-                        			warning('The CAUCHY constructor is not (yet) efficiently implemented');
-                        			obj = create_cauchy_h_matrix(obj, varargin{2:end});
+                    case 'cauchy'
+                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
+                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
 					otherwise
 						error('Unsupported constructor mode');
 				end
