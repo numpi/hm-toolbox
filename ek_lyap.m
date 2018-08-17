@@ -83,10 +83,10 @@ it = it + 1;
 end
 
 [QQ, DD] = eig(Y);
-nn = max(abs(diag(DD)));
-ii = find(arrayfun(@(s) tol(s, nn / nrmA), diag(DD)) == false );
-%ii = find(arrayfun(@(i) tol(
-%diag(DD) > max(diag(DD)) * tol / nrmA);
+
+rk = sum(arrayfun(@(s) tol(s, max(abs(diag(DD))) / nrmA), ...
+    abs(diag(DD))) == false);
+[~,ii] = sort(diag(abs(DD))); ii = ii(end:-1:end-rk+1);
 
 Xu = VA(:,1:size(QQ,1)) * QQ(:,ii) * sqrt(DD(ii,ii));
 
