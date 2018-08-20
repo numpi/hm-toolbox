@@ -30,8 +30,8 @@ v = [ CV , X' * AV, BV ];
 A.topnode = 1;
 B.topnode = 1;
 
-[~,ru] = qr(u,0); [~,rv] = qr(v,0);
-%tol = hssoption('threshold') / norm(ru * rv');
+% [~,ru] = qr(u,0); [~,rv] = qr(v,0);
+% tol = hssoption('threshold') / norm(ru * rv');
 tol = hssoption('threshold');
 [Xu, Xv] = ek_sylv(sA, sB, -u, v, inf, tol);
 

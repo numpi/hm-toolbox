@@ -15,8 +15,10 @@ switch ul
 		U = Ur * A.B21;
 		V = Vl;
 	case 'all'
-		U = [ zeros(size(Ul,1), size(A.B21,2)) , Ul * A.B12 ; Ur * A.B21 , zeros(size(Ur,1), size(A.B12,2)) ];
-		V = [ Vl , zeros(size(Vl,1), size(Vr,2)) ; zeros(size(Vr,1), size(Vl,2)) , Vr ];
+		U = [ zeros(size(Ul,1), size(A.B21,2)) , ...
+            Ul * A.B12 ; Ur * A.B21 , zeros(size(Ur,1), size(A.B12,2)) ];
+		V = [ Vl , zeros(size(Vl,1), size(Vr,2)) ; ...
+            zeros(size(Vr,1), size(Vl,2)) , Vr ];
 	end
 end
 

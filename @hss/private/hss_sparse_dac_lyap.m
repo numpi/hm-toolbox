@@ -29,8 +29,6 @@ X = blkdiag(...
 u = [ CU , AU , X * AV ];
 v = [ CV , X' * AV, AU ];
 
-size(u, 2)
-
 tol = hssoption('threshold');
 %[~,ru] = qr(u, 0); [~,rv] = qr(v, 0);
 %tol = tol / norm(ru * rv');

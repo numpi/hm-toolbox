@@ -77,8 +77,8 @@ while max(sa-2*bsa, sb-2*bsb) < k
     if ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
             ( size(VB, 2) + 2 * bsb >= size(VB, 1) )
         
-        warning('HM:EK_SYLV', ...
-            'Extended Krylov space is equal to the whole space: using dense solver');
+        %warning('HM:EK_SYLV', ...
+        %    'Extended Krylov space is equal to the whole space: using dense solver');
         
         na = size(VA, 1);
         nb = size(VB, 1);
@@ -86,7 +86,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
         A = AA.multiply(1.0, 0.0, eye(na));
         B = BB.multiply(1.0, 0.0, eye(nb));
         
-        Y = lyap(A, B, u * v');
+        Y = lyap(A, B', -u * v');
         
         [UU,SS,VV] = svd(Y);
 
