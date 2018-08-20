@@ -14,6 +14,9 @@ function X = lyap(A, C, varargin)
 %         A has eigenvalue on the open left or right half-planes).
 %      - 'expm': Uses a quadrature formula to approimate the solution [3]. 
 %         Works for positive definite matrices. 
+%
+% X = LYAP(A, C, sA) uses the D&C approach exploiting the sparse structure
+%     of A, stored in the variable SA. 
 % 
 % [1] Grasedyck, L., Hackbusch, W., & Khoromskij, B. N. (2003). Solution
 %     of large scale algebraic matrix Riccati equations by use of 
@@ -34,7 +37,7 @@ if ~isempty(varargin) && ~ischar(varargin{1})
 	nrmA = norm(A);
 	
 	X = sparse_dac_lyap(A / nrmA, A' / nrmA, C / nrmA , ...
-		varargin{1} / nrmA, varargin{2} / nrmA);
+		varargin{1} / nrmA, varargin{1}' / nrmA);
 	return;
 end
 
