@@ -112,12 +112,14 @@ classdef hm
 			end
 		end
 		
-		function H = create_banded_h_matrix(obj, A, band)
+		function H = create_banded_h_matrix(obj, A, bandl, bandu)
 		%CREATE_BANDED_H_MATRIX Create a banded H-matrix. 
 			H = obj;
 
 			block_size = hmoption('block-size');
-
+			if ~exist('bandu', 'var')
+				bandu = bandl;
+			end
 			if size(A, 1) <= block_size
 				H.F = full(A);
 				H.sz = size(A);
@@ -125,19 +127,19 @@ classdef hm
 				mp = ceil(size(A, 1) / 2);
 				n = size(A, 1);
 
-				if band <= min(n - mp)
-					H.A11 = create_banded_h_matrix(hm(), A(1:mp,1:mp), band);
-					H.A22 = create_banded_h_matrix(hm(), A(mp+1:end,mp+1:end), band);
+				if max(bandu, bandl) <= min(n - mp)
+					H.A11 = create_banded_h_matrix(hm(), A(1:mp,1:mp), bandl, bandu);
+					H.A22 = create_banded_h_matrix(hm(), A(mp+1:end,mp+1:end), bandl, bandu);
 
-					H.U12 = [ zeros(mp-band,band) ; full(A(mp-band+1:mp,mp+1:mp+band)) ];
-					H.V12 = [ eye(band) ; zeros(n - mp - band, band) ];
+					H.U12 = [ zeros(mp - bandu, bandu) ; full(A(mp - bandu + 1:mp, mp + 1:mp + bandu)) ];
+					H.V12 = [ eye(bandu) ; zeros(n - mp - bandu, bandu) ];
 
-					H.U21 = [ full(A(mp+1:mp+band,mp-band+1:mp)) ; zeros(n - mp - band, band) ];
-					H.V21 = [ zeros(mp-band, band) ; eye(band) ];
+					H.U21 = [ full(A(mp + 1:mp + bandl, mp - bandl + 1:mp)) ; zeros(n - mp - bandl, bandl) ];
+					H.V21 = [ zeros(mp - bandl, bandl) ; eye(bandl) ];
                     
-                    % Perform a compression
-                    [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));                    
-                    [H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
+                    			% Perform a compression
+                    			[H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));                    
+                    [			H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
 				else
 					H = create_h_matrix(H, full(A));
 				end

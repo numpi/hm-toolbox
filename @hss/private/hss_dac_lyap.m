@@ -33,7 +33,7 @@ v = [ CV , X' * AV, BV ];
 A.topnode = 1;
 B.topnode = 1;
 
-[Xu, Xv] = ek_sylv(A, B, -u, v, inf, tol);
+[Xu, Xv] = ek_sylv(A, B, u, v, inf, tol);
 
 A.topnode = 0;
 B.topnode = 0;

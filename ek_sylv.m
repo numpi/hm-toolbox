@@ -1,5 +1,5 @@
 function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrm_type)
-%EK_SYLV Approximate the solution of a Sylvester equation AX + XB' = U*V'.
+%EK_SYLV Approximate the solution of a Sylvester equation AX + XB' + U*V' = 0.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the 
 %     Sylvester equation in the factored form XU * XV'. 
@@ -86,7 +86,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
         A = AA.multiply(1.0, 0.0, eye(na));
         B = BB.multiply(1.0, 0.0, eye(nb));
         
-        Y = lyap(A, B', -u * v');
+        Y = lyap(A, B', u * v');
         
         [UU,SS,VV] = svd(Y);
 

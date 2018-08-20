@@ -38,18 +38,17 @@ v = [ v1, zeros(size(v1,1), size(v2, 2));zeros(size(v2,1), size(v1, 2)), v2];
 if debug
 	dA = A; dA.A11=hm(zeros(size(A.A11))); dA.A22=hm(zeros(size(A.A22))); dB = B; dB.A11=hm(zeros(size(B.A11))); dB.A22=hm(zeros(size(B.A22)));
 	dC = C; dC.A11=hm(zeros(size(C.A11))); dC.A22=hm(zeros(size(C.A22))); 
-	norm(dC+dA*X+X*dB-hm('low-rank',u,v)) 
+	norm(dC + dA * X + X * dB + hm('low-rank',u,v)) 
 end
 
 % Solve with Krylov methods for the low-rank update
 tol = hmoption('threshold');
-[ Xu, Xv ] = ek_sylv(A, B', -u, v, inf, tol);
+[ Xu, Xv ] = ek_sylv(A, B', u, v, inf, tol);
 
 if debug 
 	XX=hm('low-rank',Xu,Xv);
 	norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))
 end
-%X=X-XX;
 X = hmatrix_rank_update(X, Xu, Xv);
 
 

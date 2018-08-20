@@ -4,6 +4,7 @@ function hm_RunAllTests
 addpath ../
 
 hm_TestCreation;
+hm_TestOperations;
 hm_TestLyapunov;
 
 rmpath ../

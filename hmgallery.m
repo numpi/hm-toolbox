@@ -52,11 +52,32 @@ case 'haber'
 		
 		varargout{1} = hm('banded', A, 6);
 		varargout{2} = hm('banded', P, 11);
-		
+case 'rand'	
+	if isempty(varargin)
+            n = 2048; k = 10;
+        elseif length(varargin) == 1
+            n = varargin{1}; k = 10;     
+	else
+	    n = varargin{1}; k = varargin{2};    
+        end
+	H = hm('diagonal', ones(n, 1));	
+	H = hm_rand_ric(H, k);
+	varargout{1} = H;
     otherwise
         error('Unsupported example name');
 end
+end
 
-
+function H = hm_rand_ric(H, k)
+	if ~isempty(H.F)
+		H.F = randn(size(H.F));
+	else
+		H.U12 = randn(size(H.U12, 1), k);
+		H.V12 = randn(size(H.U12, 1), k);
+		H.U21 = randn(size(H.U12, 1), k);
+		H.V21 = randn(size(H.U12, 1), k);
+		H.A11 =	hm_rand_ric(H.A11, k);
+		H.A22 = hm_rand_ric(H.A22, k);
+	end
 end
 

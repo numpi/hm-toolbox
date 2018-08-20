@@ -37,9 +37,9 @@ end
 % Compute the solution of the Lyapunov equation (word of warning: please
 % check the sign of C in the implementation of SylvKrylov).
 if ~is_lyapunov
-	Y = lyap(HA1, HB1', -C(1:end-bsa,1:end-bsb));
+	Y = lyap(HA1, HB1', C(1:end-bsa,1:end-bsb));
 else
-	Y = lyap(HA1, -C(1:end-bsa,1:end-bsa));
+	Y = lyap(HA1, C(1:end-bsa,1:end-bsa));
 end
 
 % Check the residual
