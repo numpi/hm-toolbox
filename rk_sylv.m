@@ -32,26 +32,8 @@ if ~exist('rat_krylov', 'file')
     error('rktoolbox not found. Did you forget to add it to the path?');
 end
 
-
-if ~isstruct(A)
-	if issparse(A)
-		AA = ek_struct(A, issymmetric(A));
-	else
-		AA = ek_struct(A, false);
-	end
-else
-	AA = A;
-end
-
-if ~isstruct(B) 
-	if issparse(B)
-		BB = ek_struct(B', issymmetric(B));
-	else
-		BB = ek_struct(B', false);
-	end
-else
-	BB = B';
-end
+AA = A;
+BB = B';
 
 nrmA = AA.nrm;
 nrmB = BB.nrm;
