@@ -222,7 +222,7 @@ classdef hm
             block_size = hmoption('block-size');
             obj.sz = [ n, n ];
 
-            if ~exist('chebfun2', 'class')
+            if ~exist('chebfun2')
                 error('Chebfun not found: did you forget to add it to the path?');
             end
             

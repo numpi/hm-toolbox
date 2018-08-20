@@ -23,8 +23,8 @@ X = blkdiag(...
 	hss_sparse_dac_lyap(A.A22, C.A22, sA(A.ml+1:end, A.nl+1:end), use_sylv) ...
 );
 
-[CU,CV] = hss_offdiag(C);
-[AU,AV] = hss_offdiag(A);
+[CU, CV] = hss_offdiag(C);
+[AU, AV] = hss_offdiag(A);
 
 u = [ CU , AU , X * AV ];
 v = [ CV , X' * AV, AU ];
