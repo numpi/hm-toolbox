@@ -33,4 +33,5 @@ You are now ready to create new @hm and @hss objects. Check some examples in the
 # References
 
 [1] Massei, S., Palitta, D., & Robol, L. (2017). Solving rank structured Sylvester and Lyapunov equations. arXiv preprint arXiv:1711.05493.
+
 [2] Kressner, D., Massei, S., & Robol, L. (2017). Low-rank updates and a divide-and-conquer method for linear matrix equations. arXiv preprint arXiv:1712.04349.
