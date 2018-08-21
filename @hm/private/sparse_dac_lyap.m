@@ -12,7 +12,7 @@ if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
 end
 
 if n <= 256
-	X = hm(lyap(full(A),full(B),full(C)));
+	X = hm(lyap(full(A), full(B), full(C)));
 	return
 end
 
@@ -47,7 +47,7 @@ if size(u1,2) > 0 && size(u2,2) > 0
 
 	% Solve with Krylov methods for the low-rank update
 	tol = hmoption('threshold');
-	[ Xu, Xv ] = ek_sylv(sA, sB', u, v, inf, tol);
+	[ Xu, Xv ] = ek_sylv(sA, sB, u, v, inf, tol);
 	if debug 
 		XX=hm('low-rank',Xu,Xv);
 		norm(A*XX+XX*B+hm('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))

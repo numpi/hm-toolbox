@@ -43,7 +43,7 @@ end
 
 % Solve with Krylov methods for the low-rank update
 tol = hmoption('threshold');
-[ Xu, Xv ] = ek_sylv(A, B', u, v, inf, tol);
+[ Xu, Xv ] = ek_sylv(A, B, u, v, inf, tol);
 
 if debug 
 	XX=hm('low-rank',Xu,Xv);

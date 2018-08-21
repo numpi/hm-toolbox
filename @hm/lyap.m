@@ -1,4 +1,4 @@
-function X = lyap(A, C, varargin)
+function X = lyap(varargin)
 %LYAP Solve the Lyapounov equation AX + XA' + C = 0
 %
 % X = LYAP(A, C) solves the Lyapunov equation using a divide and conquer
@@ -31,38 +31,69 @@ function X = lyap(A, C, varargin)
 
 N = 64;
 
-[x, w] = hm_legpts(N);
-
-if ~isempty(varargin) && ~ischar(varargin{1})
-	nrmA = norm(A);
-	
-	X = sparse_dac_lyap(A / nrmA, A' / nrmA, C / nrmA , ...
-		varargin{1} / nrmA, varargin{1}' / nrmA);
-	return;
-end
-
 p = inputParser;
+
+A = varargin{1};
+if length(varargin) == 2 || ~isa(varargin{3}, 'hm')
+    C = varargin{2};
+    is_lyapunov = true;
+else
+    C = varargin{3};
+    B = varargin{2};
+    is_lyapunov = false;
+end
 
 addParameter(p, 'debug', false, @islogical);
 addParameter(p, 'expm',  'pade', @ischar);
 addParameter(p, 'method', 'd&c', @ischar);
 addParameter(p, 'parallel', false, @islogical);
 
-parse(p, varargin{:});
+for first_keyword = 1 : length(varargin)
+    if ischar(varargin{first_keyword})
+        first_keyword = first_keyword - 1;
+        break;
+    end
+end
+
+parse(p, varargin{first_keyword+1:end});
 
 debug = p.Results.debug;
 expm_method = p.Results.expm;
 method = p.Results.method;
 parallel = p.Results.parallel;
 
-if strcmp(method, 'sign')
-	X = sign_lyap(A, C);
+if ( is_lyapunov && length(varargin) >= 3 && issparse(varargin{3})  )|| ...
+   ( ~is_lyapunov && length(varargin) >= 4 && issparse(varargin{4}) )
+	
+    if is_lyapunov
+        X = sparse_dac_lyap(A, A', C, ...
+            varargin{3}, varargin{3}');
+    else
+        X = sparse_dac_lyap(A, B, C, ...
+            varargin{4}, varargin{5});
+    end
+    
 	return;
 end
 
 if strcmp(method, 'd&c')
-	X = dac_lyap(A,A',C);
+    if is_lyapunov
+        X = dac_lyap(A, A', C);
+    else
+        X = dac_lyap(A, B, C);
+    end
+    
     X = compress_hmatrix(X);
+	return;
+end
+
+if strcmp(method, 'sign')
+    if is_lyapunov
+        X = sign_lyap(A, C);
+    else
+        X = sign_lyap(A, B, C);
+    end
+    
 	return;
 end
 
@@ -70,6 +101,8 @@ if strcmp(method, 'adi')
 	X = adi_lyap(A, C, 1e-6, 100);
 	return;
 end
+
+[x, w] = hm_legpts(N);
 
 % Acceleration parameter. 
 L = 5;
