@@ -222,9 +222,9 @@ classdef hm
             block_size = hmoption('block-size');
             obj.sz = [ n, n ];
             
-            if ~exist('chebfun2')
-                error('Chebfun not found: did you forget to add it to the path?');
-            end
+            % if ~exist('chebfun2') && ~exist('chebapprox2')
+            %    error('Chebfun not found: did you forget to add it to the path?');
+            % end
             
             x = linspace(xdom(1), xdom(2), n);
             y = linspace(ydom(1), ydom(2), n);

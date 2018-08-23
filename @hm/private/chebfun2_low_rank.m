@@ -3,8 +3,16 @@ function [U, V] = chebfun2_low_rank(f, xdom, ydom, m, n)
 
 threshold = hmoption('threshold');
 
-cf = chebfun2(f, xdom, ydom);
-cc = chebcoeffs2(cf);
+try
+    % Chebapprox is a simplified chebfun drop-in replacement that only
+    % performs the interpolation part --- and that we can use in Octave
+    % where chebfun does not work. 
+    cf = chebapprox2(f, [ xdom ydom ], threshold);
+    cc = chebcoeffs(cf);
+catch
+    cf = chebfun2(f, [ xdom ydom ]);
+    cc = chebcoeffs2(cf);
+end
 
 U = zeros(m, 0);
 V = zeros(n, 0);
