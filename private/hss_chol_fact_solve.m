@@ -5,11 +5,11 @@ function x = hss_chol_fact_solve(F,b)
 %
 x = b;
 for j = 1:length(F.U)
-	x(F.ind{j}, :) = F.L{j} \ x(F.ind{j}, :);
-	x(F.ind{j}, :) = F.U{j}' * x(F.ind{j}, :);				
-end 
+    x(F.ind{j}, :) = F.L{j} \ x(F.ind{j}, :);
+    x(F.ind{j}, :) = F.U{j}' * x(F.ind{j}, :);
+end
 x(F.ind{end}, :) = F.L{end}'\(F.L{end} \ x(F.ind{end}, :));
 for j = length(F.U):-1:1
-		x(F.ind{j}, :) = F.U{j} * x(F.ind{j}, :);
-		x(F.ind{j}, :) = F.L{j}' \ x(F.ind{j}, :);				
-end 
+    x(F.ind{j}, :) = F.U{j} * x(F.ind{j}, :);
+    x(F.ind{j}, :) = F.L{j}' \ x(F.ind{j}, :);
+end

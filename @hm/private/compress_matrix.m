@@ -1,12 +1,12 @@
 function [U,V] = compress_matrix(A)
-%COMPRESS_MATRIX Compress a dense matrix into low rank format. 
+%COMPRESS_MATRIX Compress a dense matrix into low rank format.
 
 maxk = 64;
 
 if max(size(A)) < 2048
     [U,S,V] = svd(A);
 else
-    [U,S,V] = svds(A, maxk);    
+    [U,S,V] = svds(A, maxk);
 end
 
 threshold = hmoption('threshold');

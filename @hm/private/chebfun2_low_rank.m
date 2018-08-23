@@ -1,5 +1,5 @@
 function [U, V] = chebfun2_low_rank(f, xdom, ydom, m, n)
-%CHEBFUN2_LOW_RANK Create a low rank representation of the sampling of F. 
+%CHEBFUN2_LOW_RANK Create a low rank representation of the sampling of F.
 
 threshold = hmoption('threshold');
 
@@ -35,10 +35,10 @@ for i = 1 : size(cc, 1)
         gim1 = ones(n,1);
         gi = lx;
         g = cc(i,1) * ones(n,1) + cc(i,2) * linspace(-1,1,n).';
-        for j = 3 : size(cc, 2)        
+        for j = 3 : size(cc, 2)
             gn = 2 .* lx .* gi - gim1;
             gim1 = gi;
-            gi = gn;                  
+            gi = gn;
             g = g + cc(i,j) * gn;
         end
         V = [ V, g ];

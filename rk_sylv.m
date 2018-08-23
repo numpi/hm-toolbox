@@ -1,19 +1,19 @@
 function [Xu, Xv, As, Bs] = rk_sylv(poles, A, B, u, v, k, tol, debug, nrm_type)
 %RK_SYLV Approximate the solution of a Sylvester equation AX + XB' = U*V'.
 %
-% [XU,XV] = RK_SYLV(POLES, A, B, U, V, K) approximates the solution of the 
+% [XU,XV] = RK_SYLV(POLES, A, B, U, V, K) approximates the solution of the
 %     Sylvester equation in the factored form XU * XV'. The variable POLES
 %     is a 2 x N matrix containing the poles to use in the rational Krylov
 %     method. The poles for A are on the first row, the ones for B on the
-%     second one. 
+%     second one.
 %
-% [XU, VA] = RK_SYLV(POLES, A, B, U, V, K, TOL, DEBUG) also returns the 
-%     bases VA and VB, and the optional parameters TOL and DEBUG control 
-%     the stopping criterion and the debugging during the iteration. 
+% [XU, VA] = RK_SYLV(POLES, A, B, U, V, K, TOL, DEBUG) also returns the
+%     bases VA and VB, and the optional parameters TOL and DEBUG control
+%     the stopping criterion and the debugging during the iteration.
 %
 % The tolerance TOL can also be specified as a function TOL(R, N) that
 % takes as input the residual norm and the norm of the solution (R and N,
-% respectively), and returns true if the solution can be accepted. 
+% respectively), and returns true if the solution can be accepted.
 
 if ~exist('debug', 'var')
     debug = false;
@@ -72,21 +72,21 @@ while max(sa-bsa, sb-bsb) < k
     sb = size(VB, 2);
     
     if poles(1, counter) == inf && poles(2, counter) == inf
-    
+        
         % Compute the solution and residual of the projected Lyapunov equation
         As = HA(1:end-bsa,:) / KA(1:end-bsa,:);
         Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:);
         Cs = zeros(size(As, 1), size(Bs, 1));
-
-        Cs(1:size(u,2), 1:size(v,2)) = Cprojected;    
-
+        
+        Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
+        
         [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb);
-
+        
         % You might want to enable this for debugging purposes
         if debug
             fprintf('%d Residue: %e\n', it, res / norm(Y));
         end
-
+        
         if tol(res, norm(Y, nrm_type)) % res < norm(Y) * tol
             break
         end

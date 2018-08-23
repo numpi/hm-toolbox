@@ -4,7 +4,7 @@ function [x, time ,n]= hss_solve(hss,b,run,I, J, S)
 % Theoretical framework:
 % S. Chandrasekaran, P. Dewilde, M. Gu, W. Lyons, and T. Pals, A fast
 % solver for HSS representations via sparse matrices , SIAM J. Matrix Anal.
-% Appl. 29 (2006/07), no. 1, 67--81 (electronic). 
+% Appl. 29 (2006/07), no. 1, 67--81 (electronic).
 % Chapter 4: 'Sparse represenation'
 %
 % inputs:
@@ -64,27 +64,27 @@ if run == true
         J = zeros(n,1);
         S = zeros(n,1);
     end
-
+    
     % prepare the struct for the time measurement
     time=struct();
-
- 
+    
+    
     % Compose the sparse matrix S out of the HSS representation
     % tic % time.composeS = cputime;
     [S, indb, indx, n] = hss_toSparse(hss,b,run,I, J, S);
     % time.composeS = toc; %cputime-time.composeS;
-   
+    
     % use \ to calculate x
     % tic %time.backslash = cputime;
     bHSS =  sparse(size(indb,1),size(b,2));
     bHSS(indb,:)=b;
     x=S\bHSS;
     % time.backslash = toc; %cputime-time.backslash;
-   
-   
+    
+    
     % Select the x
     x = x(indx,:);
-
+    
 else %run == false
     % tic
     [I, J, S, n] = hss_toSparse(hss,b,run);

@@ -1,23 +1,23 @@
 function X = hss_dac_lyap(A,B,C)
-% HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0 
+% HSS_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0
 %          where all the matrices are represented in the HSS format
 
 tol = hssoption('threshold');
 
 if A.leafnode == 1
-	X = hss();
-	X.D = lyap(A.D, B.D, C.D);
-
-	X.topnode = 1;
-	X.leafnode = 1;
-
-	return;
+    X = hss();
+    X.D = lyap(A.D, B.D, C.D);
+    
+    X.topnode = 1;
+    X.leafnode = 1;
+    
+    return;
 end
 
 X = blkdiag(...
-	hss_dac_lyap(A.A11, B.A11, C.A11), ...
-	hss_dac_lyap(A.A22, B.A22, C.A22) ...
-);
+    hss_dac_lyap(A.A11, B.A11, C.A11), ...
+    hss_dac_lyap(A.A22, B.A22, C.A22) ...
+    );
 
 
 [CU,CV] = hss_offdiag(C);

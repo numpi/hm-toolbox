@@ -1,5 +1,5 @@
 function [sz, sz2] = size(H, idx)
-%SIZE Size of an HSS matrix. 
+%SIZE Size of an HSS matrix.
 
 if nargout == 2
     if exist('idx', 'var')

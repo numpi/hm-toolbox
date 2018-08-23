@@ -4,7 +4,7 @@ function [U, V] = cauchy_lr(x, y, tol)
 % [U, V] = CAUCHY(X) constructs a low-rank representation of the matrix
 %     with entries 1 / (x(i) + y(j)).
 %
-% [U, V] = CAUCHY(X, TOL) truncates with the given tolerance. 
+% [U, V] = CAUCHY(X, TOL) truncates with the given tolerance.
 
 if isempty(x)
     U = [];
@@ -38,7 +38,7 @@ y = reshape(y, ny, 1);
 % fprintf(' => Cauchy(%d, %d)\n', nx, ny);
 
 if max(nx, ny) <= bs
-
+    
     C = 1 ./ (x * ones(1, ny) + ones(nx, 1) * y.');
     
     [U, S, V] = svd(C, 'econ');
@@ -53,8 +53,8 @@ else
     ym = mean(y);
     
     if max(abs(x - xm)) < .5 * min(abs(xm + y))
-
-        % Perform a Taylor expansion in the variable x around the point xm        
+        
+        % Perform a Taylor expansion in the variable x around the point xm
         k = -floor(log(tol) / log(min(abs(xm+y)) / max(abs(x-xm))));
         scl = 1 ./ max(abs(x - xm));
         
@@ -67,9 +67,9 @@ else
             U(:,j+1) = -U(:,j) .* (x - xm) .* scl;
             V(:,j+1) = V(:,j) ./ (y + xm) ./ scl;
         end
-	V = conj(V);
+        V = conj(V);
     elseif max(abs(y - ym)) < .5 * min(abs(ym + x))
-
+        
         % Perform a Taylor expansion in the variable y around the point ym
         k = -floor(log(tol) / log(min(abs(ym+x)) / max(abs(y-ym))));
         scl = 1 ./ max(abs(y - ym));
@@ -83,10 +83,10 @@ else
             U(:,j+1) = -U(:,j) ./ (x + ym) .* scl;
             V(:,j+1) = V(:,j) .* (y - ym) ./ scl ;
         end
-	V = conj(V);
+        V = conj(V);
     else
         % If no expansion is possible with a fast decay, further subdivided
-        % the domain, until that condition is met. 
+        % the domain, until that condition is met.
         if nx > bs
             mpx = floor(nx / 2);
         else
@@ -98,36 +98,36 @@ else
         else
             mpy = ny;
         end
-
+        
         [U11, V11] = cauchy_lr(x(1:mpx), y(1:mpy), tol);
         [U, V2]    = cauchy_lr(x, y(mpy+1:end), tol);
         [U21, V21] = cauchy_lr(x(mpx+1:end), y(1:mpy), tol);
-
+        
         % Reconstruct the global low-rank representation
         U = [ ...
-              [ U11 ; zeros(nx-mpx, size(U11,2)) ], ...
-              U, ...
-              [ zeros(mpx, size(U21, 2)) ; U21 ] ...
-             ];
-
-         V = [ ...
-               [ V11 ; zeros(ny-mpy, size(V11,2)) ], ...
-               [ zeros(mpy,size(V2,2)) ; V2 ], ...
-               [ V21 ; zeros(ny-mpy,size(V21,2)) ] ...
-             ];
-
-         % Recompression
-         if compress
-             [QU, RU] = qr(U, 0);
-             [QV, RV] = qr(V, 0);
-             [U, S, V] = svd(RU * RV', 'econ');
-
-             rk = sum(diag(S) > tol * S(1,1));
-
-             U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
-             V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
-         end
+            [ U11 ; zeros(nx-mpx, size(U11,2)) ], ...
+            U, ...
+            [ zeros(mpx, size(U21, 2)) ; U21 ] ...
+            ];
+        
+        V = [ ...
+            [ V11 ; zeros(ny-mpy, size(V11,2)) ], ...
+            [ zeros(mpy,size(V2,2)) ; V2 ], ...
+            [ V21 ; zeros(ny-mpy,size(V21,2)) ] ...
+            ];
+        
+        % Recompression
+        if compress
+            [QU, RU] = qr(U, 0);
+            [QV, RV] = qr(V, 0);
+            [U, S, V] = svd(RU * RV', 'econ');
+            
+            rk = sum(diag(S) > tol * S(1,1));
+            
+            U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
+            V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
+        end
     end
 end
-         
+
 end

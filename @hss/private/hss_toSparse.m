@@ -6,7 +6,7 @@ function [S, indb, indx, n] = hss_toSparse (hss,b,run,I, J, S)
 % Theoretical framework:
 % S. Chandrasekaran, P. Dewilde, M. Gu, W. Lyons, and T. Pals, A fast
 % solver for HSS representations via sparse matrices , SIAM J. Matrix Anal.
-% Appl. 29 (2006/07), no. 1, 67--81 (electronic). 
+% Appl. 29 (2006/07), no. 1, 67--81 (electronic).
 % Chapter 4: 'Sparse represenation'
 %
 % inputs:
@@ -110,7 +110,7 @@ function [I, J, S, n, indb, indx, x0, y0, xB0, yB0] = hss_toSparse_iter (hss,b,r
 %       6. indb, indx - The matrix S is bigger than the original matrix A.
 %       indb and indx are used to place the entries of b to the right
 %       places in the new bigger b and to extract x out of the bigger
-%       solution vector.            
+%       solution vector.
 %       7. x0,y0 - starting from this coordinate the node can writhe his
 %       matrices D,U V' and two I in tho the sparse matrix S.
 % output:
@@ -135,37 +135,37 @@ if nargin < 10
 end
 
 if hss.topnode==true
-   n=0;
+    n=0;
 end
 
 
 if hss.leafnode==false
     [I, J, S, n, indb, indxl, x0, y0, xBl0, yBu0] = hss_toSparse_iter(hss.A11,b(1:hss.ml),run,I, J, S, n,indb,x0,y0);
     [I, J, S, n, indb, indxr, x0, y0, xBu0, yBl0] = hss_toSparse_iter(hss.A22,b(hss.ml+1:end),run,I, J, S, n,indb,x0,y0);
-
+    
     indx = [indxl; indxr];
-
+    
     y1 = size(hss.B12,1);
     y2 = size(hss.B21,1);
     x1 = size(hss.B21,2);
     x2 = size(hss.B12,2);
-
+    
     %Bu
     %oldS(yBu0:yBu0+y1-1 , xBu0:xBu0+x2-1) = hss.B12;
     [I, J, S, n] = addSparce(I, J, S, n, yBu0:yBu0+y1-1, xBu0:xBu0+x2-1, hss.B12,run);
     %Bl
     %oldS(yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1) = hss.B21;
     [I, J, S, n] = addSparce(I, J, S, n, yBl0:yBl0+y2-1 , xBl0:xBl0+x1-1, hss.B21,run);
-
-
+    
+    
     if hss.topnode==false
         y3 = size(hss.Wl',1);
         x4 = size(hss.Rl,2);
         x3 = y3;
         y4 = x4;
-
+        
         indx = [indx; sparse(false(x3+x4,1))];
-
+        
         %Rl
         %oldS(yBu0:yBu0+y1-1 , x0+x3:x0+x3+x4-1) = hss.Rl;
         [I, J, S, n] = addSparce(I, J, S, n, yBu0:yBu0+y1-1 , x0+x3:x0+x3+x4-1, hss.Rl,run);
@@ -184,32 +184,32 @@ if hss.leafnode==false
         %-I
         %oldS(y0+y3:y0+y3+y4-1 , x0+x3:x0+x3+x4-1) = -spdiags(ones(y4,1), 0, y4,y4);
         [I, J, S, n] = addSparceDiag(I, J, S, n, y0+y3:y0+y3+y4-1 , x0+x3:x0+x3+x4-1, -1,run);
-
+        
         indb(y0:y0+y3+y4-1) = sparse(false(y3+y4,size(indb,2)));
-
+        
         yB0 = y0+y3;
         xB0 = x0;
         y0 = y0+y3+y4;
         x0 = x0+x3+x4;
-
+        
     else
         yB0=[];
         xB0=[];
     end
-
-
+    
+    
 else %leaf node
-
+    
     y1 = size(hss.D,1);
     y2 = size(hss.V',1);
     y3 = size(hss.U,2);
     x1 = size(hss.D,2);
     x2 = y2;
     x3 = y3;
-
+    
     yB0 = y0+y1+y2;
     xB0 = x0+x1;
-
+    
     %D
     %oldS(y0:y0+y1-1, x0:x0+x1-1)=hss.D;
     [I, J, S, n] = addSparce(I, J, S, n, y0:y0+y1-1, x0:x0+x1-1, hss.D,run);
@@ -225,12 +225,12 @@ else %leaf node
     %-I
     %oldS(y0+y1+y2:y0+y1+y2+y3-1 , x0+x1+y2:x0+x1+y2+x3-1) = -spdiags(ones(x3,1), 0, x3,x3);
     [I, J, S, n] = addSparceDiag(I, J, S, n, y0+y1+y2:y0+y1+y2+y3-1 , x0+x1+y2:x0+x1+y2+x3-1, -1,run);
-
-     indb(y0:y0+y1-1,:) = b;
-     indb(y0+y1:y0+y1+y2+y3-1,:) = sparse(false(x2+x3,size(indb,2)));
-
+    
+    indb(y0:y0+y1-1,:) = b;
+    indb(y0+y1:y0+y1+y2+y3-1,:) = sparse(false(x2+x3,size(indb,2)));
+    
     indx = sparse([true(x1,1); false(x2+x3,1)]);
-
+    
     y0 = y0+y1+y2+y3;
     x0 = x0+x1+x2+x3;
 end
@@ -262,7 +262,7 @@ if run==true
     if num+n >length(I)
         warning('slow down by dynamically allocated memory for I,J and S');
     end
-
+    
     I(n+1:n+num) =repmat(i,length(j),1);
     temp = repmat(j,1,length(i))';
     J(n+1:n+num) = temp(:);
@@ -303,7 +303,7 @@ if run==true
     J(n+1:n+num) = j;
     S(n+1:n+num) = ones(num,1)*s;
     n=n+num;
-
+    
 else
     num = length(i)*length(j);
     n = n+num;

@@ -1,8 +1,8 @@
 function F = norm_frobenius(H)
-%NORM_FROBENIUS Compute the Frobenius norm of H. 
+%NORM_FROBENIUS Compute the Frobenius norm of H.
 %
 % F = NORM_FROBENIUS(H) evaluates the Frobenius norm of H. The computed
-%     norm is exact, up to rounding errors. 
+%     norm is exact, up to rounding errors.
 
 if ~isempty(H.F)
     F = norm(H.F, 'fro');

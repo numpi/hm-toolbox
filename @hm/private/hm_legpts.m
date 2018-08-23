@@ -1,10 +1,10 @@
 function [x, w] = hm_legpts(N)
-%HM_LEGPTS Obtain the Legendre points and relative Guassian weights for [0 pi]. 
+%HM_LEGPTS Obtain the Legendre points and relative Guassian weights for [0 pi].
 %
-% [X, W] = LEGPTS(N) obtains the Legendre points and quadrature weights. The 
+% [X, W] = LEGPTS(N) obtains the Legendre points and quadrature weights. The
 % values have been precomputed using Chebfun, and are hardcoded for the
-% following values of N. 
-% 
+% following values of N.
+%
 %   N = 4, 8, 16, 32, 36, 48, 64, 80, 96, 128, 192, 256
 %
 

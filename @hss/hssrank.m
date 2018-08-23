@@ -1,3 +1,3 @@
 function k = hssrank(A)
-    k = hss_rank(A);
+k = hss_rank(A);
 end

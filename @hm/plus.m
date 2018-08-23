@@ -1,5 +1,5 @@
 function H = plus(H1, H2)
-%PLUS Sum two H matrices. 
+%PLUS Sum two H matrices.
 
 %hmatrix_pack_plus(H1, H2)
 

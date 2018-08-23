@@ -1,5 +1,5 @@
 function [V, D] = eigs(varargin)
-%EIGS Compute extremal eigenvalues of an H-matrix. 
+%EIGS Compute extremal eigenvalues of an H-matrix.
 
 p = inputParser;
 
@@ -27,7 +27,7 @@ switch args.opts
         else
             V = eigs(@(x) args.H \ x, n, args.k, args.opts);
             %V = 1 ./ V;
-        end                
+        end
         
     otherwise
         error('Unsupported eigenvalue selection');

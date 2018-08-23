@@ -1,6 +1,6 @@
 function [U,S,V] = tsvd(A,tol)
 if min(size(A)) == 0
-	U = []; S = []; V = []; return;
+    U = []; S = []; V = []; return;
 end
 [U,S,V] = svd(A);
 

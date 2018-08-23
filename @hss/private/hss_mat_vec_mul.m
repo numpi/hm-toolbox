@@ -1,11 +1,11 @@
 function x = hss_mat_vec_mul(A, v)
-%X=HSS_MAT_VEC_MUL computes the fast Multiplication of a HSS matrix with a 
+%X=HSS_MAT_VEC_MUL computes the fast Multiplication of a HSS matrix with a
 %                  (block) vector x from right.
 %                  The algorithm is taken from the paper:
 %
 % 		   S. Chandrasekaran, P. Dewilde, M. Gu, W. Lyons, and T. Pals, A fast
 %                  solver for HSS representations via sparse matrices , SIAM J. Matrix Anal.
-%                  Appl. 29 (2006/07), no. 1, 67--81 (electronic). 
+%                  Appl. 29 (2006/07), no. 1, 67--81 (electronic).
 
 if (A.leafnode==0)            % not a leaf
     g = bottom_up(A, v);
@@ -22,14 +22,14 @@ function g = bottom_up(A, v)
 g = struct();
 
 if (A.leafnode == 0)   % not a leaf
-   
+    
     g.gl = bottom_up(A.A11, v(1:A.nl,:));
     g.gr = bottom_up(A.A22, v(A.nl+1:end,:));
     if A.topnode == 0    % not root
-        	g.Vv = A.Wl' * g.gl.Vv + A.Wr' * g.gr.Vv;     
+        g.Vv = A.Wl' * g.gl.Vv + A.Wr' * g.gr.Vv;
     end
 else        % leaf
-    g.Vv = A.V' * v;                       
+    g.Vv = A.V' * v;
 end
 
 end
@@ -44,11 +44,11 @@ if (A.leafnode==0)   % not a leaf
         fl = A.B12 * g.gr.Vv + A.Rl * f;
         fr = A.B21 * g.gl.Vv + A.Rr * f;
     end
-   
+    
     xl = up_bottom(A.A11, v(1:A.nl,:), g.gl, fl);
     xr = up_bottom(A.A22, v(A.nl+1:end,:), g.gr, fr);
     x = [xl; xr];
-   
+    
 else        %leaf node
     x = A.D * v + A.U * f;
 end

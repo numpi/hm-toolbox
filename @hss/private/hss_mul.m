@@ -5,7 +5,7 @@ function b=hss_mul(hss,x)
 % According to:
 % S. Chandrasekaran, P. Dewilde, M. Gu, W. Lyons, and T. Pals, A fast
 % solver for HSS representations via sparse matrices , SIAM J. Matrix Anal.
-% Appl. 29 (2006/07), no. 1, 67--81 (electronic). 
+% Appl. 29 (2006/07), no. 1, 67--81 (electronic).
 % Chapter 3: 'Fast multiplication'
 %
 % inputs:
@@ -25,7 +25,7 @@ function b=hss_mul(hss,x)
 
 % Authors:  Stefan Pauli, stefan.pauli@alumni.ethz.ch
 %           Karthik Jayaraman Raghuram, jrk@ece.ucsb.edu
-% v1.0 Created 21-Okt-09 
+% v1.0 Created 21-Okt-09
 %
 % hss_mul: Multiplication of a HSS matrix with a vector from right
 % Copyright (C) 2009  Stefan Pauli (stefan.pauli@alumni.ethz.ch)
@@ -66,11 +66,11 @@ function [vb, g] = upSweep(hss, x)
 vb = struct();
 
 if (hss.leafnode==0)   % parent node
-   
+    
     [vb.vbl, vb.gl] = upSweep(hss.A11, x(1:hss.nl,:));
     [vb.vbr, vb.gr] = upSweep(hss.A22, x(hss.nl+1:end,:));
     if hss.topnode==0    % not top node
-        	g = hss.Wl'*vb.gl + hss.Wr'*vb.gr;      % (4)
+        g = hss.Wl'*vb.gl + hss.Wr'*vb.gr;      % (4)
     end
 else        %leav node
     g = hss.V'*x;                           % (3)
@@ -99,11 +99,11 @@ if (hss.leafnode==0)   % parent node
         fl = hss.B12*vb.gr+hss.Rl*f;
         fr = hss.B21*vb.gl+hss.Rr*f;
     end
-   
+    
     bl = downSweep(vb.vbl, hss.A11, fl, x(1:hss.nl,:));
     br = downSweep(vb.vbr, hss.A22, fr, x(hss.nl+1:end,:));
     b = [bl; br];
-   
+    
 else        %leaf node
     b = hss.D*x + hss.U*f;
 end

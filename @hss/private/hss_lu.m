@@ -21,7 +21,7 @@ function [L, U, indb, indx, time ,n]= hss_lu(hss,b,run,I, J, S)
 %                   bHSS =  indb;
 %                   bHSS(indb)=b;
 %                   x =  U\(L\bHSS);
-%                   x = x(indx,:);   
+%                   x = x(indx,:);
 %         2. time - struct of different execution times measured.
 %         3. n - minimal length of I,J,S.
 %
@@ -41,7 +41,7 @@ function [L, U, indb, indx, time ,n]= hss_lu(hss,b,run,I, J, S)
 
 % Authors:  Stefan Pauli, stefan.pauli@alumni.ethz.ch
 %           Karthik Jayaraman Raghuram, jrk@ece.ucsb.edu
-% v1.0 Created 21-Okt-09 
+% v1.0 Created 21-Okt-09
 %
 % hss_lu: LU decomposition of a HSS matrix
 % Copyright (C) 2009  Stefan Pauli (stefan.pauli@alumni.ethz.ch)
@@ -72,21 +72,21 @@ if run == true
         J = zeros(n,1);
         S = zeros(n,1);
     end
-
+    
     % prepare the struct for the time measurement
     time=struct();
-
+    
     % Compose the matrix S in the format where every non zero element has
     % two indexes (I,J) and a value (S)
     tic % time.composeS = cputime;
     [S, indb, indx, n] = hss_toSparse(hss,b,run,I, J, S);
     time.composeS = toc; %cputime-time.composeS;
-   
+    
     % Do the LU factorization and apply it to b
     tic %time.LU = cputime;
     [L,U] = lu(S);
     time.LU = toc; %cputime-time.LU;
-   
+    
 else %run == false
     tic
     [I, J, S, n] = hss_toSparse(hss,b,run);

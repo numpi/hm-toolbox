@@ -1,16 +1,16 @@
 function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrm_type)
 %EK_SYLV Approximate the solution of a Sylvester equation AX + XB' + U*V' = 0.
 %
-% [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the 
-%     Sylvester equation in the factored form XU * XV'. 
+% [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
+%     Sylvester equation in the factored form XU * XV'.
 %
-% [XU, VA] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA 
-%     and VB, and the optional parameters TOL and DEBUG control the 
-%     stopping criterion and the debugging during the iteration. 
+% [XU, VA] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA
+%     and VB, and the optional parameters TOL and DEBUG control the
+%     stopping criterion and the debugging during the iteration.
 %
 % The tolerance TOL can also be specified as a function TOL(R, N) that
 % takes as input the residual norm and the norm of the solution (R and N,
-% respectively), and returns true if the solution can be accepted. 
+% respectively), and returns true if the solution can be accepted.
 
 if ~exist('debug', 'var')
     debug = false;
@@ -30,23 +30,23 @@ if ~exist('rat_krylov', 'file')
 end
 
 if ~isstruct(A)
-	if issparse(A)
-		AA = ek_struct(A, issymmetric(A));
-	else
-		AA = ek_struct(A, false);
-	end
+    if issparse(A)
+        AA = ek_struct(A, issymmetric(A));
+    else
+        AA = ek_struct(A, false);
+    end
 else
-	AA = A;
+    AA = A;
 end
 
-if ~isstruct(B) 
-	if issparse(B)
-		BB = ek_struct(B', issymmetric(B));
-	else
-		BB = ek_struct(B', false);
-	end
+if ~isstruct(B)
+    if issparse(B)
+        BB = ek_struct(B', issymmetric(B));
+    else
+        BB = ek_struct(B', false);
+    end
 else
-	BB = B';
+    BB = B';
 end
 
 nrmA = AA.nrm;
@@ -89,10 +89,10 @@ while max(sa-2*bsa, sb-2*bsb) < k
         Y = lyap(A, B', u * v');
         
         [UU,SS,VV] = svd(Y);
-
+        
         % rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
         rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
-
+        
         Xu = UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
         Xv = VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
         
@@ -114,19 +114,19 @@ while max(sa-2*bsa, sb-2*bsb) < k
     Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:);
     Cs = zeros(size(As, 1), size(Bs, 1));
     
-    Cs(1:size(u,2), 1:size(v,2)) = Cprojected;    
+    Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
     
     [Y, res] = lyap_galerkin(As, Bs, Cs, 2*bsa, 2*bsb);
-
+    
     % You might want to enable this for debugging purposes
     if debug
         fprintf('%d Residue: %e\n', it, res / norm(Y));
     end
-
+    
     if tol(res, norm(Y, nrm_type)) % res < norm(Y) * tol
         break
-    end        
- it=it+1;
+    end
+    it=it+1;
 end
 
 % fprintf('SYLV : it = %d\n', it);
