@@ -103,7 +103,7 @@ CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b), ...
 
 [L, U] = lu(H); y = U \ (L \ b);
 CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b), ...
-    'Solution of a linear system explicit LU');
+    'Solution of a linear system (explicit LU)');
 
 
 
