@@ -32,11 +32,23 @@ if ~exist('rat_krylov', 'file')
     error('rktoolbox not found. Did you forget to add it to the path?');
 end
 
-AA = A;
-BB = B';
+if ~isstruct(A)
+        AA = rk_struct(A);
+else
+        AA = A;
+end
 
+if ~isstruct(B)
+    BB = rk_struct(B');
+else
+    BB = B';
+end
 nrmA = AA.nrm;
 nrmB = BB.nrm;
+
+if size(poles, 1) == 1
+	poles = [poles; poles];
+end
 
 % Start with the initial basis
 [VA, KA, HA, param_A] = rat_krylov(AA, u, inf);
@@ -55,7 +67,7 @@ Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
 % a scalar. In the latter case, we turn it into a function
 if isfloat(tol)
     tol_eps = tol;
-    tol = @(r, n) r < tol_eps * n;
+    tol = @(r, nrm) r < tol_eps * nrm;
 end
 
 it=1;
@@ -100,7 +112,7 @@ end
 
 [UU,SS,VV] = svd(Y);
 
-rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
+rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false); 
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
