@@ -52,18 +52,12 @@ end
 nrmA = AA.nrm;
 nrmB = BB.nrm;
 
-% Start with the initial basis
-[VA, KA, HA, param_A] = rat_krylov(AA, u, inf);
-[VB, KB, HB, param_B] = rat_krylov(BB, v, inf);
-
 % Dimension of the space
 sa = size(u, 2);
 sb = size(v, 2);
 
 bsa = sa;
 bsb = sb;
-
-Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
 
 % tol can be function tol(r, n) that is given the residual and the norm, or
 % a scalar. In the latter case, we turn it into a function
@@ -74,8 +68,8 @@ end
 
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
-    if ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
-            ( size(VB, 2) + 2 * bsb >= size(VB, 1) )
+    if exist('VA', 'var') && ( ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
+            ( size(VB, 2) + 2 * bsb >= size(VB, 1) ) )
         
         %warning('HM:EK_SYLV', ...
         %    'Extended Krylov space is equal to the whole space: using dense solver');
@@ -103,20 +97,29 @@ while max(sa-2*bsa, sb-2*bsb) < k
         return;
     end
     
-    [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, [0 inf], param_A);
-    [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, [0 inf], param_B);
+    if ~exist('VA', 'var')
+        [VA, KA, HA, param_A] = rat_krylov(AA, u, [0 inf]);
+        [VB, KB, HB, param_B] = rat_krylov(BB, v, [0 inf]);
+    else
+        [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, [0 inf], param_A);
+        [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, [0 inf], param_B);
+    end
     
     sa = size(VA, 2);
     sb = size(VB, 2);
     
     % Compute the solution and residual of the projected Lyapunov equation
-    As = HA(1:end-bsa,:) / KA(1:end-bsa,:);
-    Bs = HB(1:end-bsa,:) / KB(1:end-bsb,:);
+    As = HA / KA(1:end-bsa,:);
+    Bs = HB / KB(1:end-bsb,:);
     Cs = zeros(size(As, 1), size(Bs, 1));
+
+    if ~exist('Cprojected', 'var')
+        Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
+    end
     
     Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
     
-    [Y, res] = lyap_galerkin(As, Bs, Cs, 2*bsa, 2*bsb);
+    [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb);
     
     % You might want to enable this for debugging purposes
     if debug

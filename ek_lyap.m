@@ -51,15 +51,10 @@ if isfloat(tol)
     tol = @(r, n) r < tol_eps * n;
 end
 
-% Start with the initial basis
-[VA, KA, HA] = rat_krylov(AA, u, inf);
-
 % Dimension of the space
 sa = size(u, 2);
 
 bsa = sa;
-
-Cprojected = ( VA(:,1:size(u,2))' * u ) * K * ( u' * VA(:,1:size(u,2)) );
 
 if ~exist('tol', 'var')
     tol = 1e-8;
@@ -91,20 +86,28 @@ while sa - 2*bsa < k
         
         return;
     end
-    [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
+
+    if ~exist('VA', 'var')
+        [VA, KA, HA] = rat_krylov(AA, u, [0 inf]);
+    else
+        [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
+    end
     
     sa = size(VA, 2);
     
     % Compute the solution and residual of the projected Lyapunov equation
-    As = HA(1:end-bsa,:) / KA(1:end-bsa,:);
+    As = HA / KA(1:end-bsa,:);
     Cs = zeros(size(As, 1), size(As, 2));
     
     % FIXME: The above steps can be carried out much more efficiently, just
     % computing the new columns and rows of As and Bs.
+    if ~exist('Cprojected', 'var')
+        Cprojected = ( VA(:,1:size(u,2))' * u ) * K * ( u' * VA(:,1:size(u,2)) );
+    end
     
     Cs(1:size(u,2), 1:size(u,2)) = Cprojected;
     
-    [Y, res] = lyap_galerkin(As, Cs, 2*bsa);
+    [Y, res] = lyap_galerkin(As, Cs, bsa);
     
     %Cs = VA(:,1:size(Y, 1))' * u * K * u' * VA(:,1:size(Y,1));
     % keyboard

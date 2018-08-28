@@ -27,11 +27,11 @@ else
 end
 
 % Consider the projected matrices at the previous step, which is needed to
-% check the Galerking condition
-HA1 = HA(1 : end - bsa, 1 : end - bsa);
+% check the Galerkin condition
+HA1 = HA(1 : end - bsa, :);
 
 if ~is_lyapunov
-    HB1 = HB(1 : end - bsb, 1 : end - bsb);
+    HB1 = HB(1 : end - bsb, :);
 end
 
 % Compute the solution of the Lyapunov equation (word of warning: please
@@ -44,11 +44,11 @@ end
 
 % Check the residual
 if ~is_lyapunov
-    res = max(norm(HA(end-bsa+1:end, 1 : end - bsa) * Y), ...
-        norm(Y * HB(end-bsb+1 : end, 1 : end - bsb)'));
+    res = max(norm(HA(end-bsa+1:end, :) * Y), ...
+        norm(Y * HB(end-bsb+1 : end, :)'));
 else
-    res = max(norm(HA(end-bsa+1:end, 1 : end - bsa) * Y), ...
-        norm(Y * HA(end-bsa+1 : end, 1 : end - bsa)'));
+    res = max(norm(HA(end-bsa+1:end, :) * Y), ...
+        norm(Y * HA(end-bsa+1 : end, :)'));
 end
 
 end
