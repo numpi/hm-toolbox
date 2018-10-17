@@ -20,7 +20,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
         if isempty(H.A22.U12) && isempty(H1.A22.F)
             H.U21 = solve_lower_triangular(H1.A22, H.U21);
             H.A22 = solve_lower_triangular(H1.A22, ...
-                hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * H.U21), H2.V12));
+                hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * H.U12), H2.V12));
         else
             H.U21 = H1.A22\H.U21;
             H.A22 = H1.A22\hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * H.U12), H2.V12);
