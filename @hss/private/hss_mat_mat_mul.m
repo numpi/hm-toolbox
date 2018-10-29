@@ -54,9 +54,14 @@ if (A.leafnode==0)   % not a leaf
     C.A11 = up_bottom(A.A11, B.A11, g.gl, fl, C.A11);
     C.A22 = up_bottom(A.A22, B.A22, g.gr, fr, C.A22);
     
+    C.ml = size(A.A11,1); C.nl = size(B.A11,2);
+    C.mr = size(A.A22,1); C.nr = size(B.A22,2);
+    
 else        %leaf node
     C.D = A.D * B.D + A.U * f * B.V';
     C.U = [A.U, A.D * B.U];
     C.V = [B.D' * A.V, B.V];
+    
+    C.ml = []; C.nl = []; C.nr = []; C.mr = [];
 end
 end

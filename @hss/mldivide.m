@@ -1,6 +1,6 @@
-function X = mldivide(A,B)
+function X = mldivide(A, B)
 if isa(B,'hss')
-    error('unsupported');
+    X = hss_mldivide(A, B);
 else
     if size(A, 1) <= hssoption('block-size')
         X = full(A) \ B;

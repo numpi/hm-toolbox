@@ -1,5 +1,5 @@
 function M = full(A)
-n = size(A, 1);
+n = size(A, 2);
 if A.topnode == 0
     A.topnode = 1;
     M = hss_mul(A, eye(n));
