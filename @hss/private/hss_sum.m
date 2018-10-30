@@ -1,7 +1,14 @@
-function C = hss_sum(A,B)
-tol = hssoption('threshold');
+function C = hss_sum(A,B,compress)
 C = hss_sum_ric(A,B);
-C = hss_compress(C,tol);
+if ~exist('compress', 'var')
+    compress = true;
+end
+
+if compress
+    tol = hssoption('threshold');
+    C = hss_compress(C,tol);
+end
+
 end
 
 function C = hss_sum_ric(A,B)
