@@ -9,11 +9,14 @@ function [X,Q,Z, Y0] = hss_mldivide(A, B)
 
 	QB = applyQ(B, Q, true);
 	Y0 = applyLinv(QB, L, ind, cind);
-	QB2 = QB - L * Y0;
-    QB = QB2;
-	L = hss_remove_leaf_level(hss_project(L, cind, 'both'));
-	QB2 = hss_remove_leaf_level(hss_project(QB, cind, 'row'));
-    QB = QB2;
+    L = hss_project(L, cind, 'row');
+    QB = hss_remove_leaf_level(hss_project(QB, cind, 'row') - L * Y0);
+    L = hss_remove_leaf_level(hss_project(L, cind, 'col'));
+	% QB = QB - L * Y0;
+    % QB = QB2;
+	% L = hss_remove_leaf_level(hss_project(L, cind, 'both'));
+	% QB2 = hss_remove_leaf_level(hss_project(QB, cind, 'row'));
+    % QB = QB2;
 	Y1 = hss_mldivide(L, QB);
 	Y1 = hss_unpack(Y0, Y1, ind, cind);
 
