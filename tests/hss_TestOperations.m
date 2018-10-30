@@ -95,16 +95,36 @@ B = hssgallery('rand', n, 10);
 H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the HSS representation of random hss A and  B');
+
 % Linear systems
 H = hssgallery('rand', n, 3);
 x = rand(n, 5); b = H*x; y = H \ b;
-CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b), ...
+CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b) * tol, ...
     'Solution of a linear system (implicit ULV)');
 
 F = ulv(H); y = ulv_solve(F, b);
-CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b), ...
+CheckTestResult(norm(x - y), '<', cond(full(H)) * norm(b) * tol, ...
     'Solution of a linear system (explicit ULV)');
 
+% Inversion and backslash
+B = hssgallery('rand', n, 3);
+X = H \ B;
+CheckTestResult(norm(H*X - B), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
+    'Backslash operator for HSS A \ B (hss rank 3)');
+
+X = inv(H);
+CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
+    'Inversion (hss rank 3)');
+
+H = hssgallery('rand', n, 12);
+B = hssgallery('rand', n, 12);
+X = H \ B;
+CheckTestResult(norm(H*X - B), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
+    'Backslash operator for HSS A \ B (hss rank 12)');
+
+X = inv(H);
+CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
+    'Inversion (hss rank 12)');
 
 
 end
