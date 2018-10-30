@@ -11,21 +11,19 @@ function [X,Q,Z, Y0] = hss_mldivide(A, B)
 	Y0 = applyLinv(QB, L, ind, cind);
     L = hss_project(L, cind, 'row');
     
+    % This performs QB - L*Y0
     LY = L * Y0;
     QB = hss_project(QB, cind, 'row');
-    % QB = QB - LY;
-    QB = hss_sum(QB, -1 * LY, true);
+    QB = hss_sum(QB, -LY, true);
     QB = hss_remove_leaf_level(QB);
     
-    % QB = hss_remove_leaf_level(hss_project(QB, cind, 'row') - L * Y0);
-    
+    % Project L on the columns as well
     L = hss_project(L, cind, 'col');
     L = hss_remove_leaf_level(L);
 	
 	Y1 = hss_mldivide(L, QB);
 	Y1 = hss_unpack(Y0, Y1, ind, cind);
 
-	% Y = Y0 + Y1;
     Y = hss_sum(Y0, Y1, false);
 
 	X = applyQ(Y, Z, false);
@@ -45,25 +43,16 @@ function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
 	    % Compress off-diagonal block row
 	    [QQ(:, end:-1:1), A.U(end:-1:1, :)] = qr(A.U);
 	    Q = [Q, QQ];
-	    %A.U = zeros(size(A.U));
-	    %A.U = A.U(end-k+1:end,:);
 	    A.D = QQ' * A.D;
+        
 	    % Triangularize part of diagonal block
 	    [ZZ, L] = qr(A.D(1:end-k,:)');
-	    %F.L = [F.L, L(1:end-k,:)' ];
+        A.D(end-k+1:end,:) = A.D(end-k+1:end,:) * ZZ;
+        A.D(1:end-k,:) = L';
+        
 	    % Update transformations on the right
 	    A.V = ZZ' * A.V;
-	    Z = [Z, ZZ];
-	    %ort_ind = [ort_ind, cur_ind];
-	    % Reduce the rows in the system
-	    A.D = A.D * ZZ;
-        A.D(1:end-k, 1:end-k) = tril(A.D(1:end-k,1:end-k)); A.D(1:end-k,end-k+1:end) = 0;
-	    % A.D = A.D(end-k+1:end, :) * ZZ;
-	    %F.L = [F.L, D(:, 1:end-k)];
-	    
-	    % Reduce the columns of the diagonal block
-	    %D = D(:,end-k+1:end);
-	    
+	    Z = [Z, ZZ];	    	    
 	else    % NOT A LEAF
 	    [A.A11, Q, Z, ind, cind] = hss_mldivide_rec(A.A11, Q, Z, ind, cind);  % recursive call on left  child  
 	    [A.A22, Q, Z, ind, cind] = hss_mldivide_rec(A.A22, Q, Z, ind, cind);  % recursive call on right child
@@ -80,17 +69,25 @@ function  [X, Q, ind] = applyQ(X, Q, transp, ind)
 		if ~isempty(ind)
 			localind = ind{1}; 
 			ind = { ind{2:end} };
-		else
-			localind = 1 : size(X.D, 1);
+            
+            if transp
+                X.D(localind,:) = QQ(localind,:)' * X.D(localind,:);
+                X.U(localind,:) = QQ(localind,:)' * X.U(localind,:);
+            else
+                X.D(localind,:) = QQ(:,localind) * X.D(localind,:);
+                X.U(localind,:) = QQ(:,localind) * X.U(localind,:);
+            end
+        else
+            if transp
+                X.D = QQ' * X.D;
+                X.U = QQ' * X.U;
+            else
+                X.D = QQ * X.D;
+                X.U = QQ * X.U;
+            end
 		end
 
-		if transp
-			X.D(localind,:) = QQ(localind,:)' * X.D(localind,:);
-			X.U(localind,:) = QQ(localind,:)' * X.U(localind,:);
-		else
-			X.D(localind,:) = QQ(:,localind) * X.D(localind,:);
-			X.U(localind,:) = QQ(:,localind) * X.U(localind,:);
-		end
+		
 	else
 		[X.A11, Q, ind] = applyQ(X.A11, Q, transp, ind);
 		[X.A22, Q, ind] = applyQ(X.A22, Q, transp, ind);
@@ -194,13 +191,13 @@ function [Y1, ind, cind] = hss_unpack(Y0, Y1, ind, cind)
 
 		Y1.U = []; Y1.V = []; Y1.D = [];
 
-		[Y1.ml Y1.nl] = size(Y1.A11);
-		[Y1.mr Y1.nr] = size(Y1.A22);
+		[Y1.ml, Y1.nl] = size(Y1.A11);
+		[Y1.mr, Y1.nr] = size(Y1.A22);
 	else
 		[Y1.A11, ind, cind] = hss_unpack(Y0.A11, Y1.A11, ind, cind);
 		[Y1.A22, ind, cind] = hss_unpack(Y0.A22, Y1.A22, ind, cind);
         
-        [Y1.ml Y1.nl] = size(Y1.A11);
-		[Y1.mr Y1.nr] = size(Y1.A22);
+        [Y1.ml, Y1.nl] = size(Y1.A11);
+		[Y1.mr, Y1.nr] = size(Y1.A22);
 	end
 end
