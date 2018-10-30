@@ -10,13 +10,23 @@ function [X,Q,Z, Y0] = hss_mldivide(A, B)
 	QB = applyQ(B, Q, true);
 	Y0 = applyLinv(QB, L, ind, cind);
     L = hss_project(L, cind, 'row');
-    QB = hss_remove_leaf_level(hss_project(QB, cind, 'row') - L * Y0);
-    L = hss_remove_leaf_level(hss_project(L, cind, 'col'));
+    
+    LY = L * Y0;
+    QB = hss_project(QB, cind, 'row');
+    % QB = QB - LY;
+    QB = hss_sum(QB, -1 * LY, true);
+    QB = hss_remove_leaf_level(QB);
+    
+    % QB = hss_remove_leaf_level(hss_project(QB, cind, 'row') - L * Y0);
+    
+    L = hss_project(L, cind, 'col');
+    L = hss_remove_leaf_level(L);
 	
 	Y1 = hss_mldivide(L, QB);
 	Y1 = hss_unpack(Y0, Y1, ind, cind);
 
-	Y = Y0 + Y1;
+	% Y = Y0 + Y1;
+    Y = hss_sum(Y0, Y1, false);
 
 	X = applyQ(Y, Z, false);
 end
@@ -47,6 +57,7 @@ function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
 	    %ort_ind = [ort_ind, cur_ind];
 	    % Reduce the rows in the system
 	    A.D = A.D * ZZ;
+        A.D(1:end-k, 1:end-k) = tril(A.D(1:end-k,1:end-k)); A.D(1:end-k,end-k+1:end) = 0;
 	    % A.D = A.D(end-k+1:end, :) * ZZ;
 	    %F.L = [F.L, D(:, 1:end-k)];
 	    
