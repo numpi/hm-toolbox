@@ -12,7 +12,9 @@ if A.leafnode == 1
     return
 end
 
-A = hss_symmetrize(A);
+if ~issymmetric(A)
+    A = hss_symmetrize(A);
+end
 
 x = hss_chol_solve_rec(A,b,{},{},{}, [1:size(A,1)]);
 end
