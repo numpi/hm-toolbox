@@ -29,15 +29,15 @@ m = size(A, 1);
 n = size(A, 2);
 
 if m ~= n
-    error('Rectangular HSS matrices are not (yet) supported');
+    % error('Rectangular HSS matrices are not (yet) supported');
 end
 
 block_size = hssoption('block-size');
 tol = hssoption('threshold');
 
 % Prepare the tree for the HSS structure -- leaving all the blocks empty
-H = build_hss_tree(m, n, block_size);
-H.topnode = 1;
+H = hss_build_hss_tree(m, n, block_size);
+
 
 % Create the stack
 rs = createStack();
@@ -102,7 +102,8 @@ if H.leafnode
         Z = hss_elementAt(rs, j);
         
         % FIXME: We should preallocate B
-        B = [ Z(row_offsets(j+1)+1:row_offsets(j+1)+m,:) , B ];
+        B2 = [ Z(row_offsets(j+1)+1:row_offsets(j+1)+n,:) , B ];
+        B = B2;
     end
     
     [H.V, Z] = compress_hss_block(B, tol);
@@ -256,36 +257,7 @@ rU = rlU + rrU;
 rV = rlV + rrV;
 end
 
-function H = build_hss_tree(m, n, block_size)
-H = hss();
 
-if m ~= n
-    error('Rectangular HSS matrices are not supported');
-end
-
-H.topnode  = 0;
-
-if n > block_size
-    [m1, m2] = split_indices(m);
-    [n1, n2] = split_indices(n);
-    
-    H.ml = m1; H.mr = m2;
-    H.nl = n1; H.nr = n2;
-    
-    H.A11 = build_hss_tree(m1, n1, block_size);
-    H.A22 = build_hss_tree(m2, n2, block_size);
-    
-    H.leafnode = 0;
-else
-    H.leafnode = 1;
-    H.D = zeros(m, n);
-end
-end
-
-function [n1, n2] = split_indices(n)
-n1 = ceil(n / 2);
-n2 = n - n1;
-end
 
 function [U, Z] = compress_hss_block(B, tol)
 

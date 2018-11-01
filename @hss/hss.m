@@ -61,6 +61,13 @@ classdef hss
                     case 'cauchy'
                         obj = hm2hss(hm('cauchy', varargin{2:end}));
                         %obj = hss_from_cauchy(varargin{2:end});
+                    case 'handle'
+                        if length(varargin) < 6
+                            error('Unsufficient parameters for the handle constructor');
+                        end
+                        obj = hss_from_random_sampling(varargin{2:end});
+                    case 'toeplitz'
+                        obj = hss_from_symbol(varargin{2:end});
                     otherwise
                         error('Unsupported constructor mode');
                 end
