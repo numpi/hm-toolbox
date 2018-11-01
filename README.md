@@ -2,17 +2,19 @@
 
 [![Build status](https://api.travis-ci.org/numpi/hm-toolbox.svg?branch=master)](https://travis-ci.org/numpi/hm-toolbox)
 
-The <code>hm-toolbox</code> is a toolbox implementing the arithmetic of H-matrices in MATLAB. 
+The <code>hm-toolbox</code> is a toolbox implementing the arithmetic of HODLR and HSS matrices in MATLAB. 
 
-Only the simplest case of the so-called HODLR matrices is handled, where the partitioning
-is recursively done in 2 x 2 blocks, and the off-diagonal blocks are of low-rank. An implementation
-of the HSS arithmetic is also available through the @hss class. 
+The HODLR case is handled in the @hm class, and correspond to H-matrices with partitioning
+recursively done in 2 x 2 blocks, where the off-diagonal blocks are of low-rank. The HSS 
+arithmetic uses the same partitioning (with nested bases), and is available through the
+@hss class. 
 
 Routines to compute matrix functions [1] and to solve matrix equations are included [1,2]. 
 
 Some features depend on external packages, namely chebfun for the construction of 
 HODLR / HSS matrices which sample (piecewise) regular functions on a grid, and rktoolbox to
-solve Lyapunov / Sylvester equations with D&C methods. 
+solve Lyapunov / Sylvester equations with D&C methods. Please note that, as of now, the toolbox
+is comparible only with rktoolbox up to 2.6. 
 
 # Installation instructions
 
