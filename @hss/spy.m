@@ -47,7 +47,7 @@ function spy_draw_block(H, xoffset, yoffset, rk)
         xb = [xoffset + nn, xoffset + nn + nn2, ...
               xoffset + nn + nn2, xoffset + nn ];
         yb = [yoffset, yoffset, yoffset + mm, yoffset + mm ];
-        thisrk = size(H.B12, 2);
+        thisrk = rank(H.B12);
         
         fill(xb, yb, offdiag_color);
         text(xoffset + nn + nn2 / 2, yoffset + mm / 2, ...
@@ -58,7 +58,7 @@ function spy_draw_block(H, xoffset, yoffset, rk)
         xb = [xoffset, xoffset + nn, xoffset + nn, xoffset ];
         yb = [yoffset + mm, yoffset + mm, ...
               yoffset + mm + mm2, yoffset + mm + mm2 ];
-        thisrk = size(H.B21, 2);
+        thisrk = rank(H.B21);
         
         fill(xb, yb, offdiag_color);
         text(xoffset + nn / 2, yoffset + mm + mm2 / 2, ...
