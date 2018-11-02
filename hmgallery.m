@@ -14,7 +14,7 @@ switch name
         end
         
         varargout{1} = hm('tridiagonal', ...
-            spdiags((n - 1)^2 * ones(n,1) * [ -1 2 -1 ], -1:1, n, n));
+            spdiags(ones(n,1) * [ -1 2 -1 ], -1:1, n, n));
         
     case 'haber'
         if isempty('varargin')
