@@ -66,11 +66,13 @@ if ( is_lyapunov && length(varargin) >= 3 && issparse(varargin{3})  )|| ...
         ( ~is_lyapunov && length(varargin) >= 4 && issparse(varargin{4}) )
     
     if is_lyapunov
-        X = sparse_dac_lyap(A, A', C, ...
-            varargin{3}, varargin{3}');
+        nrmA = 1 / norm(A);
+        X = sparse_dac_lyap(A * nrmA, A' * nrmA, C * nrmA, ...
+            varargin{3} * nrmA, varargin{3}' * nrmA);
     else
-        X = sparse_dac_lyap(A, B, C, ...
-            varargin{4}, varargin{5});
+        nrm = 1 / max(norm(A), norm(B));
+        X = sparse_dac_lyap(A * nrm, B * nrm, C * nrm, ...
+            varargin{4} * nrm, varargin{5} * nrm);
     end
     
     return;
@@ -78,9 +80,11 @@ end
 
 if strcmp(method, 'd&c')
     if is_lyapunov
-        X = dac_lyap(A, A', C);
+        nrmA = 1 / norm(A);
+        X = dac_lyap(A * nrmA, A' * nrmA, C * nrmA);
     else
-        X = dac_lyap(A, B, C);
+        nrm = 1 ./ max(norm(A), norm(B));
+        X = dac_lyap(A * nrm, B * nrm, C * nrm);
     end
     
     X = compress_hmatrix(X);

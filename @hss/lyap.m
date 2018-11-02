@@ -14,7 +14,9 @@ function X = lyap(varargin)
 
 if nargin == 2
     % HSS Lyapunov case
-    X = hss_dac_lyap(varargin{1}, varargin{1}', varargin{2});
+    nrmA = 1 / norm(varargin{1});
+    X = hss_dac_lyap(varargin{1} * nrmA, varargin{1}' * nrmA, ...
+            varargin{2} * nrmA);
 elseif nargin == 3
     % Either HSS Sylvester or Sparse Lyapunov.
     if issparse(varargin{3})
@@ -26,7 +28,9 @@ elseif nargin == 3
         
         X = hss_sparse_dac_lyap(A, C, sA);
     else
-        X = hss_dac_lyap(varargin{1}, varargin{2}, varargin{3});
+        nrm = 1 / max(norm(varargin{1}), norm(varargin{2}));
+        X = hss_dac_lyap(varargin{1} * nrm, varargin{2} * nrm, ...
+                varargin{3} * nrm);
     end
 elseif nargin == 5
     % Sparse Sylvester equation
