@@ -22,7 +22,7 @@ Orow = randn(m, k);
 Srow = Afunt(Orow);
 
 while failed
-    
+    % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
     [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
         hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
             Ocol, Orow, 0, 0, tol);
@@ -40,7 +40,7 @@ B = hss_compress(B, tol);
 end
 
 function [B, Scol, Srow, Ocol, Orow, Jcol, ...
-          Jrow, Jcolloc, Jrowloc, failed] = ...
+          Jrow, U, V, failed] = ...
               hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
               Ocol, Orow, row, col, tol)
           
@@ -56,9 +56,9 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         end
         
 		Scol = Scol - B.D * Ocol;
-		[Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps);
+		[Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
         
-        if rk >= size(Scol, 2)
+        if rk >= size(Scol, 2) - 10
             failed = true;
         end
         
@@ -67,13 +67,14 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 		B.U = Xcol';
 		Scol = Scol(Jcol, :);
         
-        Jcolloc = Jcol;
+        % Jcolloc = Jcol;
+        U = Xcol';
         Jcol = row + Jcol;
 
 		Srow = Srow - B.D' * Orow;
-		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps);
+		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
         
-        if rk >= size(Scol, 2)
+        if rk >= size(Scol, 2) - 10
             failed = true;
         end
         
@@ -82,17 +83,18 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 		B.V = Xrow';
 		Srow = Srow(Jrow, :);
         
-        Jrowloc = Jrow;
+        % Jrowloc = Jrow;
+        V = Xrow';
         Jrow = col + Jrow;
 	else
-		[B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, Jcolloc1, Jrowloc1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol);
-		[B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, Jcolloc2, Jrowloc2, failed2]  = hss_from_random_sampling_rec(B.A22, Aeval, Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), row + B.ml, col + B.nl, tol);
+		[B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol);
+		[B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2, failed2]  = hss_from_random_sampling_rec(B.A22, Aeval, Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), row + B.ml, col + B.nl, tol);
         
         if (failed1 || failed2)
             failed = true;
             
             Scol = []; Srow = []; Ocol = []; Orow = []; 
-            Jcol = []; Jrow = []; Jcolloc = []; Jrowloc = [];
+            Jcol = []; Jrow = []; U = []; V = [];
             
             return;
         else
@@ -104,17 +106,21 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         
         if B.topnode == 0
         
-            Ocol2 = Ocol2(Jrowloc2, :);
-            Ocol1 = Ocol1(Jrowloc1, :);
-            Orow2 = Orow2(Jcolloc2, :);
-            Orow1 = Orow1(Jcolloc1, :);
+            % Ocol2 = Ocol2(Jrowloc2, :);
+            % Ocol1 = Ocol1(Jrowloc1, :);
+            % Orow2 = Orow2(Jcolloc2, :);
+            % Orow1 = Orow1(Jcolloc1, :);
+            Ocol2 = V2' * Ocol2;
+            Ocol1 = V1' * Ocol1;
+            Orow2 = U2' * Orow2;
+            Orow1 = U1' * Orow1;
 
             Jcol = [Jcol1, Jcol2]; Jrow = [Jrow1, Jrow2];
             Scol = [Scol1 - B.B12  * Ocol2;  Scol2 - B.B21  * Ocol1 ]; 
             Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
             Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
 
-            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps);
+            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
 
             %if rk >= size(Scol, 2)
             %    failed = true;
@@ -122,12 +128,18 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
             Q = Q(:,1:rk);
             [Xcol, Jcolloc] = interpolative(Q', eps);
+            rr = norm(Xcol' * Q(Jcolloc,:) - Q);
+            if rr > 1e-14
+                rr
+                keyboard
+            end
             B.Rl = Xcol(:, 1:size(Scol1, 1))';
             B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
             Scol = Scol(Jcolloc, :);
             Jcol = Jcol(Jcolloc);
+            U = [ B.Rl ; B.Rr ];
 
-            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps);
+            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
 
             %if rk >= size(Srow, 2)
             %    failed = true;
@@ -135,13 +147,19 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
             Q = Q(:,1:rk);
             [Xrow, Jrowloc] = interpolative(Q', eps);
+            rr = norm(Xrow' * Q(Jrowloc,:) - Q);
+            if rr > 1e-14
+                rr
+                keyboard
+            end
             B.Wl = Xrow(:, 1:size(Srow1, 1))';
             B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
             Srow = Srow(Jrowloc, :);
             Jrow = Jrow(Jrowloc);
+            V = [ B.Wl ; B.Wr ];
         else
             Scol = []; Srow = []; Ocol = []; Orow = []; 
-            Jcol = []; Jrow = []; Jcolloc = []; Jrowloc = [];
+            Jcol = []; Jrow = []; U = []; V = [];
         end
 	end
 end

@@ -59,8 +59,8 @@ classdef hss
                     case 'chebfun2'
                         obj = hm2hss(hm('chebfun2', varargin{2:end}));
                     case 'cauchy'
-                        obj = hm2hss(hm('cauchy', varargin{2:end}));
-                        %obj = hss_from_cauchy(varargin{2:end});
+                        %obj = hm2hss(hm('cauchy', varargin{2:end}));
+                        obj = hss_from_cauchy(varargin{2:end});
                     case 'handle'
                         if length(varargin) < 6
                             error('Unsufficient parameters for the handle constructor');
