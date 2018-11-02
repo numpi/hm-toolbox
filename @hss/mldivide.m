@@ -1,4 +1,10 @@
 function X = mldivide(A, B)
+
+if isscalar(A)
+    X = hss_scalar_mul(1 ./ A, B);
+    return;
+end
+
 if isa(B,'hss')
     X = hss_mldivide(A, B);
 else

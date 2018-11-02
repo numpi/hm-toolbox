@@ -1,3 +1,10 @@
 function X = mrdivide(A, B)
-    X = mldivide(B', A')';
+    if isscalar(B)
+        X = hss_scalar_mul(1 ./ B, A);
+    else
+        X = mldivide(B', A')';        
+    end
+        
+
+
 end
