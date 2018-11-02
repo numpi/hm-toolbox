@@ -1,5 +1,5 @@
 function [V, D] = eigs(varargin)
-%EIGS Compute extremal eigenvalues of an H-matrix.
+%EIGS Compute extremal eigenvalues of an HODLR matrix.
 
 p = inputParser;
 
@@ -21,12 +21,11 @@ switch args.opts
         end
         
     case { 'sm', 'SM' }
+        [L, U] = lu(args.H);
         if nargout == 2
-            [V, D] = eigs(@(x) args.H \ x, n, args.k, args.opts);
-            %D = 1 ./ D;
+            [V, D] = eigs(@(x) U \ (L \ x), n, args.k, args.opts);
         else
-            V = eigs(@(x) args.H \ x, n, args.k, args.opts);
-            %V = 1 ./ V;
+            V = eigs(@(x) U \ (L \ x), n, args.k, args.opts);
         end
         
     otherwise
