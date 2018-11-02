@@ -19,10 +19,6 @@ classdef hm
         % Dense version of the matrix, if the size is smaller than the
         % minimum allowed block size.
         F
-        
-        % If this flag is true no compression is performed, until
-        % hm_recompress is called.
-        compression_disabled
     end
     
     methods
