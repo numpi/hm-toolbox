@@ -24,11 +24,6 @@ if ~exist('nrm_type', 'var')
     nrm_type = 2;
 end
 
-% Check if the rktoolbox is in the path
-if ~exist('rat_krylov', 'file')
-    error('rktoolbox not found. Did you forget to add it to the path?');
-end
-
 if ~isstruct(A)
     if issparse(A)
         AA = ek_struct(A, issymmetric(A));
