@@ -24,11 +24,6 @@ if ~issymmetric(K)
     error('EK_LYAP:: kernel of the RHS is not symmetric')
 end
 
-% Check if the rktoolbox is in the path
-if ~exist('rat_krylov', 'file')
-    error('rktoolbox not found. Did you forget to add it to the path?');
-end
-
 if ~isstruct(A)
     if issparse(A)
         AA = ek_struct(A, issymmetric(A));
@@ -88,9 +83,9 @@ while sa - 2*bsa < k
     end
 
     if ~exist('VA', 'var')
-        [VA, KA, HA] = rat_krylov(AA, u, [0 inf]);
+        [VA, KA, HA, params] = ek_krylov(AA, u);
     else
-        [VA, KA, HA] = rat_krylov(AA, VA, KA, HA, [0 inf]);
+        [VA, KA, HA, params] = ek_krylov(VA, KA, HA, params);
     end
     
     sa = size(VA, 2);

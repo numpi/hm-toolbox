@@ -1,5 +1,5 @@
 function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrm_type)
-%EK_SYLV Approximate the solution of a Sylvester equation AX + XB' + U*V' = 0.
+%EK_SYLV Approximate the solution of a Sylvester equation AX + XB + U*V' = 0.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
 %     Sylvester equation in the factored form XU * XV'.
@@ -98,11 +98,11 @@ while max(sa-2*bsa, sb-2*bsb) < k
     end
     
     if ~exist('VA', 'var')
-        [VA, KA, HA, param_A] = rat_krylov(AA, u, [0 inf]);
-        [VB, KB, HB, param_B] = rat_krylov(BB, v, [0 inf]);
+        [VA, KA, HA, param_A] = ek_krylov(AA, u);
+        [VB, KB, HB, param_B] = ek_krylov(BB, v);
     else
-        [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, [0 inf], param_A);
-        [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, [0 inf], param_B);
+        [VA, KA, HA, param_A] = ek_krylov(VA, KA, HA, param_A);
+        [VB, KB, HB, param_B] = ek_krylov(VB, KB, HB, param_B);
     end
     
     sa = size(VA, 2);
