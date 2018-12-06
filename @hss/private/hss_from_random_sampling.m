@@ -63,28 +63,31 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         end
         
         Q = Q(:,1:rk);
+        
 		[Xcol, Jcol] = interpolative(Q', eps);
 		B.U = Xcol';
 		Scol = Scol(Jcol, :);
         
-        % Jcolloc = Jcol;
         U = Xcol';
         Jcol = row + Jcol;
 
 		Srow = Srow - B.D' * Orow;
-		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
         
-        if rk >= size(Scol, 2) - 10
+		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
+                
+        if rk >= size(Srow, 2) - 10
             failed = true;
         end
         
         Q = Q(:,1:rk);
-		[Xrow, Jrow] = interpolative(Q', eps);
-		B.V = Xrow';
+        
+		[Xrow, Jrow] = interpolative(Q.', eps);
+
+		B.V = Xrow.';
 		Srow = Srow(Jrow, :);
         
-        % Jrowloc = Jrow;
-        V = Xrow';
+        V = Xrow.';
+        
         Jrow = col + Jrow;
 	else
 		[B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol);
@@ -105,11 +108,6 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 		B.B21 = Aeval(Jcol2, Jrow1);
         
         if B.topnode == 0
-        
-            % Ocol2 = Ocol2(Jrowloc2, :);
-            % Ocol1 = Ocol1(Jrowloc1, :);
-            % Orow2 = Orow2(Jcolloc2, :);
-            % Orow1 = Orow1(Jcolloc1, :);
             Ocol2 = V2' * Ocol2;
             Ocol1 = V1' * Ocol1;
             Orow2 = U2' * Orow2;
@@ -122,41 +120,27 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
             [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
 
-            %if rk >= size(Scol, 2)
-            %    failed = true;
-            %end
-
             Q = Q(:,1:rk);
+            
             [Xcol, Jcolloc] = interpolative(Q', eps);
-            rr = norm(Xcol' * Q(Jcolloc,:) - Q);
-            if rr > 1e-14
-                rr
-                keyboard
-            end
+
             B.Rl = Xcol(:, 1:size(Scol1, 1))';
             B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
             Scol = Scol(Jcolloc, :);
             Jcol = Jcol(Jcolloc);
             U = [ B.Rl ; B.Rr ];
-
+            
             [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
 
-            %if rk >= size(Srow, 2)
-            %    failed = true;
-            %end
-
             Q = Q(:,1:rk);
+            
             [Xrow, Jrowloc] = interpolative(Q', eps);
-            rr = norm(Xrow' * Q(Jrowloc,:) - Q);
-            if rr > 1e-14
-                rr
-                keyboard
-            end
+
             B.Wl = Xrow(:, 1:size(Srow1, 1))';
             B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
             Srow = Srow(Jrowloc, :);
             Jrow = Jrow(Jrowloc);
-            V = [ B.Wl ; B.Wr ];
+            V = [ B.Wl ; B.Wr ];            
         else
             Scol = []; Srow = []; Ocol = []; Orow = []; 
             Jcol = []; Jrow = []; U = []; V = [];

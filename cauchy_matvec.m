@@ -1,5 +1,5 @@
 function z = cauchy_matvec(x, y, v, tol)
-% Compute the matrix vector product C(x, y) v where C_ij = 1/(xi - yj)
+% Compute the matrix vector product C(x, y) v where C_ij = 1/(xi + yj)
 
 if ~exist('tol', 'var')
     tol = 1e-8;
