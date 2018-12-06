@@ -22,7 +22,7 @@ if(A.leafnode==1)
 end
 if (A.topnode == 1)
     [U,Su,V] = tcomp(A.B12, tol);
-    A.B12 = Su; Tl = Su.';
+    A.B12 = Su; Tl = Su';
     if A.A11.leafnode == 0
         A.A11.Rl = A.A11.Rl * U;
         A.A11.Rr = A.A11.Rr * U;
@@ -33,7 +33,7 @@ if (A.topnode == 1)
         A.A22.V = A.A22.V * V;
     end
     [U,Sl,V] = tcomp(A.B21, tol);
-    A.B21 = Sl; Tu = Sl.';
+    A.B21 = Sl; Tu = Sl';
     if A.A11.leafnode ==0
         A.A22.Rl = A.A22.Rl * U;
         A.A22.Rr = A.A22.Rr * U;
@@ -47,7 +47,7 @@ if (A.topnode == 1)
     end
 else
     Su = [A.B12, A.Rl * S];
-    Tl = [A.B12.', A.Wr * T]; % possibile inghippo
+    Tl = [A.B12', A.Wr * T]; % possibile inghippo
     [Us,Su,Vs] = tcomp(Su, tol);
     [Ut,Tl,Vt] = tcomp(Tl, tol);
     k = size(A.B12,2);
@@ -65,7 +65,7 @@ else
     end
     
     Sl = [A.B21, A.Rr * S];
-    Tu = [A.B21.', A.Wl * T]; % possibile inghippo
+    Tu = [A.B21', A.Wl * T]; % possibile inghippo
     [Us,Sl,Vs] = tcomp(Sl, tol);
     [Ut,Tu,Vt] = tcomp(Tu, tol);
     k = size(A.B21,2);
