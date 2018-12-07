@@ -14,7 +14,7 @@ B = hss_build_hss_tree(m, n, hssoption('block-size'));
 
 failed = true;
 
-k = 80;
+k = 100;
 
 Ocol = randn(n, k);
 Scol = Afun(Ocol);
@@ -28,10 +28,11 @@ while failed
             Ocol, Orow, 0, 0, tol);
     
     if failed
-        Ocol = [ Ocol, randn(n, 10) ];
-        Scol = [ Scol, Afun(Ocol(:, end-9:end))  ];
-        Orow = [ Orow, randn(m, 10) ];
-        Srow = [ Srow, Afunt(Orow(:,end-9:end)) ];
+        Ocol = [ Ocol, randn(n, k) ];
+        Scol = [ Scol, Afun(Ocol(:, end-k+1:end))  ];
+        Orow = [ Orow, randn(m, k) ];
+        Srow = [ Srow, Afunt(Orow(:,end-k+1:end)) ];
+        k = 2 * k;
     end
 end
 

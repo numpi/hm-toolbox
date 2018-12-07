@@ -1,7 +1,7 @@
 function eT = expm(A, method, N, nrm)
 %EXPM Evaluate the matrix exponential of A.
 %
-% E = EXPM(A) computes the matrix exponential of the HM matrix A. The
+% E = EXPM(A) computes the matrix exponential of the HSS matrix A. The
 % method used is a Pade' approximant combined with a scaling and squaring
 % technique.
 %
@@ -11,15 +11,6 @@ function eT = expm(A, method, N, nrm)
 %  - 'pade': The default choice, a Pade approximant with scaling and
 %    squaring
 %  - 'taylor': A truncated Taylor series with scaling and squaring.
-%  - 'ratcheb': A rational Chebyshev approximation that only works for
-%    negative definite matrices.
-%
-% E = EXPM(A, METHOD, N) uses a degree N approximation. The meaning of the
-% integer N is method-dependent, but typically gives the number of terms
-% used in the approximation.
-%
-% E = EXPM(A, METHOD, N, NRM) gives an estimate for the norm of A that is
-% used for the scaling and squaring.
 
 if ~exist('method','var')
     method = 'pade';
@@ -29,28 +20,14 @@ if ~exist('N', 'var')
     N = 26;
 end
 
-% Implementation of an efficient evaluation for negative definite matrices
-if strcmp(method, 'ratcheb')
-    eT = expm_ratcheb(A);
-    return;
-end
-
-if strcmp(method, 'fasttaylor')
-    A_pwr = nrm.pwr;
-    A_k = nrm.k;
-    t   = nrm.t;
-    % eT = expm_fasttaylor(t, A_pwr, A_k, A, nrm.nrm, N);
-    error('fasttaylor has not been implemented yet');
-    return;
-end
-
 if ~exist('nrm', 'var')
     nrm = norm(A);
 end
 
 n = size(A, 2);
+
 if nrm == 0
-    eT = hm('diagonal', ones(n,1));
+    eT = hss('diagonal', ones(n,1));
     return;
 end
 
@@ -64,7 +41,7 @@ A = A * (1 / 2^h);
 
 if strcmp(method,'taylor')
     maxit = N;
-    eT = hm('diagonal', ones(n,1));
+    eT = hss('diagonal', ones(n,1));
     
     tempT = eT;
     for i=1:maxit
@@ -74,8 +51,8 @@ if strcmp(method,'taylor')
 elseif strcmp(method,'pade')
     
     c = 1 / 2;
-    eTn = hm('diagonal', ones(n,1)) + c * A;
-    eTd = hm('diagonal', ones(n,1)) - c * A;
+    eTn = hss('diagonal', ones(n,1)) + c * A;
+    eTd = hss('diagonal', ones(n,1)) - c * A;
     
     q = floor(N / 2);
     p = 1;
@@ -93,7 +70,8 @@ elseif strcmp(method,'pade')
         p = ~p;
     end
     
-    eT =  eTn / eTd;
+    % eT =  eTn / eTd;
+    eT = eTd \ eTn;
 else
     error('Invalid parameter method in EXPM');
 end

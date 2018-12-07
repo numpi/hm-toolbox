@@ -26,7 +26,7 @@ function [X,Q,Z, Y0] = hss_mldivide(A, B)
 
     Y = hss_sum(Y0, Y1, false);
 
-	X = applyQ(Y, Z, false);
+	X = hss_compress(applyQ(Y, Z, false), hssoption('threshold'));
 end
 
 function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
