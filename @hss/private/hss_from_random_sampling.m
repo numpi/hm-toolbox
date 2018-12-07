@@ -14,7 +14,7 @@ B = hss_build_hss_tree(m, n, hssoption('block-size'));
 
 failed = true;
 
-k = 20;
+k = 80;
 
 Ocol = randn(n, k);
 Scol = Afun(Ocol);
@@ -35,7 +35,10 @@ while failed
     end
 end
 
-B = hss_compress(B, tol);
+% hssrank(B)
+% B = hss_proper(B);
+% B = hss_compress(B, tol);
+% hssrank(B)
 
 end
 
@@ -56,7 +59,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         end
         
 		Scol = Scol - B.D * Ocol;
-		[Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
+		[Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
         
         if rk >= size(Scol, 2) - 10
             failed = true;
@@ -64,7 +67,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         
         Q = Q(:,1:rk);
         
-		[Xcol, Jcol] = interpolative(Q', eps);
+		[Xcol, Jcol] = interpolative(Q', tol);
 		B.U = Xcol';
 		Scol = Scol(Jcol, :);
         
@@ -73,7 +76,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
 		Srow = Srow - B.D' * Orow;
         
-		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
+		[Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
                 
         if rk >= size(Srow, 2) - 10
             failed = true;
@@ -81,7 +84,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         
         Q = Q(:,1:rk);
         
-		[Xrow, Jrow] = interpolative(Q.', eps);
+		[Xrow, Jrow] = interpolative(Q.', tol);
 
 		B.V = Xrow.';
 		Srow = Srow(Jrow, :);
@@ -118,11 +121,11 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
             Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
             Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
 
-            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
+            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
 
             Q = Q(:,1:rk);
             
-            [Xcol, Jcolloc] = interpolative(Q', eps);
+            [Xcol, Jcolloc] = interpolative(Q', tol);
 
             B.Rl = Xcol(:, 1:size(Scol1, 1))';
             B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
@@ -130,11 +133,11 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
             Jcol = Jcol(Jcolloc);
             U = [ B.Rl ; B.Rr ];
             
-            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * eps * size(R, 2));
+            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
 
             Q = Q(:,1:rk);
             
-            [Xrow, Jrowloc] = interpolative(Q', eps);
+            [Xrow, Jrowloc] = interpolative(Q', tol);
 
             B.Wl = Xrow(:, 1:size(Srow1, 1))';
             B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
