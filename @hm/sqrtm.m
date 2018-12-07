@@ -9,7 +9,7 @@ converged = false;
 threshold = hmoption('threshold') * norm(A);
         
 X = A;
-Y = hss('diagonal', ones(size(A, 2), 1));
+Y = eye(size(A), 'like', A);
 
 it = 1;
 max_its = 100;
