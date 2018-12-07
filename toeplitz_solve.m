@@ -29,9 +29,9 @@ C = hss('handle', @(v) toep_cauchy_matvec(c, r, d0, v), ...
           @(v) toep_cauchy_matvec_trasp(c, r, d0, v), ...
           @(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n);
 
-fv = ifft(b);
-fx = C \ fv;
-x = d0' .* fft(fx);
+z = ifft(b);
+y = C \ z;
+x = d0' .* fft(y);
 
 end
 
