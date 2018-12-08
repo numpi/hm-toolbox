@@ -95,17 +95,22 @@ function  [X, Q, ind] = applyQ(X, Q, transp, ind)
 end
 
 function  [X, ind, cind] = applyLinv(X, L, ind, cind)
-	if ~exist('ind', 'var')
-		ind = {};
-	end
+    if ~exist('ind', 'var')
+        ind = {};
+    end
 	if X.leafnode == 1  % LEAF
 		LL = L.D; 
 
 		if ~isempty(ind)
-			localind = ind{1}; 
-            localcind = cind{1};
+			localind = ind{1};
 			ind = { ind{2:end} };
-            cind = { cind{2:end} };
+            if ~isempty(cind)
+                localcind = cind{1};
+                cind = { cind{2:end} };
+            else
+                cind = {};
+                localcind = [];
+            end
 		else
 			localind = 1 : size(X.D, 1);
             localcind = [];
@@ -125,8 +130,13 @@ end
 function [A, ind] = hss_project(A, ind, rc)
 % Compute principal projection of an HSS matrix A(ind, :)
 	if A.leafnode == 1  % LEAF
-		localind = ind{1};
-		ind = { ind{2:end} };
+        if ~isempty(ind)
+            localind = ind{1};
+            ind = { ind{2:end} };
+        else
+            localind = [];
+        end
+        
 		if strcmp(rc, 'row')
 			A.D = A.D(localind, :);
 			A.U = A.U(localind, :);
@@ -155,11 +165,18 @@ function [Y1, ind, cind] = hss_unpack(Y0, Y1, ind, cind)
 		Y1.A22.leafnode = 1;
         Y1.A11.topnode = 0;
         Y1.A22.topnode = 0;
-
-		lind1 = ind{1};
-		lind2 = ind{2};
-		lcind1 = cind{1};
-		lcind2 = cind{2};
+            
+        if length(cind) >= 1
+            lcind1 = cind{1};
+        else
+            lcind1 = [];
+        end
+        
+        if length(cind) >= 2
+            lcind2 = cind{2};
+        else
+            lcind2 = [];
+        end
 		cind = { cind{3:end} };
 		ind = { ind{3:end} };
 		Y1.A11.D = zeros(size(Y0.A11));
