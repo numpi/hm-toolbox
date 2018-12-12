@@ -211,7 +211,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 end
 
 function [Q, rk] = colspan(S, tol, nrm)
-    use_qr = true;
+    use_qr = false;
     
     if use_qr
         [Q, R, ~] = qr(S, 0);
@@ -219,7 +219,7 @@ function [Q, rk] = colspan(S, tol, nrm)
         Q = Q(:,1:rk);
     else
         [Q, S] = svd(S);
-        rk = sum(diag(S) > nrm * tol);
+        rk = sum(diag(S) > nrm * tol * size(S, 2));
         Q = Q(:,1:rk);
     end
 end
