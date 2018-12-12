@@ -9,9 +9,12 @@ function B = hss_from_random_sampling(Afun, Afunt, Aeval, m, n)
 %     hierarchically semiseparable representation of a matrix." SIAM 
 %     Journal on Matrix Analysis and Applications 32.4 (2011): 1251-1274
 
+% A few things are not available in Octave, so we use workarounds
+isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
 tol = hssoption('threshold');
 
-B = hss_build_hss_tree(m, n, hssoption('block-size'));
+B = hss('zeros', m, n);
 
 failed = true;
 
@@ -24,9 +27,14 @@ Srow = Afunt(Orow);
 
 bs = 5;
 
-nrm = svds(@(x,t) normest_afun(Afun, Afunt, x, t), [n n], 1, 'largest', ...
-    struct('tol', 1e-2)); nrm = nrm(1);
-% nrm = 1;
+if isOctave
+    nrm = eigs(@(x, t) real(Afunt(Afun(x))), n, 1, 'lm', ...
+    struct('issym', true, 'tol', 1e-2));
+else
+    nrm = svds(@(x,t) normest_afun(Afun, Afunt, x, t), ...
+        [n n], 1, 'largest', ...
+        struct('tol', 1e-2)); nrm = nrm(1);
+end
 
 while failed
     % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
@@ -218,7 +226,7 @@ function [Q, rk] = colspan(S, tol, nrm)
         rk = sum(abs(diag(R)) > nrm * tol * sqrt(size(S, 2)));
         Q = Q(:,1:rk);
     else
-        [Q, S] = svd(S);
+        [Q, S, ~] = svd(S);
         rk = sum(diag(S) > nrm * tol * size(S, 2));
         Q = Q(:,1:rk);
     end
