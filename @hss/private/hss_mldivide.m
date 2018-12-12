@@ -1,9 +1,16 @@
 function [X,Q,Z, Y0] = hss_mldivide(A, B)
 	if A.leafnode == 1 % Base case
 		X = B;
-    		X.D = full(A) \ full(B);
-    		return
-	end
+    	X.D = full(A) \ full(B);
+    	return
+    end
+    
+    if size(A, 1) == 0
+        % This is a special case -- we use this just to copy the HSS tree
+        % in place, since there is no computation to do. 
+        X = A' * B;
+        return;
+    end
 
 	[L, Q, Z, ind, cind] = hss_mldivide_rec(A, {}, {}, {}, {});
 
@@ -21,24 +28,34 @@ function [X,Q,Z, Y0] = hss_mldivide(A, B)
     L = hss_project(L, cind, 'col');
     L = hss_remove_leaf_level(L);
 	
-	Y1 = hss_mldivide(L, QB);
+    Y1 = hss_mldivide(L, QB);
+    
 	Y1 = hss_unpack(Y0, Y1, ind, cind);
 
     Y = hss_sum(Y0, Y1, false);
 
-	X = applyQ(Y, Z, false);
+	X = hss_compress(applyQ(Y, Z, false), hssoption('threshold'));
 end
 
 function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
 	if A.leafnode == 1  % LEAF
 	    k = size(A.U,2);
 	    [row, col] = size(A.D);
-	    if k == row
-		Q = [Q, eye(col)]; Q = [Z, eye(row)]; ind = zeros(1,0); cind = [1:col];
-		return
-	    end
-	    ind = [ind, [1:row-k]];  % Indices of computed entries in the solution, at the end
-	    cind = [cind, [row - k + 1: row]]; % Complementary of ind
+        
+        if k == row
+            Q{length(Q) + 1} = eye(col);
+            Q{length(Q) + 1} = eye(row);
+            % Q = [Q, eye(col)]; Q = [Z, eye(row)]; 
+            ind = { zeros(1,0) }; cind = { (1:col) };
+            return
+        end
+        
+	    % ind = [ind, [1:row-k]];  % Indices of computed entries in the solution, at the end
+        ind{length(ind)+1} = [1:row-k];
+        
+	    % cind = [cind, [row - k + 1: row]]; % Complementary of ind
+        cind{length(cind)+1} = [row - k + 1 : row];
+        
 	    QQ = zeros(row);
 	    % Compress off-diagonal block row
 	    [QQ(:, end:-1:1), A.U(end:-1:1, :)] = qr(A.U);
@@ -52,7 +69,7 @@ function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
         
 	    % Update transformations on the right
 	    A.V = ZZ' * A.V;
-	    Z = [Z, ZZ];	    	    
+	    Z = [Z, ZZ];    	    
 	else    % NOT A LEAF
 	    [A.A11, Q, Z, ind, cind] = hss_mldivide_rec(A.A11, Q, Z, ind, cind);  % recursive call on left  child  
 	    [A.A22, Q, Z, ind, cind] = hss_mldivide_rec(A.A22, Q, Z, ind, cind);  % recursive call on right child
@@ -85,9 +102,7 @@ function  [X, Q, ind] = applyQ(X, Q, transp, ind)
                 X.D = QQ * X.D;
                 X.U = QQ * X.U;
             end
-		end
-
-		
+        end
 	else
 		[X.A11, Q, ind] = applyQ(X.A11, Q, transp, ind);
 		[X.A22, Q, ind] = applyQ(X.A22, Q, transp, ind);
@@ -95,21 +110,21 @@ function  [X, Q, ind] = applyQ(X, Q, transp, ind)
 end
 
 function  [X, ind, cind] = applyLinv(X, L, ind, cind)
-	if ~exist('ind', 'var')
-		ind = {};
-	end
+    if ~exist('ind', 'var')
+        ind = {};
+    end
 	if X.leafnode == 1  % LEAF
 		LL = L.D; 
 
-		if ~isempty(ind)
-			localind = ind{1}; 
+        if ~isempty(ind)
+            localind = ind{1};
+            ind = { ind{2:end} };
             localcind = cind{1};
-			ind = { ind{2:end} };
-            cind = { cind{2:end} };
-		else
-			localind = 1 : size(X.D, 1);
+            cind = { cind{2:end} };            
+        else
+            localind = 1 : size(X.D, 1);
             localcind = [];
-		end
+        end
 
 		X.D(localind,:) = LL(localind,localind)\X.D(localind,:);
 		X.U(localind,:) = LL(localind,localind)\X.U(localind,:);
@@ -125,8 +140,13 @@ end
 function [A, ind] = hss_project(A, ind, rc)
 % Compute principal projection of an HSS matrix A(ind, :)
 	if A.leafnode == 1  % LEAF
-		localind = ind{1};
-		ind = { ind{2:end} };
+        if ~isempty(ind)
+            localind = ind{1};
+            ind = { ind{2:end} };
+        else
+            localind = [];
+        end
+        
 		if strcmp(rc, 'row')
 			A.D = A.D(localind, :);
 			A.U = A.U(localind, :);
@@ -155,11 +175,10 @@ function [Y1, ind, cind] = hss_unpack(Y0, Y1, ind, cind)
 		Y1.A22.leafnode = 1;
         Y1.A11.topnode = 0;
         Y1.A22.topnode = 0;
-
-		lind1 = ind{1};
-		lind2 = ind{2};
-		lcind1 = cind{1};
-		lcind2 = cind{2};
+            
+        lcind1 = cind{1};
+        lcind2 = cind{2};
+        
 		cind = { cind{3:end} };
 		ind = { ind{3:end} };
 		Y1.A11.D = zeros(size(Y0.A11));

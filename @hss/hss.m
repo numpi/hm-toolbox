@@ -68,6 +68,15 @@ classdef hss
                         obj = hss_from_random_sampling(varargin{2:end});
                     case 'toeplitz'
                         obj = hss_from_symbol(varargin{2:end});
+                    case 'zeros'
+                        m = varargin{2};
+                        if nargin >= 3
+                            n = varargin{3};
+                        else
+                            n = m;
+                        end
+                        obj = hss_build_hss_tree(m, n, ...
+                            hssoption('block-size'));
                     otherwise
                         error('Unsupported constructor mode');
                 end
