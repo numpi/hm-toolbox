@@ -11,10 +11,8 @@ arithmetic uses the same partitioning (with nested bases), and is available thro
 
 Routines to compute matrix functions [1] and to solve matrix equations are included [1,2]. 
 
-Some features depend on external packages, namely chebfun for the construction of 
-HODLR / HSS matrices which sample (piecewise) regular functions on a grid, and rktoolbox to
-solve Lyapunov / Sylvester equations with D&C methods. Please note that, as of now, the toolbox
-is comparible only with rktoolbox up to 2.6. 
+Chebfun2 is required for the construction of HODLR / HSS matrices which sample 
+(piecewise) regular functions on a grid.
 
 # Installation instructions
 
