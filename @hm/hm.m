@@ -1,4 +1,33 @@
 classdef hm
+%HM
+%
+% H = HM(A) constructs the HODLR representation of a matrix A by
+%     approximating the off-diagonal blocks at all levels using truncated 
+%     SVDs.
+% 
+% H = HM('low-rank', U, V) construct an HM representation of the low-rank
+%     matrix U*V'. 
+%
+% H = HM('banded', A) constructs an HM representation of a banded matrix
+%     A. The matrix A can be either sparse or dense. 
+%
+% H = HM('banded', A, B) can be used to specify the symmetric bandwidth B 
+%     of the matrix A.
+%
+% H = HM('banded', A, BL, BU) specifies different lower and upper 
+%     bandwidth BL and BU, respectively.
+%
+% H = HM('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
+%     containing the samplings of the bivariate function F over a uniform
+%     grid of the square XDOM x YDOM. The procedure relies on separable
+%     approximation of F(X,Y) as provided by the Chebfun package. 
+%
+% H = HM('toeplitz', C, R) constructs the Toeplitz matrix with C as first
+%     column and R as first row. 
+%
+% H = HM('toeplitz', C, R, N) constructs the N x N Toeplitz matrix with 
+%     C as first column and R as first row. if N is larger than C and 
+%     R, respectively, then C and R are padded with zeros. 
     
     properties
         % top and bottom blocks of the matrix.
@@ -113,9 +142,15 @@ classdef hm
             H = obj;
             
             block_size = hmoption('block-size');
+            
+            if ~exist('bandl', 'var')
+                [bandl, bandu] = bandwidth(A);
+            end
+            
             if ~exist('bandu', 'var')
                 bandu = bandl;
             end
+            
             if size(A, 1) <= block_size
                 H.F = full(A);
                 H.sz = size(A);
@@ -252,6 +287,14 @@ classdef hm
         
         function obj = create_toeplitz_h_matrix(obj, am, ap, n)
             block_size = hmoption('block-size');
+            
+            if ~exist('n', 'var')
+                n = length(am);
+                if n ~= length(ap)
+                    error('Only square Toeplitz matrices are supported in @hm');
+                end
+            end
+            
             obj.sz = [ n, n ];
             
             if length(am) > n

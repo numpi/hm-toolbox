@@ -58,7 +58,7 @@ end
 it = 1;
 
 while sa - 2*bsa < k
-    if ( size(VA, 2) + 2 * bsa >= size(VA, 1) )
+    if exist('VA', 'var') && ( size(VA, 2) + 2 * bsa >= size(VA, 1) )
         
         na = size(VA, 1);
         
@@ -92,7 +92,7 @@ while sa - 2*bsa < k
     
     % Compute the solution and residual of the projected Lyapunov equation
     As = HA / KA(1:end-bsa,:);
-    Cs = zeros(size(As, 1), size(As, 2));
+    Cs = zeros(size(As, 1), size(As, 1));
     
     % FIXME: The above steps can be carried out much more efficiently, just
     % computing the new columns and rows of As and Bs.

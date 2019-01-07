@@ -1,4 +1,49 @@
 classdef hss
+%HSS HSS matrices
+%
+% H = HSS(A) constructs an HSS representation of the matrix A, using the
+%     algorithm described in [2]. This procedure has a cost O(n^2), where
+%     n is the size of A, provided that the off-diagonal rank is negligible
+%     with respect to n.
+%
+% H = HSS('low-rank', U, V) construct an HSS representation of the low-rank
+%     matrix U*V'. 
+%
+% H = HSS('banded', A) constructs an HSS representation of a banded matrix
+%     A. The matrix A can be either sparse or dense. 
+%
+% H = HSS('banded', A, B) can be used to specify the symmetric bandwidth B 
+%     of the matrix A.
+%
+% H = HSS('banded', A, BL, BU) specifies different lower and upper 
+%     bandwidth BL and BU, respectively.
+%
+% H = HSS('handle', AFUN, AFUNT, AEVAL, M, N) constructs an HSS matrix
+%     using the random sampling based algorithm in [1]. It requires the
+%     handle function AFUN and AFUNT which perform the matrix-vector
+%     products A*v and A'*v, respectively, and AEVAL which, given two
+%     integer vectors I, J returns the submatrix A(I, J). M and N are the
+%     number of rows and columns of A. 
+%
+% H = HSS('toeplitz', C, R) constructs the Toeplitz matrix with C as first
+%     column and R as first row. The representation is constructed using
+%     the 'handle' constructor, and fast Toeplitz-vector multiplication. 
+%
+% H = HSS('zeros', M, N) constructs the HSS representation of the M x N
+%     zero matrix. 
+%
+% H = HSS('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
+%     containing the samplings of the bivariate function F over a uniform
+%     grid of the square XDOM x YDOM. The procedure relies on separable
+%     approximation of F(X,Y) as provided by the Chebfun package. 
+%
+%[1] Martinsson, P. G. (2011). A fast randomized algorithm for computing a
+%    hierarchically semiseparable representation of a matrix. SIAM Journal
+%    on Matrix Analysis and Applications, 32(4), 1251-1274.
+%
+%[2] Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast 
+%    algorithms for hierarchically semiseparable matrices. Numerical 
+%    Linear Algebra with Applications, 17(6), 953-976.
     
     properties
         % top and bottom blocks of the matrix.
