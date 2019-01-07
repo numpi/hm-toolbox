@@ -42,11 +42,12 @@ function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
 	    k = size(A.U,2);
 	    [row, col] = size(A.D);
         
-        if k == row
+        if k >= row
             Q{length(Q) + 1} = eye(col);
-            Q{length(Q) + 1} = eye(row);
+            Z{length(Z) + 1} = eye(row);
             % Q = [Q, eye(col)]; Q = [Z, eye(row)]; 
-            ind = { zeros(1,0) }; cind = { (1:col) };
+            ind{length(ind)+1} = zeros(1,0); 
+            cind{length(cind)+1} = (1:col);
             return
         end
         

@@ -1,6 +1,6 @@
 function [U, S, V] = tqr(A,tol)
 if min(size(A)) == 0
-    U = []; S = []; V = []; return;
+    U = zeros(size(A, 1), 0); S = []; V = zeros(size(A, 2), 0); return;
 end
 [U, R, p] = qr(A, 0);
 ip = zeros(length(p),1);
