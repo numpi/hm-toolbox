@@ -4,7 +4,10 @@ classdef hss
 % H = HSS(A) constructs an HSS representation of the matrix A, using the
 %     algorithm described in [2]. This procedure has a cost O(n^2), where
 %     n is the size of A, provided that the off-diagonal rank is negligible
-%     with respect to n.
+%     with respect to n. 
+%
+%     If A is sparse, then the random sampling constructor described in
+%     HSS('handle', ...) below is used. 
 %
 % H = HSS('low-rank', U, V) construct an HSS representation of the low-rank
 %     matrix U*V'. 
@@ -89,7 +92,15 @@ classdef hss
             obj = hss();
             
             if nargin == 1
-                obj = hss_from_full(varargin{1});
+                A = varargin{1};
+                if issparse(A)
+                    obj = hss('handle', ...
+                        @(v) A * v, @(v) A' * v, @(i,j) full(A(i,j)), ...
+                        size(A, 1), size(A, 2));
+                else
+                    obj = hss_from_full(A);
+                end
+                
                 return;
             end
             
