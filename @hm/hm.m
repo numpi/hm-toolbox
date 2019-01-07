@@ -108,7 +108,7 @@ classdef hm
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
                     case 'diagonal'
-                        D = varargin{2};
+                        D = varargin{2}; D = D(:);
                         obj = hm('banded', spdiags(D, 0, ...
                             length(D), length(D)), varargin{3:end});
                     case 'chebfun2'
