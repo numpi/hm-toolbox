@@ -1,5 +1,7 @@
 function A = hm2hss(B)
 %HM2HSS Conversion between data-sparse formats.
+%
+% A = HM2HSS(B) constructs an HSS representation of the HM matrix B. 
 
 m = size(B, 1);
 n = size(B, 2);
