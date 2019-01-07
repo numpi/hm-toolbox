@@ -1,14 +1,20 @@
-function sz = size(H, idx)
+function varargout = size(H, idx)
 %SIZE Get the size of an H-matrix.
 
+if nargout == 2
+    varargout{1} = H.sz(1);
+    varargout{2} = H.sz(2);
+    return
+end
+
 if ~exist('idx', 'var')
-    sz = H.sz;
+    varargout{1} = H.sz;
 else
     switch idx
         case 1
-            sz = H.sz(1);
+            varargout{1} = H.sz(1);
         case 2
-            sz = H.sz(2);
+            varargout{1} = H.sz(2);
         otherwise
             error('Unsupported index specified');
     end

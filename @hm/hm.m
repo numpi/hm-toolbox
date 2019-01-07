@@ -60,7 +60,31 @@ classdef hm
                 return;
             end
             
-            if nargin == 1
+            rowcluster = [];
+            colcluster = [];
+            
+            % Find the first string parameter after varargin{1}
+            charpos = 2;
+            while charpos <= nargin && ~ischar(varargin{charpos})
+                charpos = charpos + 1;
+            end
+            
+            if charpos <= nargin && strcmp(varargin{charpos}, 'cluster')
+                rowcluster = varargin{charpos + 1};
+                if nargin >= charpos + 2
+                    colcluster = varargin{charpos + 2};
+                else
+                    colcluster = rowcluster;
+                end
+            end
+            
+            if ~ischar(varargin{1})
+                A = varargin{1};
+                
+                obj = hm_build_hm_tree(size(A, 1), size(A, 2), ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster);
+                
                 obj = create_h_matrix(obj, varargin{1});
                 return;
             end
@@ -68,19 +92,37 @@ classdef hm
             if nargin > 1
                 switch varargin{1}
                     case 'low-rank'
-                        obj = create_low_rank_h_matrix(obj, varargin{2:end});
+                        obj = hm_build_hm_tree(size(varargin{2}, 1), ...
+                            size(varargin{3}, 1), ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster);
+                        
+                        obj = create_low_rank_h_matrix(obj, varargin{2:charpos - 1});
                     case 'tridiagonal'
                         obj = create_tridiagonal_h_matrix(obj, varargin{2});
                     case 'banded'
-                        obj = create_banded_h_matrix(obj, varargin{2:end});
+                        obj = hm_build_hm_tree(size(varargin{2}, 1), ...
+                            size(varargin{2}, 2), ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster);                        
+                        
+                        obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
                     case 'diagonal'
-                        obj = create_diagonal_h_matrix(obj, varargin{2:end});
-                    case 'sparse'
-                        obj = create_sparse_h_matrix(obj, varargin{2});
+                        obj = hm('banded', spdiags(varargin{2}, 0, ...
+                            length(D), length(D)), varargin{3:end});
                     case 'chebfun2'
                         obj = create_chebfun2_h_matrix(obj, varargin{2:end});
                     case 'toeplitz'
-                        obj = create_toeplitz_h_matrix(obj, varargin{2:end});
+                        n = length(varargin{2});
+                        if charpos > 4
+                            n = varargin{4};
+                        end
+                        
+                        obj = hm_build_hm_tree(n, n, ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster); 
+                        
+                        obj = create_toeplitz_h_matrix(obj, varargin{2:charpos-1});
                     case 'cauchy'
                         warning('The CAUCHY constructor is not (yet) efficiently implemented');
                         obj = create_cauchy_h_matrix(obj, varargin{2:end});
@@ -101,47 +143,26 @@ classdef hm
         function obj = create_h_matrix(obj, A)
             %CREATE_H_MATRIX Given a dense matrix A, construct a hierarchical
             %representation for it.
-            min_block_size = hmoption('block-size');
             
-            obj.F = [];
-            obj.sz = size(A);
-            
-            if size(A, 1) <= min_block_size && size(A, 2) <= min_block_size
+            if ~isempty(obj.F)
                 obj.F = A;
             else
                 % Get the middle point
-                mp = ceil(size(A, 1) / 2);
+                % mp = ceil(size(A, 1) / 2);
+                m1 = obj.A11.sz(1);
+                n1 = obj.A11.sz(2);
                 
-                obj.A11 = create_h_matrix(hm(), A(1:mp,1:mp));
-                obj.A22 = create_h_matrix(hm(), A(mp+1:end,mp+1:end));
+                obj.A11 = create_h_matrix(obj.A11, A(1:m1,1:n1));
+                obj.A22 = create_h_matrix(obj.A22, A(m1+1:end,n1+1:end));
                 
-                [obj.U21, obj.V21] = compress_matrix(A(mp+1:end,1:mp));
-                [obj.U12, obj.V12] = compress_matrix(A(1:mp,mp+1:end));
-            end
-        end
-        
-        function obj = create_sparse_h_matrix(obj, A)
-            %CREATE_SPARSE_H_MATRIX Create an H-matrix starting from a sparse one
-            
-            n = size(A, 2);
-            block_size = hmoption('block-size');
-            
-            if n <= block_size
-                obj.F = A;
-            else
-                mp = ceil(size(A, 1));
-                obj.A11 = create_sparse_h_matrix(hm(), A(1:mp, 1:mp));
-                obj.A22 = create_sparse_h_matrix(hm(), A(mp+1:end,mp+1:end));
-                
-                % FIXME: Missing implementation of two-sided Lanczos method
+                [obj.U21, obj.V21] = compress_matrix(A(m1+1:end,1:n1));
+                [obj.U12, obj.V12] = compress_matrix(A(1:m1,n1+1:end));
             end
         end
         
         function H = create_banded_h_matrix(obj, A, bandl, bandu)
             %CREATE_BANDED_H_MATRIX Create a banded H-matrix.
             H = obj;
-            
-            block_size = hmoption('block-size');
             
             if ~exist('bandl', 'var')
                 [bandl, bandu] = bandwidth(A);
@@ -151,74 +172,48 @@ classdef hm
                 bandu = bandl;
             end
             
-            if size(A, 1) <= block_size
+            if ~isempty(H.F)
                 H.F = full(A);
-                H.sz = size(A);
             else
-                mp = ceil(size(A, 1) / 2);
-                n = size(A, 1);
+                [m, n] = size(H);
                 
-                if max(bandu, bandl) <= min(n - mp)
-                    H.A11 = create_banded_h_matrix(hm(), A(1:mp,1:mp), bandl, bandu);
-                    H.A22 = create_banded_h_matrix(hm(), A(mp+1:end,mp+1:end), bandl, bandu);
+                m1 = H.A11.sz(1);
+                n1 = H.A11.sz(2);
+                
+                if max(bandu, bandl) <= min(n - max(m1, n1))
+                    H.A11 = create_banded_h_matrix(H.A11, A(1:m1,1:n1), bandl, bandu);
+                    H.A22 = create_banded_h_matrix(H.A22, A(m1+1:end,n1+1:end), bandl, bandu);
                     
-                    H.U12 = [ zeros(mp - bandu, bandu) ; full(A(mp - bandu + 1:mp, mp + 1:mp + bandu)) ];
-                    H.V12 = [ eye(bandu) ; zeros(n - mp - bandu, bandu) ];
+                    H.U12 = [ zeros(m1 - bandu, bandu) ; full(A(m1 - bandu + 1:n1, m1 + 1:m1 + bandu)) ];
+                    H.V12 = [ eye(bandu) ; zeros(n - n1 - bandu, bandu) ];
                     
-                    H.U21 = [ full(A(mp + 1:mp + bandl, mp - bandl + 1:mp)) ; zeros(n - mp - bandl, bandl) ];
-                    H.V21 = [ zeros(mp - bandl, bandl) ; eye(bandl) ];
+                    H.U21 = [ full(A(m1 + 1:m1 + bandl, m1 - bandl + 1:m1)) ; zeros(m - m1 - bandl, bandl) ];
+                    H.V21 = [ zeros(n1 - bandl, bandl) ; eye(bandl) ];
                     
                     % Perform a compression
-                    [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));
-                    [			H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
+                    % [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));
+                    % [H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
                 else
                     H = create_h_matrix(H, full(A));
                 end
-                
-                H.sz = size(A);
-            end
-        end
-        
-        function obj = create_diagonal_h_matrix(obj, D)
-            %CREATE_DIAGONAL_H_MATRIX Create an H-matrix with the specified diagonal.
-            n = length(D);
-            
-            if length(D) <= hmoption('block-size')
-                obj.F = diag(D);
-                obj.sz = [ n, n ];
-            else
-                mp = ceil(length(D) / 2);
-                obj.A11 = create_diagonal_h_matrix(hm(), D(1:mp));
-                obj.A22 = create_diagonal_h_matrix(hm(), D(mp+1:end));
-                obj.U12 = zeros(mp, 0);
-                obj.V12 = zeros(n - mp, 0);
-                obj.U21 = zeros(n - mp, 0);
-                obj.V21 = zeros(mp, 0);
-                
-                obj.sz = [ n, n ];
             end
         end
         
         function obj = create_low_rank_h_matrix(obj, U, V)
             %CREATE_LOW_RANK_H_MATRIX Create a low rank H matrix.
-            global hm_block_size
             
-            if isempty(hm_block_size)
-                hmoption('block-size');
-            end
-            
-            obj.sz = [ size(U, 1), size(V, 1) ];
-            
-            if obj.sz(1) <= hm_block_size
+            if ~isempty(obj.F)
                 obj.F = U * V';
             else
-                mp = ceil(obj.sz(1) / 2);
-                obj.A11 = create_low_rank_h_matrix(hm(), U(1:mp,:), V(1:mp,:));
-                obj.A22 = create_low_rank_h_matrix(hm(), U(mp+1:end,:), V(mp+1:end,:));
-                obj.U12 = U(1:mp,:);
-                obj.V12 = V(mp+1:end,:);
-                obj.U21 = U(mp+1:end,:);
-                obj.V21 = V(1:mp,:);
+                m1 = obj.A11.sz(1);
+                n1 = obj.A11.sz(2);
+                
+                obj.A11 = create_low_rank_h_matrix(obj.A11, U(1:m1,:), V(1:n1,:));
+                obj.A22 = create_low_rank_h_matrix(obj.A22, U(m1+1:end,:), V(n1+1:end,:));
+                obj.U12 = U(1:m1,:);
+                obj.V12 = V(n1+1:end,:);
+                obj.U21 = U(m1+1:end,:);
+                obj.V21 = V(1:n1,:);
             end
         end
         
@@ -288,6 +283,9 @@ classdef hm
         function obj = create_toeplitz_h_matrix(obj, am, ap, n)
             block_size = hmoption('block-size');
             
+            am = am(:).';
+            ap = ap(:).';
+            
             if ~exist('n', 'var')
                 n = length(am);
                 if n ~= length(ap)
@@ -315,14 +313,10 @@ classdef hm
                 ap(n) = 0;
             end
             
-            if n <= block_size
+            if ~isempty(obj.F)
                 obj.F = toeplitz(am, ap);
             else
-                % obj.A11 = create_toeplitz_h_matrix(hm(), am, ap, block_size);
-                % obj.A22 = obj.A11;
-                
-                mp = ceil(n / 2);
-                np = mp;
+                [mu, nu, ml, nl] = find_max_offdiag_size(obj);
                 
                 tol = hmoption('threshold');
                 
@@ -330,11 +324,11 @@ classdef hm
                 % off-diagonal blocks: we might want to do it relatively to
                 % the norm of the big matrix.
                 [tU21,S21,tV21] = lanczos_svd(@(v,trasp) toepmult_afun(...
-                    am(mp+1:end), am(mp+1:-1:2), ...
-                    n - mp, np, v, trasp), n - mp, np, tol);
+                    [ am(nl+1:min(nl+ml, length(am))) , zeros(1, ml - min(nl+ml, length(am)) + ml) ], am(nl+1:-1:2), ...
+                    ml, nl, v, trasp), ml, nl, tol);
                 [tU12,S12,tV12] = lanczos_svd(@(v,trasp) toepmult_afun(...
-                    ap(np+1:-1:2), ap(np+1:end), ...
-                    mp, n - np, v, trasp), mp, n - np, tol);
+                    ap(mu+1:-1:2), [ ap(mu+1:min(mu+nu, length(ap))), zeros(1, nu - min(mu+nu, length(ap)) + mu) ], ...
+                    mu, nu, v, trasp), mu, nu, tol);
                 
                 tU21 = tU21 * sqrt(S21);
                 tV21 = tV21 * sqrt(S21);
@@ -347,22 +341,41 @@ classdef hm
             
         end
         
+        function [mu, nu, ml, nl] = find_max_offdiag_size(obj)
+            if isempty(obj.F)
+                [mu1, nu1, ml1, nl1] = find_max_offdiag_size(obj.A11);                
+                [mu2, nu2, ml2, nl2] = find_max_offdiag_size(obj.A22);
+                
+                mu = max([ size(obj.U12, 1), mu1, mu2 ]);
+                nu = max([ size(obj.V12, 1), nu1, nu2 ]);
+                ml = max([ size(obj.U21, 1), ml1, ml2 ]);
+                nl = max([ size(obj.V21, 1), nl1, nl2 ]);
+            else
+                mu = 0;
+                ml = 0;
+                nu = 0;
+                nl = 0;
+            end
+        end
+        
         function obj = initialize_toeplitz_h_matrix(obj, am, ap, n, tU12, tV12, tU21, tV21)
-            obj.sz = [ n n ];
+            % obj.sz = [ n n ];
             
-            if n <= hmoption('block-size')
+            if ~isempty(obj.F)
                 obj.F = toeplitz(am(1:n), ap(1:n));
             else
-                mp = ceil(n / 2);
-                np = ceil(n / 2);
+                m1 = obj.A11.sz(1);
+                n1 = obj.A11.sz(2);
+                m2 = obj.A22.sz(1);
+                n2 = obj.A22.sz(2);
                 
-                obj.U21 = tU21(1:(n-mp), :);
-                obj.V21 = tV21(end-np+1:end,:);
-                obj.U12 = tU12(end-mp+1:end,:);
-                obj.V12 = tV12(1:(n-np), :);
+                obj.U21 = tU21(1:m2, :);
+                obj.V21 = tV21(end-n1+1:end,:);
+                obj.U12 = tU12(end-m1+1:end,:);
+                obj.V12 = tV12(1:n2, :);
                 
-                obj.A11 = initialize_toeplitz_h_matrix(hm(), am, ap, mp, tU12, tV12, tU21, tV21);
-                obj.A22 = initialize_toeplitz_h_matrix(hm(), am, ap, n-mp, tU12, tV12, tU21, tV21);
+                obj.A11 = initialize_toeplitz_h_matrix(obj.A11, am, ap, m1, tU12, tV12, tU21, tV21);
+                obj.A22 = initialize_toeplitz_h_matrix(obj.A22, am, ap, n-m1, tU12, tV12, tU21, tV21);
             end
         end
         
