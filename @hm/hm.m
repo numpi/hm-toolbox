@@ -126,7 +126,7 @@ classdef hm
                             hmoption('block-size'), rowcluster, ...
                             colcluster); 
 
-                        obj = create_chebfun2_h_matrix(obj, varargin{2:charpos-1});
+                        obj = create_chebfun2_h_matrix(obj, varargin{2:4}, m, n);
                     case 'toeplitz'
                         n = length(varargin{2});
                         if charpos > 4
