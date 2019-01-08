@@ -1,4 +1,10 @@
 function [X, J] = interpolative(A, tol)
+
+    if isempty(A)
+        J = []; X = A;
+        return;
+    end
+
 	% compute interpolative (by columns) low rank approximation of A
 	if ~exist('tol', 'var')
 		tol = hssoption('threshold');

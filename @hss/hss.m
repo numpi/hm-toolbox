@@ -89,16 +89,37 @@ classdef hss
                 return;
             end
             
-            obj = hss();
+            rowcluster = [];
+            colcluster = [];
             
-            if nargin == 1
+            % Find the first string parameter after varargin{1}
+            charpos = 2;
+            while charpos <= nargin && ~ischar(varargin{charpos})
+                charpos = charpos + 1;
+            end
+            
+            if charpos <= nargin && strcmp(varargin{charpos}, 'cluster')
+                rowcluster = varargin{charpos + 1};
+                if nargin >= charpos + 2
+                    colcluster = varargin{charpos + 2};
+                else
+                    colcluster = rowcluster;
+                end
+            end
+            
+            if ~ischar(varargin{1})
                 A = varargin{1};
+                
                 if issparse(A)
                     obj = hss('handle', ...
                         @(v) A * v, @(v) A' * v, @(i,j) full(A(i,j)), ...
-                        size(A, 1), size(A, 2));
+                        size(A, 1), size(A, 2), 'cluster', ...
+                        rowcluster, colcluster);
                 else
-                    obj = hss_from_full(A);
+                    obj = hss_build_hss_tree(size(A, 1), size(A, 2), ...
+                                hssoption('block-size'), rowcluster, ...
+                                colcluster);
+                    obj = hss_from_full(obj, A);
                 end
                 
                 return;
@@ -118,10 +139,15 @@ classdef hss
                         %obj = hm2hss(hm('cauchy', varargin{2:end}));
                         obj = hss_from_cauchy(varargin{2:end});
                     case 'handle'
-                        if length(varargin) < 6
+                        if charpos < 7
                             error('Unsufficient parameters for the handle constructor');
                         end
-                        obj = hss_from_random_sampling(varargin{2:end});
+                        
+                        obj = hss_build_hss_tree(varargin{5}, varargin{6}, ...
+                                hssoption('block-size'), rowcluster, ...
+                                colcluster);
+                        
+                        obj = hss_from_random_sampling(obj, varargin{2:charpos-1});
                     case 'toeplitz'
                         obj = hss_from_symbol(varargin{2:end});
                     case 'zeros'

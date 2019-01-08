@@ -32,12 +32,11 @@ if m ~= n
     % error('Rectangular HSS matrices are not (yet) supported');
 end
 
-block_size = hssoption('block-size');
 tol = hssoption('threshold');
 
 % Prepare the tree for the HSS structure -- leaving all the blocks empty
-H = hss_build_hss_tree(m, n, block_size);
-
+% H = hss_build_hss_tree(m, n, block_size);
+H = obj;
 
 % Create the stack
 rs = createStack();

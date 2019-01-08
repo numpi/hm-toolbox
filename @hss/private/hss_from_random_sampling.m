@@ -1,4 +1,4 @@
-function B = hss_from_random_sampling(Afun, Afunt, Aeval, m, n)
+function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n)
 %HSS_FROM_RANDOM_SAMPLING Build the HSS representation of a matrix
 % 			   using mat-vec multiplication with random (block) vectors
 %			   and access to (block) diagonal entries.
@@ -14,7 +14,7 @@ isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
 
 tol = hssoption('threshold');
 
-B = hss('zeros', m, n);
+B = obj;
 
 failed = true;
 
