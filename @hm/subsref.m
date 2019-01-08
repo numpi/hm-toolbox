@@ -14,7 +14,7 @@ switch S(1).type
         if min(mind)<1 | max(mind)>m | min(nind)<1 | max(nind)>n,
             error('Indices not in range.');
         end
-        varargout = {hm_sub(H,mind,nind)};
+        varargout = {purge_tree(hm_sub(H,mind,nind))};
     otherwise
         varargout = {builtin('subsref',H,S)};
     end
