@@ -199,7 +199,7 @@ classdef hm
                 m1 = H.A11.sz(1);
                 n1 = H.A11.sz(2);
                 
-                if max(bandu, bandl) <= min(n - max(m1, n1))
+                if max(bandu, bandl) <= min(n - max(m1, n1), m1)
                     H.A11 = create_banded_h_matrix(H.A11, A(1:m1,1:n1), bandl, bandu);
                     H.A22 = create_banded_h_matrix(H.A22, A(m1+1:end,n1+1:end), bandl, bandu);
                     
