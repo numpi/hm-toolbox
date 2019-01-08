@@ -4,15 +4,26 @@ function [HL, HU] = hmatrix_lu(H)
 HL = H;
 HU = H;
 
+if size(H, 1) ~= size(H, 2)
+    error('LU is supported only for square HODLR matrices');
+end
+
+HL.sz = [size(H, 1), size(H, 1)];
+
 if ~isempty(H.F)
     [HL.F, HU.F] = lu(H.F);
 else
-    mp = H.A11.sz(2);
+    m1 = H.A11.sz(1);
+    n1 = H.A11.sz(2);
+    
     n = H.sz(2);
-    HL.U12 = zeros(mp,0);
-    HL.V12 = zeros(n-mp,0);
-    HU.U21 = zeros(n-mp,0);
-    HU.V21 = zeros(mp,0);
+    m = H.sz(1);
+    
+    HL.U12 = zeros(m1,0);
+    HL.V12 = zeros(m-m1,0);
+    HU.U21 = zeros(m-m1,0);
+    HU.V21 = zeros(n1,0);
+    
     [HL.A11, HU.A11] = hmatrix_lu(H.A11);
     HU.U12 = solve_lower_triangular(HL.A11, H.U12);
     % HL.V21 = (H.V21' / HU.A11)';
