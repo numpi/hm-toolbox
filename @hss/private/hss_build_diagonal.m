@@ -1,17 +1,18 @@
-function B = hss_build_diagonal(varargin)
+function B = hss_build_diagonal(obj, varargin)
 %HSS_BUILD_DIAGONAL  Build a diagonal HSS matrix from a vector.
 %
 % B = HSS_BUILD_DIAGONAL(v) builds an HSS representation of diag(v).
 %
 switch nargin
-    case 1
+    case 2
         v = varargin{1};
+        B = obj;
         if isvector(v)
-            if length(v) < hssoption('block-size')
-                B = hss(diag(v));
+            if B.leafnode
+                B.D = diag(v);
                 return;
             end
-            B = hss_build_diagonal_ric(v);
+            B = hss_build_diagonal_ric(B, v);
             B.topnode = 1;
         else
             error('HSS::Unsopported non vector argument')
@@ -21,25 +22,23 @@ switch nargin
 end
 end
 
-function B = hss_build_diagonal_ric(v)
-B = hss();
-B.topnode = 0;
-B.leafnode = 0;
+function B = hss_build_diagonal_ric(B, v)
+
 m = length(v);
-if m <= hssoption('block-size')
-    B.leafnode = 1;
+
+if B.leafnode == 1
     B.D = diag(v);
-    B.leafnode = 1;
     B.U = zeros(m, 0);
     B.V = zeros(m, 0);
 else
-    mmid = ceil(m/2);
-    B.ml = mmid;
-    B.nl = mmid;
-    B.mr = m - mmid;
-    B.nr = B.mr;
-    B.A11 = hss_build_diagonal_ric(v(1:mmid));
-    B.A22 = hss_build_diagonal_ric(v(mmid+1:end));
+    if B.ml ~= B.nl
+        error('Diagonal constructor is only supported for square matrices');
+    end
+
+    mmid = B.ml;
+
+    B.A11 = hss_build_diagonal_ric(B.A11, v(1:mmid));
+    B.A22 = hss_build_diagonal_ric(B.A22, v(mmid+1:end));
 end
 
 end

@@ -128,11 +128,20 @@ classdef hss
             if nargin > 1
                 switch varargin{1}
                     case 'low-rank'
-                        obj = hss_build_low_rank(varargin{2:end});
+                        obj = hss_build_hss_tree(size(varargin{2}, 1), ...
+                            size(varargin{3}, 1), hssoption('block-size'), ...
+                            rowcluster, colcluster);
+                        obj = hss_build_low_rank(obj, varargin{2:charpos-1});
                     case 'diagonal'
-                        obj = hss_build_diagonal(varargin{2:end});
+                        obj = hss_build_hss_tree(length(varargin{2}), ...
+                            length(varargin{2}), hssoption('block-size'), ...
+                            rowcluster, colcluster);
+                        obj = hss_build_diagonal(obj, varargin{2:charpos-1});
                     case 'banded'
-                        obj = hss_from_banded(varargin{2:end});
+                        obj = hss_build_hss_tree(size(varargin{2}, 1), ...
+                            size(varargin{2}, 2), hssoption('block-size'), ...
+                            rowcluster, colcluster);
+                        obj = hss_from_banded(obj, varargin{2:charpos-1});
                     case 'chebfun2'
                         obj = hm2hss(hm('chebfun2', varargin{2:end}));
                     case 'cauchy'
@@ -149,16 +158,17 @@ classdef hss
                         
                         obj = hss_from_random_sampling(obj, varargin{2:charpos-1});
                     case 'toeplitz'
-                        obj = hss_from_symbol(varargin{2:end});
+                        obj = hss_from_symbol(varargin{2:charpos-1}, ...
+                            rowcluster, colcluster);
                     case 'zeros'
                         m = varargin{2};
-                        if nargin >= 3
+                        if charpos > 3
                             n = varargin{3};
                         else
                             n = m;
                         end
                         obj = hss_build_hss_tree(m, n, ...
-                            hssoption('block-size'));
+                            hssoption('block-size'), rowcluster, colcluster);
                     otherwise
                         error('Unsupported constructor mode');
                 end

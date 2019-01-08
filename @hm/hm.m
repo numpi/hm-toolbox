@@ -177,6 +177,10 @@ classdef hm
                 H.F = full(A);
             else
                 [m, n] = size(H);
+
+                if m ~= n
+                    error('The construction of banded matrices is supported only for square diagonal blocks');
+                end
                 
                 m1 = H.A11.sz(1);
                 n1 = H.A11.sz(2);
@@ -190,10 +194,6 @@ classdef hm
                     
                     H.U21 = [ full(A(m1 + 1:m1 + bandl, m1 - bandl + 1:m1)) ; zeros(m - m1 - bandl, bandl) ];
                     H.V21 = [ zeros(n1 - bandl, bandl) ; eye(bandl) ];
-                    
-                    % Perform a compression
-                    % [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro'));
-                    % [H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro'));
                 else
                     H = create_h_matrix(H, full(A));
                 end
