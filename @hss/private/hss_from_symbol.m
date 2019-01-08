@@ -1,4 +1,4 @@
-function H = hss_from_symbol(am, ap, m, n)
+function H = hss_from_symbol(am, ap, m, n, rowcluster, colcluster)
 %HSS_FROM_SYMBOL 
 
 if ~exist('m', 'var')
@@ -12,17 +12,19 @@ end
 
 am = am(:)'; ap = ap(:)';
 
-if (m == n) && (length(am) + length(ap) - 1) < 10 * log(n)
+if (m == n) && (length(am) + length(ap) - 1) < 10 * log(n) ...
+        && prod(rowcluster == colcluster)
     bl = length(am) - 1;
     bu = length(ap) - 1;
     
     H = hss('banded', spdiags(ones(m, 1) * [ am(end:-1:2) , ap ], ...
-        -bl : bu, m, n), bl, bu);
+        -bl : bu, m, n), bl, bu, 'cluster', rowcluster, colcluster);
 else
     H = hss('handle', ...
         @(v) toepmult_fft(am, ap, m, n, v), ...
         @(v) toepmult_fft(ap, am, n, m, v), ...
-        @(I,J) Aeval(am, ap, I, J), m, n);
+        @(I,J) Aeval(am, ap, I, J), m, n, 'cluster', ...
+        rowcluster, colcluster);
 end
 
 end
