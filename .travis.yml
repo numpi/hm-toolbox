@@ -21,4 +21,4 @@ notifications:
     - stefano.massei@epfl.ch
 
 script: 
-  - flatpak run org.octave.Octave --no-gui --eval "pkg load control; addpath rktoolbox; addpath rktoolbox/utils; addpath chebapprox; addpath tests; RunAllTests;"
+  - flatpak run org.octave.Octave --no-gui --eval "pkg load control; addpath chebapprox; addpath tests; RunAllTests;"
