@@ -112,7 +112,21 @@ classdef hm
                         obj = hm('banded', spdiags(D, 0, ...
                             length(D), length(D)), varargin{3:end});
                     case 'chebfun2'
-                        obj = create_chebfun2_h_matrix(obj, varargin{2:end});
+                        if charpos < 6
+                            error('Unsufficient arguments for the chebfun2 constructor');
+                        end
+                        m = varargin{5};
+                        if charpos == 6
+                            n = m;
+                        else
+                            n = varargin{6};
+                        end
+
+                        obj = hm_build_hm_tree(m, n, ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster); 
+
+                        obj = create_chebfun2_h_matrix(obj, varargin{2:charpos-1});
                     case 'toeplitz'
                         n = length(varargin{2});
                         if charpos > 4
@@ -245,44 +259,45 @@ classdef hm
             end
         end
         
-        function obj = create_chebfun2_h_matrix(obj, fct, xdom, ydom, n)
-            block_size = hmoption('block-size');
-            obj.sz = [ n, n ];
+        function obj = create_chebfun2_h_matrix(obj, fct, xdom, ydom, m, n)           
             
             % if ~exist('chebfun2') && ~exist('chebapprox2')
             %    error('Chebfun not found: did you forget to add it to the path?');
             % end
             
             x = linspace(xdom(1), xdom(2), n);
-            y = linspace(ydom(1), ydom(2), n);
+            y = linspace(ydom(1), ydom(2), m);
             
-            if n <= block_size
-                obj.F = fct( ones(n,1) * x, y.' * ones(1,n) );
+            if ~isempty(obj.F)
+                obj.F = fct( ones(m,1) * x, y.' * ones(1,n) );
             else
-                mp = ceil(n / 2);
-                obj.A11 = create_chebfun2_h_matrix(obj(), fct, ...
-                    [ x(1), x(mp) ], ...
-                    [ y(1), y(mp) ], mp);
-                obj.A22 = create_chebfun2_h_matrix(hm(), fct, ...
-                    [ x(mp+1), x(end) ], ...
-                    [ y(mp+1), y(end) ], n - mp);
+                m1 = obj.A11.sz(1);
+                n1 = obj.A11.sz(2);
+                m2 = obj.A22.sz(1);
+                n2 = obj.A22.sz(2);
+
+                obj.A11 = create_chebfun2_h_matrix(obj.A11, fct, ...
+                    [ x(1), x(n1) ], ...
+                    [ y(1), y(m1) ], m1, n1);
+                obj.A22 = create_chebfun2_h_matrix(obj.A22, fct, ...
+                    [ x(n1+1), x(end) ], ...
+                    [ y(m1+1), y(end) ], m2, n2);
                 
                 % Create the low-rank block A12 and A21
                 [obj.U12, obj.V12] = chebfun2_low_rank(fct, ...
-                    [ x(mp+1), x(end) ], ...
-                    [ y(1), y(mp) ], ...
-                    mp, n - mp);
+                    [ x(n1+1), x(end) ], ...
+                    [ y(1), y(m1) ], ...
+                    m1, n2);
                 [obj.U21, obj.V21] = chebfun2_low_rank(fct, ...
-                    [ x(1), x(mp) ], ...
-                    [ y(mp+1), y(end) ], ...
-                    n - mp, mp);
+                    [ x(1), x(n1) ], ...
+                    [ y(m1+1), y(end) ], ...
+                    m2, n1);
             end
             
             obj = compress_hmatrix(obj);
         end
         
         function obj = create_toeplitz_h_matrix(obj, am, ap, n)
-            block_size = hmoption('block-size');
             
             am = am(:).';
             ap = ap(:).';

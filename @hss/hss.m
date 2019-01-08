@@ -38,7 +38,7 @@ classdef hss
 % H = HSS('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
 %     containing the samplings of the bivariate function F over a uniform
 %     grid of the square XDOM x YDOM. The procedure relies on separable
-%     approximation of F(X,Y) as provided by the Chebfun package. 
+%     approximation of F(X,Y) as provided by the Chebfun package.
 %
 %[1] Martinsson, P. G. (2011). A fast randomized algorithm for computing a
 %    hierarchically semiseparable representation of a matrix. SIAM Journal
