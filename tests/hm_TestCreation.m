@@ -68,7 +68,7 @@ H = hm('chebfun2', f, [0 1], [0 1], n, n);
 
 A = f( linspace(0, 1, n), linspace(0, 1, n)' );
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * 1e-8, ...
     'Generation of an HM representation for A that samples f(x,y)');
 
 % Generate random clustering
