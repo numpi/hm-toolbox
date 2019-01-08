@@ -73,9 +73,9 @@ if ~isempty(H.F)
     H.F = randn(size(H.F));
 else
     H.U12 = randn(size(H.U12, 1), k);
-    H.V12 = randn(size(H.U12, 1), k);
-    H.U21 = randn(size(H.U12, 1), k);
-    H.V21 = randn(size(H.U12, 1), k);
+    H.V12 = randn(size(H.V12, 1), k);
+    H.U21 = randn(size(H.U21, 1), k);
+    H.V21 = randn(size(H.V21, 1), k);
     H.A11 =	hm_rand_ric(H.A11, k);
     H.A22 = hm_rand_ric(H.A22, k);
 end
