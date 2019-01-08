@@ -1,7 +1,7 @@
-function H = solve_upper_triangular(H1,H2)
+function H = solve_upper_triangular(H1, H2)
 if isa(H2,'hm') %case of hierarchical right-hand side
     if ~isempty(H1.F)
-        H = H1;
+        H = H2;
         H.F = H1.F\H2.F;
     else
         H = H2;
