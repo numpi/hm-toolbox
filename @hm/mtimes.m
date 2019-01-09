@@ -9,7 +9,7 @@ if isfloat(H2)
             return;
         end
         
-        if ~isempty(H1.F)
+        if is_leafnode(H1)
             H = hm();
             H.F = H1.F * H2;
             H.sz = H1.sz;

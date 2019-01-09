@@ -6,7 +6,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
     else
         H = H2;
         
-        if isempty(H1.A11.U12) && isempty(H1.A11.F)
+        if isempty(H1.A11.U12) && ~is_leafnode(H1.A11)
             H.U12 = solve_lower_triangular(H1.A11, H2.U12);
             H.A11 = solve_lower_triangular(H1.A11, H2.A11);
         else
@@ -17,7 +17,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
         H.U21 = [H2.U21, H1.U21];
         H.V21 = [H2.V21, -dense_mtimes_hmatrix(H1.V21', H.A11)' ];
         
-        if isempty(H.A22.U12) && isempty(H1.A22.F)
+        if isempty(H.A22.U12) && ~is_leafnode(H1.A22)
             H.U21 = solve_lower_triangular(H1.A22, H.U21);
             H.A22 = solve_lower_triangular(H1.A22, ...
                 hmatrix_rank_update(H2.A22, -H1.U21 * (H1.V21' * H.U12), H2.V12));
