@@ -15,7 +15,7 @@ function [Y, T, A] = qr(A)
 %     matrices. Technical report, September 2018.
 
 [m,n] = size(A);
-% !!! needs to be replaced by squarish check
+
 if m~=n | ~check_cluster_equality(A), error('Input matrix must be square and have a square partition.'); end
 BL = zeros(0,0); BR = zeros(0,n);
 C = zeros(0,n);    
@@ -70,6 +70,7 @@ else
 
     % Compute QR decomposition of second block column
     [m2,n2] = size(A.A22);
+    
     [YA22, YBL2, YBR2, YC2, T2, A.A22] = qr_iter(A.A22, zeros(0,0), zeros(0,n2), BC(:,n1+1:end), Anrm);
     
     % Set Y

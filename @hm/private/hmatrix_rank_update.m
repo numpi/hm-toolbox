@@ -9,7 +9,7 @@ function H = hmatrix_rank_update(H, U, V, nrm)
 %     with respect to the global threshold NRM * HMOPTION('threshold'); 
 
 if ~isempty(H.F)
-    H.F = H.F + U * V.';
+    H.F = H.F + U * V';
 else
     m1 = H.A11.sz(1);
     n1 = H.A11.sz(2);
