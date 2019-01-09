@@ -1,5 +1,5 @@
 function H = hmatrix_plus(H1, H2)
-%HMATRIX_PLUS Sum two hm objects
+%HMATRIX_PLUS Sum of two HODLR matrices
 
 H = H1;
 

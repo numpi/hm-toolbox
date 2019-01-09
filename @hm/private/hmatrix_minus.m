@@ -1,5 +1,5 @@
 function H = hmatrix_minus(H1, H2)
-%HMATRIX_MINUS
+%HMATRIX_MINUS Difference of two HODLR matrices
 
 H = H1;
 
