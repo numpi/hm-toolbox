@@ -7,8 +7,8 @@ if ~isscalar(p) || floor(p) ~= p
     error('Only integer powers are supported');
 end
 
-if T.sz(1) ~= T.sz(2)
-    error('A^p is only possible for square matrices');
+if ~check_cluster_equality(T)
+    error('A^p is only supported for square matrices with square diagonal blocks');
 end
 
 if p < 0
@@ -22,18 +22,21 @@ switch p
     case 1
         % Nothing to do
     case 0
-        T = hm('diagonal', ones(n, 1));
+        [r,c] = cluster(T);
+        T = hm('eye', n, ones(n, 1), 'cluster', r);
     otherwise
-        p1 = floor(p / 2);
-        p2 = p - p1;
-        
-        % Call this function recursively
-        if p1 == p2
-            T = T^p1;
-            T = T*T;
+        b = dec2bin(p);
+        if b(end) == '1',
+            P = T;
         else
-            T = T^p1 * T^p2;
+            [r,c] = cluster(T);
+            P = hm('eye', n, ones(n, 1), 'cluster', r);
         end
+        for j = length(b)-1:-1:1,
+            T = T*T;
+            if b(j) == '1', P = P*T; end
+        end
+        T = P;
 end
 
 end
