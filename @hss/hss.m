@@ -127,21 +127,24 @@ classdef hss
             
             if nargin > 1
                 switch varargin{1}
-                    case 'low-rank'
-                        obj = hss_build_hss_tree(size(varargin{2}, 1), ...
-                            size(varargin{3}, 1), hssoption('block-size'), ...
-                            rowcluster, colcluster);
-                        obj = hss_build_low_rank(obj, varargin{2:charpos-1});
-                    case 'diagonal'
-                        obj = hss_build_hss_tree(length(varargin{2}), ...
-                            length(varargin{2}), hssoption('block-size'), ...
-                            rowcluster, colcluster);
-                        obj = hss_build_diagonal(obj, varargin{2:charpos-1});
                     case 'banded'
                         obj = hss_build_hss_tree(size(varargin{2}, 1), ...
                             size(varargin{2}, 2), hssoption('block-size'), ...
                             rowcluster, colcluster);
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
+
+                    case 'cauchy'
+                        %obj = hm2hss(hm('cauchy', varargin{2:end}));
+                        obj = hss_from_cauchy(varargin{2:end});
+
+                    case 'chebfun2'
+                        obj = hm2hss(hm('chebfun2', varargin{2:end}));
+
+                    case 'diagonal'
+                        obj = hss_build_hss_tree(length(varargin{2}), ...
+                            length(varargin{2}), hssoption('block-size'), ...
+                            rowcluster, colcluster);
+                        obj = hss_build_diagonal(obj, varargin{2:charpos-1});
 
                     case 'eye'
                         n = varargin{2};
@@ -152,11 +155,6 @@ classdef hss
 
                         obj = hss('diagonal', ones(n, 1), 'cluster', rowcluster);
 
-                    case 'chebfun2'
-                        obj = hm2hss(hm('chebfun2', varargin{2:end}));
-                    case 'cauchy'
-                        %obj = hm2hss(hm('cauchy', varargin{2:end}));
-                        obj = hss_from_cauchy(varargin{2:end});
                     case 'handle'
                         if charpos < 7
                             error('Unsufficient parameters for the handle constructor');
@@ -165,8 +163,26 @@ classdef hss
                         obj = hss_build_hss_tree(varargin{5}, varargin{6}, ...
                                 hssoption('block-size'), rowcluster, ...
                                 colcluster);
-                        
+
                         obj = hss_from_random_sampling(obj, varargin{2:charpos-1});
+
+                    case 'low-rank'
+                        obj = hss_build_hss_tree(size(varargin{2}, 1), ...
+                            size(varargin{3}, 1), hssoption('block-size'), ...
+                            rowcluster, colcluster);
+                        obj = hss_build_low_rank(obj, varargin{2:charpos-1});
+
+                    case 'ones'
+                        m = varargin{2};
+                        if charpos > 3
+                            n = varargin{3};
+                        else
+                            n = m;
+                        end
+
+                        obj = hss('low-rank', ones(m, 1), ones(n, 1), ...
+                            'cluster', rowcluster, colcluster);
+                        
                     case 'toeplitz'
                         if charpos == 4
                             m = length(varargin{2});
@@ -181,6 +197,7 @@ classdef hss
 
                         obj = hss_from_symbol(varargin{2:3}, m, n, ...
                             rowcluster, colcluster);
+
                     case 'zeros'
                         m = varargin{2};
                         if charpos > 3

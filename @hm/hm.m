@@ -91,15 +91,6 @@ classdef hm
             
             if nargin > 1
                 switch varargin{1}
-                    case 'low-rank'
-                        obj = hm_build_hm_tree(size(varargin{2}, 1), ...
-                            size(varargin{3}, 1), ...
-                            hmoption('block-size'), rowcluster, ...
-                            colcluster);
-                        
-                        obj = create_low_rank_h_matrix(obj, varargin{2:charpos - 1});
-                    case 'tridiagonal'
-                        obj = create_tridiagonal_h_matrix(obj, varargin{2});
                     case 'banded'
                         if ~check_cluster_equality(rowcluster, colcluster)
                             error('row and column cluster must match for banded matrices');
@@ -112,15 +103,6 @@ classdef hm
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
 
-                    case 'eye'
-                        n = varargin{2};
-
-                        if ~check_cluster_equality(rowcluster, colcluster)
-                            error('row and column cluster must match for the identity matrix');
-                        end
-
-                        obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
-
                     case 'diagonal'
                         if ~check_cluster_equality(rowcluster, colcluster)
                             error('row and column cluster must match for diagonal matrices');
@@ -129,6 +111,10 @@ classdef hm
                         D = varargin{2}; D = D(:);
                         obj = hm('banded', spdiags(D, 0, ...
                             length(D), length(D)), varargin{3:end});
+
+                    case 'cauchy'
+                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
+                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
 
                     case 'chebfun2'
                         if charpos < 6
@@ -146,6 +132,35 @@ classdef hm
                             colcluster); 
 
                         obj = create_chebfun2_h_matrix(obj, varargin{2:4}, m, n);
+
+                    case 'eye'
+                        n = varargin{2};
+
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for the identity matrix');
+                        end
+
+                        obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
+
+                    case 'low-rank'
+                        obj = hm_build_hm_tree(size(varargin{2}, 1), ...
+                            size(varargin{3}, 1), ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster);
+                        
+                        obj = create_low_rank_h_matrix(obj, varargin{2:charpos - 1});
+
+                    case 'ones'
+                        m = varargin{2};
+                        if charpos > 3
+                            n = varargin{3};
+                        else
+                            n = m;
+                        end
+
+                        obj = hm('low-rank', ones(m, 1), ones(n, 1), ...
+                            'cluster', rowcluster, colcluster);
+
                     case 'toeplitz'
                         n = length(varargin{2});
                         if charpos > 4
@@ -157,9 +172,20 @@ classdef hm
                             colcluster); 
                         
                         obj = create_toeplitz_h_matrix(obj, varargin{2:charpos-1});
-                    case 'cauchy'
-                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
-                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
+
+                    case 'tridiagonal'
+                        obj = create_tridiagonal_h_matrix(obj, varargin{2});
+
+                    case 'zeros'
+                        m = varargin{2};
+                        if charpos > 3
+                            n = varargin{3};
+                        else
+                            n = m;
+                        end
+                        obj = hm_build_hm_tree(m, n, ...
+                            hmoption('block-size'), rowcluster, colcluster);
+
                     otherwise
                         error('Unsupported constructor mode');
                 end
