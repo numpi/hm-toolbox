@@ -4,9 +4,6 @@ classdef hm
 % H = HM(A) constructs the HODLR representation of a matrix A by
 %     approximating the off-diagonal blocks at all levels using truncated 
 %     SVDs.
-% 
-% H = HM('low-rank', U, V) construct an HM representation of the low-rank
-%     matrix U*V'. 
 %
 % H = HM('banded', A) constructs an HM representation of a banded matrix
 %     A. The matrix A can be either sparse or dense. 
@@ -22,12 +19,40 @@ classdef hm
 %     grid of the square XDOM x YDOM. The procedure relies on separable
 %     approximation of F(X,Y) as provided by the Chebfun package. 
 %
+% H = HM('diagonal', D) constructs the diagonal matrix with the entries of
+%     the vector D on the main diagonal. 
+%
+% H = HM('eye', N) constructs an HM representation of the N x N identity 
+%     matrix. 
+%
+% H = HM('low-rank', U, V) construct an HM representation of the low-rank
+%     matrix U*V'. 
+%
+% H = HM('ones', M, N) constructs an HM representation of the rank-1
+%     M x N matrix of all ones. 
+%
 % H = HM('toeplitz', C, R) constructs the Toeplitz matrix with C as first
 %     column and R as first row. 
 %
 % H = HM('toeplitz', C, R, N) constructs the N x N Toeplitz matrix with 
 %     C as first column and R as first row. if N is larger than C and 
 %     R, respectively, then C and R are padded with zeros. 
+%
+% All the constructors support an additional 'cluster' keyword that allows
+% to specify custom row and column clusters. These are described as a
+% vector of indices J = [J(1), ..., J(2^P)], such that the partitioning at
+% the lowest level P is 
+%
+%        (1, J(1))    (J(1)+1, J(2))   ...   (J(2^(P-1)+1), J(2^P)), 
+%
+% J(2^P) = N. If J(I) = J(I+1) the corresponding leafnode is assumed to be
+% missing from the tree. The cluster can be specified with the syntax
+%
+%   H = HM(..., 'cluster', rowcluster, colcluster). 
+%
+% If colcluster is omitted then it is assumed that rowcluster == colcluster.
+%
+% The partitioning of an HM matrix can be retrieved calling CLUSTER(H).
     
     properties
         % top and bottom blocks of the matrix.

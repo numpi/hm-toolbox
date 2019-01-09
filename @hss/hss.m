@@ -7,10 +7,7 @@ classdef hss
 %     with respect to n. 
 %
 %     If A is sparse, then the random sampling constructor described in
-%     HSS('handle', ...) below is used. 
-%
-% H = HSS('low-rank', U, V) construct an HSS representation of the low-rank
-%     matrix U*V'. 
+%     HSS('handle', ...) below is used.  
 %
 % H = HSS('banded', A) constructs an HSS representation of a banded matrix
 %     A. The matrix A can be either sparse or dense. 
@@ -21,12 +18,29 @@ classdef hss
 % H = HSS('banded', A, BL, BU) specifies different lower and upper 
 %     bandwidth BL and BU, respectively.
 %
+% H = HSS('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
+%     containing the samplings of the bivariate function F over a uniform
+%     grid of the square XDOM x YDOM. The procedure relies on separable
+%     approximation of F(X,Y) as provided by the Chebfun package.
+%
+% H = HSS('diagonal', D) constructs the diagonal matrix with the entries of
+%     the vector D on the main diagonal. 
+%
+% H = HSS('eye', N) constructs an HSS representation of the N x N identity 
+%     matrix. 
+%
 % H = HSS('handle', AFUN, AFUNT, AEVAL, M, N) constructs an HSS matrix
 %     using the random sampling based algorithm in [1]. It requires the
 %     handle function AFUN and AFUNT which perform the matrix-vector
 %     products A*v and A'*v, respectively, and AEVAL which, given two
 %     integer vectors I, J returns the submatrix A(I, J). M and N are the
 %     number of rows and columns of A. 
+%
+% H = HSS('low-rank', U, V) construct an HSS representation of the low-rank
+%     matrix U*V'.
+%
+% H = HSS('ones', M, N) constructs an HSS representation of the rank-1
+%     M x N matrix of all ones. 
 %
 % H = HSS('toeplitz', C, R) constructs the Toeplitz matrix with C as first
 %     column and R as first row. The representation is constructed using
@@ -35,10 +49,21 @@ classdef hss
 % H = HSS('zeros', M, N) constructs the HSS representation of the M x N
 %     zero matrix. 
 %
-% H = HSS('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
-%     containing the samplings of the bivariate function F over a uniform
-%     grid of the square XDOM x YDOM. The procedure relies on separable
-%     approximation of F(X,Y) as provided by the Chebfun package.
+% All the constructors support an additional 'cluster' keyword that allows
+% to specify custom row and column clusters. These are described as a
+% vector of indices J = [J(1), ..., J(2^P)], such that the partitioning at
+% the lowest level P is 
+%
+%        (1, J(1))    (J(1)+1, J(2))   ...   (J(2^(P-1)+1), J(2^P)), 
+%
+% J(2^P) = N. If J(I) = J(I+1) the corresponding leafnode is assumed to be
+% missing from the tree. The cluster can be specified with the syntax
+%
+%   H = HSS(..., 'cluster', rowcluster, colcluster). 
+%
+% If colcluster is omitted then it is assumed that rowcluster == colcluster.
+%
+% The partitioning of an HSS matrix can be retrieved calling CLUSTER(H).  
 %
 %[1] Martinsson, P. G. (2011). A fast randomized algorithm for computing a
 %    hierarchically semiseparable representation of a matrix. SIAM Journal
