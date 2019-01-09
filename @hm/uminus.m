@@ -1,6 +1,6 @@
 function H = uminus(H1)
 %UMINUS Change the sign of a HODLR Matrix
-if ~isempty(H1.F)
+if is_leafnode(H1)
     H = H1;
     H.F = -H1.F;
 else

@@ -16,7 +16,7 @@ d = det_rec(U) * det_rec(L);
 end
 
 function d = det_rec(U)
-    if ~isempty(U.F)
+    if is_leafnode(U)
         if size(U, 1) ~= size(U, 2)
             error('det(H): Diagonal blocks need to be square');
         end

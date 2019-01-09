@@ -4,7 +4,7 @@ function rk = hmrank(H)
 % RK = HSRANK(H) returns the maximum rank in the representation of the
 % off-diagonal blocks.
 
-if ~isempty(H.F)
+if is_leafnode(H)
     rk = 0;
 else
     rk = max([ hmrank(H.A11), hmrank(H.A22), ...

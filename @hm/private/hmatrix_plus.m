@@ -3,7 +3,7 @@ function H = hmatrix_plus(H1, H2)
 
 H = H1;
 
-if ~isempty(H1.F)
+if is_leafnode(H1)
     H.F = H1.F + H2.F;
 else
     H.A11 = hmatrix_plus(H1.A11, H2.A11);

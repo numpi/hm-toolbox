@@ -3,7 +3,7 @@ function Ht = ctranspose(H)
 
 Ht = H;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     Ht.F = H.F';
     Ht.sz = H.sz(2:-1:1);
 else

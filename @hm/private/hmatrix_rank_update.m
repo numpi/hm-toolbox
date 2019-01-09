@@ -8,7 +8,7 @@ function H = hmatrix_rank_update(H, U, V, nrm)
 % H = HMATRIX_RANK_UPDATE(H, U, V, NRM) truncates the result of H + U*V'
 %     with respect to the global threshold NRM * HMOPTION('threshold'); 
 
-if ~isempty(H.F)
+if is_leafnode(H)
     H.F = H.F + U * V';
 else
     m1 = H.A11.sz(1);

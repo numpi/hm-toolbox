@@ -3,7 +3,7 @@ function HU = hmatrix_chol(H)
 
 HU = H;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     HU.F = chol(H.F);
 else
     mp = size(H.A11,2);

@@ -44,8 +44,7 @@ end
 p = size(BR,1);
 
 
-% !!! The following check should be replaced by a proper check for leaf.
-if ~isempty(A.F),
+if is_leafnode(A)
     [Y, T, R] = qrWY([A.F;BR;C]);
     
     YA  = hm( Y(1:m,:), 'cluster', m );

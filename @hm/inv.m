@@ -6,7 +6,7 @@ if size(H, 1) ~= size(H, 2)
 end
 
 IH = H;
-if ~isempty(H.F)
+if is_leafnode(H)
     IH.F = inv(H.F);
 elseif isempty(H.U12)
     IH = inv_lower_triangular(H);

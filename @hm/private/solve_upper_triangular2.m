@@ -2,7 +2,7 @@ function Y = solve_upper_triangular2(H, x)
 % Compute X * H^(-1) with H upper triangular @hm object.
 
 % Only dense matrices are supported as of now
-if ~isempty(H.F)
+if is_leafnode(H)
     Y = x / H.F;
 else
     mp = H.A11.sz(2);

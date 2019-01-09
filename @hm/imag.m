@@ -7,7 +7,7 @@ function iH = imag(H)
 
 iH = H;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     iH.F = imag(H.F);
 else
     iH.A11 = imag(H.A11);

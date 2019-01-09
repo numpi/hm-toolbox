@@ -1,7 +1,7 @@
 function w = dense_mtimes_hmatrix(w, H)
 %DENSE_MTIMES_HMATRIX Dense product w * H
 
-if ~isempty(H.F)
+if is_leafnode(H)
     w = w * H.F;
 else
     mp = H.A11.sz(1);

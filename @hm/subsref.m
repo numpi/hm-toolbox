@@ -24,9 +24,8 @@ function H = hm_sub(H, mind, nind);
 
 [m,n] = size(H);
 
-% !!! the next line should be replaced by proper function checking whether we are at a leaf node.
 H.sz = [length(mind), length(nind)];
-if ~isempty(H.F)
+if is_leafnode(H)
     H.F = H.F(mind,nind);
 else
     [m1,n1] = size(H.A11);

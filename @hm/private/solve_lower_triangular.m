@@ -1,6 +1,6 @@
 function H = solve_lower_triangular(H1, H2)
 if isa(H2,'hm') %case of hierarchical right-hand side
-    if ~isempty(H1.F)
+    if is_leafnode(H1)
         H = H2;
         H.F = H1.F \ H2.F;
     else
@@ -28,7 +28,7 @@ if isa(H2,'hm') %case of hierarchical right-hand side
     end
     
 else % case of dense right-hand side
-    if ~isempty(H1.F)
+    if is_leafnode(H1)
         H = H1.F\H2;
     else
         mp = H1.A11.sz(2);

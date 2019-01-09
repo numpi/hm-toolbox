@@ -1,7 +1,7 @@
 function H = purge_tree(H)
 %PURGE_TREE Clean empty nodes in the tree of H
 
-if isempty(H.A11)
+if is_leafnode(H)
     % We are in a leafnode -- no need for anything
 else
     collapsed = false;

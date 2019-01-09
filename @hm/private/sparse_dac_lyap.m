@@ -6,7 +6,7 @@ X = A;
 n = size(A,1);
 debug = 0;
 
-if ~isempty(A.F) && ~isempty(B.F) && ~isempty(C.F)
+if is_leafnode(A) && is_leafnode(B) && is_leafnode(C)
     X.F = lyap(A.F, B.F, C.F);
     return
 end

@@ -3,7 +3,7 @@ function H = hmatrix_minus(H1, H2)
 
 H = H1;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     H.F = H1.F - H2.F;
 else
     H.A11 = hmatrix_minus(H1.A11, H2.A11);

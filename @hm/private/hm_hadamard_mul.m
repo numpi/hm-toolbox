@@ -6,10 +6,10 @@ end
 
 function C = hm_hadamard_mul_ric(A, B)
 C = hm();
-if xor(isempty(A.F), isempty(B.F))
+if xor(~is_leafnode(A), ~is_leafnode(B))
     error('HM_HADAMARD_MUL:: the two hm matrices have not compatible partitioning')
 end
-if ~isempty(A.F)
+if is_leafnode(A)
     C.F = A.F .* B.F;
 else
     if size(A.U21, 1) ~= size(B.U21, 1) || size(A.U12, 1) ~= size(B.U12, 1)|| ...

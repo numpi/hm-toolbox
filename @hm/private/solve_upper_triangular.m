@@ -1,6 +1,6 @@
 function H = solve_upper_triangular(H1, H2)
 if isa(H2,'hm') %case of hierarchical right-hand side
-    if ~isempty(H1.F)
+    if is_leafnode(H1)
         H = H2;
         H.F = H1.F\H2.F;
     else
@@ -13,18 +13,18 @@ if isa(H2,'hm') %case of hierarchical right-hand side
         H.A11 = H1.A11\hmatrix_rank_update(H2.A11, -H1.U12 * (H1.V12' * (H1.A22 \ H2.U21) ) ,H2.V21);
     end
 else % case of dense right-hand side
-    if ~isempty(H1.F)
+    if is_leafnode(H1)
         H = H1.F\H2;
     else
         mp = size(H1.A11,2);
         
-        if isempty(H1.A22.F) && isempty(H1.A22.U21)
+        if ~is_leafnode(H1.A22) && isempty(H1.A22.U21)
             x2 = solve_upper_triangular(H1.A22, H2(mp+1:end, :));
         else
             x2 = H1.A22\H2(mp+1:end,:);
         end
         
-        if isempty(H1.A11.F) && isempty(H1.A11.U21)
+        if ~is_leafnode(H1.A11) && isempty(H1.A11.U21)
             x1 = solve_upper_triangular(H1.A11, H2(1:mp,:) - H1.U12 * (H1.V12' * x2));
         else
             x1 = H1.A11\(H2(1:mp,:) - H1.U12 * (H1.V12' * x2));

@@ -6,7 +6,7 @@ if ~exist('nrm', 'var')
     nrm = norm(H, 2);
 end
 
-if isempty(H.F)
+if ~is_leafnode(H)
     H.A11 = compress_hmatrix(H.A11, nrm);
     H.A22 = compress_hmatrix(H.A22, nrm);
     

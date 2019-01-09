@@ -1,7 +1,7 @@
 function v = hmatrix_mtimes_dense(H1, v)
 %HMATRIX_MTIMES_DENSE An H matrix times a dense matrix.
 
-if ~isempty(H1.F)
+if is_leafnode(H1)
     v = H1.F * v;
 else
     mp = H1.A11.sz(2);

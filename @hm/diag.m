@@ -1,7 +1,7 @@
 function d = diag(H)
 %DIAG Obtain the diagonal of an H-matrix.
 
-if ~isempty(H.F)
+if is_leafnode(H)
     d = diag(H.F);
 else
     d = [ diag(H.A11) ; diag(H.A22) ];

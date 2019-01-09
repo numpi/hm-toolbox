@@ -26,7 +26,7 @@ function spy_draw_block(H, xoffset, yoffset, rk)
     diag_color    = [ 0.1,  0.3,  0.95 ];
     offdiag_color = [ 0.95,  0.95,  1.0  ];
 
-    if ~isempty(H.F)
+    if is_leafnode(H)
         mm = size(H, 1);
         nn = size(H, 2);
         

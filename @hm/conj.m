@@ -3,7 +3,7 @@ function Ht = conj(H)
 
 Ht = H;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     Ht.F = conj(H.F);
 else
     Ht.A11 = conj(H.A11);

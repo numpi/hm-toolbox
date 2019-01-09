@@ -10,7 +10,7 @@ end
 
 HL.sz = [size(H, 1), size(H, 1)];
 
-if ~isempty(H.F)
+if is_leafnode(H)
     [HL.F, HU.F] = lu(H.F);
 else
     m1 = H.A11.sz(1);

@@ -7,7 +7,7 @@ function rH = real(H)
 
 rH = H;
 
-if ~isempty(H.F)
+if is_leafnode(H)
     rH.F = real(H.F);
 else
     rH.A11 = real(H.A11);

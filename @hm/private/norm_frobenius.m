@@ -4,7 +4,7 @@ function F = norm_frobenius(H)
 % F = NORM_FROBENIUS(H) evaluates the Frobenius norm of H. The computed
 %     norm is exact, up to rounding errors.
 
-if ~isempty(H.F)
+if is_leafnode(H)
     F = norm(H.F, 'fro');
 else
     F = norm(H.A11, 'fro')^2 + norm(H.A22, 'fro')^2;

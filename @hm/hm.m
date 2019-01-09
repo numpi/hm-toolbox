@@ -229,7 +229,7 @@ classdef hm
             %CREATE_H_MATRIX Given a dense matrix A, construct a hierarchical
             %representation for it.
             
-            if ~isempty(obj.F)
+            if is_leafnode(obj)
                 obj.F = A;
             else
                 % Get the middle point
@@ -257,7 +257,7 @@ classdef hm
                 bandu = bandl;
             end
             
-            if ~isempty(H.F)
+            if is_leafnode(H)
                 H.F = full(A);
             else
                 [m, n] = size(H);
@@ -287,7 +287,7 @@ classdef hm
         function obj = create_low_rank_h_matrix(obj, U, V)
             %CREATE_LOW_RANK_H_MATRIX Create a low rank H matrix.
             
-            if ~isempty(obj.F)
+            if is_leafnode(obj)
                 obj.F = U * V';
             else
                 m1 = obj.A11.sz(1);
@@ -338,7 +338,7 @@ classdef hm
             x = linspace(xdom(1), xdom(2), n);
             y = linspace(ydom(1), ydom(2), m);
             
-            if ~isempty(obj.F)
+            if is_leafnode(obj)
                 obj.F = fct( ones(m,1) * x, y.' * ones(1,n) );
             else
                 m1 = obj.A11.sz(1);
@@ -399,7 +399,7 @@ classdef hm
                 ap(n) = 0;
             end
             
-            if ~isempty(obj.F)
+            if is_leafnode(obj)
                 obj.F = toeplitz(am, ap);
             else
                 [mu, nu, ml, nl] = find_max_offdiag_size(obj);
@@ -428,7 +428,7 @@ classdef hm
         end
         
         function [mu, nu, ml, nl] = find_max_offdiag_size(obj)
-            if isempty(obj.F)
+            if ~is_leafnode(obj)
                 [mu1, nu1, ml1, nl1] = find_max_offdiag_size(obj.A11);                
                 [mu2, nu2, ml2, nl2] = find_max_offdiag_size(obj.A22);
                 
@@ -447,7 +447,7 @@ classdef hm
         function obj = initialize_toeplitz_h_matrix(obj, am, ap, n, tU12, tV12, tU21, tV21)
             % obj.sz = [ n n ];
             
-            if ~isempty(obj.F)
+            if is_leafnode(obj)
                 obj.F = toeplitz(am(1:n), ap(1:n));
             else
                 m1 = obj.A11.sz(1);

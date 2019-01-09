@@ -9,7 +9,7 @@ H = H1;
 
 H.sz = [H1.sz(1), H2.sz(2)];
 
-if ~isempty(H1.F)
+if is_leafnode(H1)
     H.F = H1.F * H2.F;
 else    
     H.A11 = hmatrix_mtimes(H1.A11, H2.A11);
