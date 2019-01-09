@@ -107,6 +107,9 @@ classdef hm
                             colcluster);                        
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
+                    case 'eye'
+                        n = varargin{2};
+                        obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
                     case 'diagonal'
                         D = varargin{2}; D = D(:);
                         obj = hm('banded', spdiags(D, 0, ...

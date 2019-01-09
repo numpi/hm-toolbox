@@ -13,7 +13,7 @@ end
 am = am(:)'; ap = ap(:)';
 
 if (m == n) && (length(am) + length(ap) - 1) < 10 * log(n) ...
-        && prod(rowcluster == colcluster)
+        && prod(rowcluster == colcluster) == 1
     bl = length(am) - 1;
     bu = length(ap) - 1;
     

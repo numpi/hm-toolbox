@@ -158,7 +158,18 @@ classdef hss
                         
                         obj = hss_from_random_sampling(obj, varargin{2:charpos-1});
                     case 'toeplitz'
-                        obj = hss_from_symbol(varargin{2:charpos-1}, ...
+                        if charpos == 4
+                            m = length(varargin{2});
+                            n = length(varargin{3});
+                        elseif charpos == 5
+                            m = varargin{4};
+                            n = m;
+                        else
+                            m = varargin{4};
+                            n = varargin{5};
+                        end
+
+                        obj = hss_from_symbol(varargin{2:3}, m, n, ...
                             rowcluster, colcluster);
                     case 'zeros'
                         m = varargin{2};
