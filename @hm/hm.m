@@ -109,6 +109,11 @@ classdef hm
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
                     case 'eye'
                         n = varargin{2};
+
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for the identity matrix');
+                        end
+
                         obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
                     case 'diagonal'
                         D = varargin{2}; D = D(:);
