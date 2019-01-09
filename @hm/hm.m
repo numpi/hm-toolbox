@@ -14,6 +14,10 @@ classdef hm
 % H = HM('banded', A, BL, BU) specifies different lower and upper 
 %     bandwidth BL and BU, respectively.
 %
+% H = HM('cauchy', x, y) constructs an HM representation of the Cauchy
+%     matrix with elements 1 ./ (x(i) + y(j)). The representation is
+%     constructed using Adaptive Cross approximation with partial pivoting.
+%
 % H = HM('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
 %     containing the samplings of the bivariate function F over a uniform
 %     grid of the square XDOM x YDOM. The procedure relies on separable
@@ -24,6 +28,13 @@ classdef hm
 %
 % H = HM('eye', N) constructs an HM representation of the N x N identity 
 %     matrix. 
+%
+% H = HSS('handle', AEVAL, M, N) constructs an HSS matrix
+%     using the random sampling based algorithm in [1]. It requires the
+%     handle function AFUN and AFUNT which perform the matrix-vector
+%     products A*v and A'*v, respectively, and AEVAL which, given two
+%     integer vectors I, J returns the submatrix A(I, J). M and N are the
+%     number of rows and columns of A. 
 %
 % H = HM('low-rank', U, V) construct an HM representation of the low-rank
 %     matrix U*V'. 
@@ -128,18 +139,13 @@ classdef hm
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
 
-                    case 'diagonal'
-                        if ~check_cluster_equality(rowcluster, colcluster)
-                            error('row and column cluster must match for diagonal matrices');
-                        end
-
-                        D = varargin{2}; D = D(:);
-                        obj = hm('banded', spdiags(D, 0, ...
-                            length(D), length(D)), varargin{3:end});
-
                     case 'cauchy'
-                        warning('The CAUCHY constructor is not (yet) efficiently implemented');
-                        obj = create_cauchy_h_matrix(obj, varargin{2:end});
+                        x = varargin{2};
+                        y = varargin{3};
+                        
+                        obj = hm('handle', @(i,j) 1 ./ (x(i).' + y(j)), ...
+                                    length(x), length(y), 'cluster', ...
+                                    rowcluster, colcluster);
 
                     case 'chebfun2'
                         if charpos < 6
@@ -157,6 +163,15 @@ classdef hm
                             colcluster); 
 
                         obj = create_chebfun2_h_matrix(obj, varargin{2:4}, m, n);
+                        
+                    case 'diagonal'
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for diagonal matrices');
+                        end
+
+                        D = varargin{2}; D = D(:);
+                        obj = hm('banded', spdiags(D, 0, ...
+                            length(D), length(D)), varargin{3:end});                        
 
                     case 'eye'
                         n = varargin{2};
@@ -166,6 +181,17 @@ classdef hm
                         end
 
                         obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
+                        
+                    case 'handle'
+                        Aeval = varargin{2};
+                        m = varargin{3};
+                        n = varargin{4};
+                        
+                        obj = hm_build_hm_tree(m, n, ...
+                            hmoption('block-size'), rowcluster, ...
+                            colcluster); 
+                        
+                        obj = hm_from_aca(obj, Aeval, 1, m, 1, n);
 
                     case 'low-rank'
                         obj = hm_build_hm_tree(size(varargin{2}, 1), ...
@@ -463,36 +489,7 @@ classdef hm
                 obj.A11 = initialize_toeplitz_h_matrix(obj.A11, am, ap, m1, tU12, tV12, tU21, tV21);
                 obj.A22 = initialize_toeplitz_h_matrix(obj.A22, am, ap, n-m1, tU12, tV12, tU21, tV21);
             end
-        end
-        
-        function obj = create_cauchy_h_matrix(obj, x, y)
-            n = length(x);
-            
-            obj.sz = [ n n ];
-            
-            x = reshape(x, length(x), 1);
-            y = reshape(y, length(y), 1);
-            
-            if n <= hmoption('block-size')
-                obj.F = 1 ./ (x * ones(1, n) + ones(n, 1) * y.');
-                for i = 1 : n
-                    obj.F(i,i) = 0;
-                end
-            else
-                mp = ceil(n / 2);
-                np = ceil(n / 2);
-                
-                [obj.U21, obj.V21] = cauchy_lr(x(mp+1:end), y(1:np), hmoption('threshold'));
-                [obj.U12, obj.V12] = cauchy_lr(x(1:mp), y(np+1:end), hmoption('threshold'));
-                
-                obj.A11 = hm();
-                obj.A22 = hm();
-                
-                obj.A11 = create_cauchy_h_matrix(obj.A11, x(1:mp), y(1:np));
-                obj.A22 = create_cauchy_h_matrix(obj.A22, x(mp+1:end), y(np+1:end));
-            end
-        end
-        
+        end       
         
     end
     
