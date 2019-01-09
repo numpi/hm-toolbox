@@ -1,4 +1,4 @@
-function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrm_type)
+function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
 %EK_SYLV Approximate the solution of a Sylvester equation AX + XB + U*V' = 0.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
@@ -20,8 +20,8 @@ if ~exist('tol', 'var')
     tol = 1e-8;
 end
 
-if ~exist('nrm_type', 'var')
-    nrm_type = 2;
+if ~exist('nrmtype', 'var')
+    nrmtype = 2;
 end
 
 if ~isstruct(A)
@@ -121,7 +121,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
         fprintf('%d Residue: %e\n', it, res / norm(Y));
     end
     
-    if tol(res, norm(Y, nrm_type)) % res < norm(Y) * tol
+    if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
         break
     end
     it=it+1;
@@ -132,8 +132,15 @@ end
 % fprintf('lyap its = %d, nrmA = %e\n', it, nrmA)
 [UU,SS,VV] = svd(Y);
 
-% rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
-rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
+switch nrmtype
+    case 2        
+        s = diag(SS);
+        rk = sum( arrayfun(@(ss) tol(ss, s(1)), s) == 1);
+    case 'fro'
+        d = sort(diag(SS));
+        s = cumsum(d);
+        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 1 );
+end
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));

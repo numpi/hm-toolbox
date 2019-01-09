@@ -15,10 +15,14 @@ function [Xu, VA, D, it] = ek_lyap(A, u, k, tol, debug, varargin)
 if ~exist('debug', 'var')
     debug = false;
 end
+
 p = inputParser;
+addOptional(p, 'nrmtype', 2, @(x) (isnumeric(x) && x == 2) || strcmp(x, 'fro'));
 addParameter(p, 'kernel', 1);
 parse(p, varargin{:});
+
 K = p.Results.kernel;
+nrmtype = p.Results.nrmtype;
 
 if ~issymmetric(K)
     error('EK_LYAP:: kernel of the RHS is not symmetric')
@@ -30,7 +34,7 @@ if ~isstruct(A)
         nrmA = normest(A, 1e-2);
     else
         AA = ek_struct(A, false);
-        nrmA = norm(A);
+        nrmA = norm(A, nrmtype);
     end
     
     AA.nrm = nrmA;
@@ -111,10 +115,10 @@ while sa - 2*bsa < k
     
     % You might want to enable this for debugging purposes
     if debug
-        fprintf('%d Residue: %e\n', it, res / norm(Y));
+        fprintf('%d Residue: %e\n', it, res / norm(Y, nrmtype));
     end
     
-    if tol(res, norm(Y)) % res < norm(Y) * tol
+    if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
         break
     end
     it = it + 1;
@@ -122,8 +126,16 @@ end
 
 [QQ, DD] = eig(.5 * (Y+ Y'));
 
-rk = sum(arrayfun(@(s) tol(s, max(abs(diag(DD))) / nrmA), ...
-    abs(diag(DD))) == false);
+switch nrmtype
+    case 2        
+        s = sort(abs(diag(DD)));
+        rk = sum( arrayfun(@(ss) tol(ss, s(end)), s) == 1 );
+    case 'fro'
+        d = sort(abs(diag(DD)));
+        s = cumsum(d);
+        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 1 );
+end
+
 [~,ii] = sort(diag(abs(DD))); ii = ii(end:-1:end-rk+1);
 
 Xu = VA(:,1:size(QQ,1)) * QQ(:,ii) * sqrt(abs(DD(ii,ii)));
