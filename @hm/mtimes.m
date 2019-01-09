@@ -39,6 +39,11 @@ if isfloat(H1)
 end
 
 % Multiplication of two H-matrices
+[~, c] = cluster(H1); [r, ~] = cluster(H2);
+if ~check_cluster_equality(c, r)
+    error('H1 * H2: Cluster or dimension mismatch in H1 and H2');
+end
+
 H = hmatrix_mtimes(H1, H2);
 H = compress_hmatrix(H);
 

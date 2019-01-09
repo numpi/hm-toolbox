@@ -101,12 +101,17 @@ classdef hm
                     case 'tridiagonal'
                         obj = create_tridiagonal_h_matrix(obj, varargin{2});
                     case 'banded'
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for banded matrices');
+                        end
+
                         obj = hm_build_hm_tree(size(varargin{2}, 1), ...
                             size(varargin{2}, 2), ...
                             hmoption('block-size'), rowcluster, ...
                             colcluster);                        
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
+
                     case 'eye'
                         n = varargin{2};
 
@@ -115,10 +120,16 @@ classdef hm
                         end
 
                         obj = hm('diagonal', ones(n, 1), 'cluster', rowcluster);
+
                     case 'diagonal'
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for diagonal matrices');
+                        end
+
                         D = varargin{2}; D = D(:);
                         obj = hm('banded', spdiags(D, 0, ...
                             length(D), length(D)), varargin{3:end});
+
                     case 'chebfun2'
                         if charpos < 6
                             error('Unsufficient arguments for the chebfun2 constructor');

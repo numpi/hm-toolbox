@@ -1,7 +1,18 @@
 function I = eye(varargin)
-%EYE Create an HM identity
+%EYE Create an HSS identity
 
-sz = varargin{1};
-I = hss('banded', speye(sz), 0, 0);
+if isa(varargin{1}, 'hss')
+    [rowcluster, colcluster] = cluster(varargin{1});
 
+    I = hss('eye', size(varargin{1}, 1), 'cluster', rowcluster, colcluster);
+else
+    sz = varargin{1};
+
+    rowcluster = []; colcluster = [];
+    if nargin >= 3
+        [rowcluster, colcluster] = cluster(varargin{3});
+    end
+
+    I = hss('eye', sz(1), 'cluster', rowcluster, colcluster);
 end
+

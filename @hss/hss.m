@@ -142,6 +142,16 @@ classdef hss
                             size(varargin{2}, 2), hssoption('block-size'), ...
                             rowcluster, colcluster);
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
+
+                    case 'eye'
+                        n = varargin{2};
+
+                        if ~check_cluster_equality(rowcluster, colcluster)
+                            error('row and column cluster must match for the identity matrix');
+                        end
+
+                        obj = hss('diagonal', ones(n, 1), 'cluster', rowcluster);
+
                     case 'chebfun2'
                         obj = hm2hss(hm('chebfun2', varargin{2:end}));
                     case 'cauchy'
