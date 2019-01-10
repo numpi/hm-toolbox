@@ -62,13 +62,14 @@ A = toeplitz(c, r);
 CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
     'Generation of an HM representation for Toeplitz A');
 
-% Chebfun2
+% Function samples
 f = @(x,y) log(1 + abs(x - y));
-H = hm('chebfun2', f, [0 1], [0 1], n, n);
+x = linspace(0, 1, n);
+H = hm('handle', @(i,j) f(x(j), x(i)'), n, n);
 
-A = f( linspace(0, 1, n), linspace(0, 1, n)' );
+A = f( x, x' );
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * 1e-8, ...
+CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * hmoption('threshold'), ...
     'Generation of an HM representation for A that samples f(x,y)');
 
 % Generate random clustering
