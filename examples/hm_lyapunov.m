@@ -32,16 +32,14 @@ h = 1 / (n + 1);
 
 A = hm('banded', spdiags(ones(n, 1) * [ -1, 2, -1 ], -1:1, n, n), 1);
 
-% To build C, instead, we rely on chebfun2 (make sure to have chebfun in
-% your MATLAB path for the following command to work!).
+% To build C, instead, we rely on adaptive cross approximation
 
-% C = hm('chebfun2', @(x,y) log(1 + abs(x - y)), [0 1], [0 1], n);
-C = hm('chebfun2', @(x,y) log(1 + abs(x - y)), [0 1], [0 1], n);
+x = linspace(0, 1, n + 2);
+C = hm('handle', @(i,j) log(1 + abs(x(j+1) - x(i+1)')), n, n);
 
 % Let us briefly check that all these matrices have a low-rank structure in
 % their off-diagonal blocks:
-
-[ hmrank(A), hmrank(C) ]
+fprintf('hmrank(A) = %d, hmrank(C) = %d\n', hmrank(A), hmrank(C));
 
 %% Solving the equation
 % We can now use LYAP to solve the Lyapunov equation. In this example, we
@@ -54,29 +52,8 @@ tic; X = lyap(A, -h^2 * C, 'method', 'sign'); toc
 % Let us verify that the solution satifies the differential equation. Here,
 % we compute the $L^2$ norm of the residual, relative to the $L^2$ norm of
 % the solution $X$.
-norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro')
-
-%%
-% Let's have a look at the solution
-x = linspace(0, 1, n); mesh(x, x, full(X));
-
-%% Other solution methods
-% Alternative solvers are available. For instance, we have one based on the
-% integral formula for the solution:
-%
-% $$
-%   X = \int_0^\infty e^{-tA} C e^{-tA} dt.
-% $$.
-%
-% Most of the time, the solver based on the sign iteration will outperform
-% this option in speed and accuracy. However, this approach is easily
-% parallelizable, and can this can be leveraged by adding the parameters
-% 'parallel', true to the function call. Note that if you see these pages
-% online, they probably have been generated where no parallelism was
-% available, so expect this approach to be slower.
-
-tic; X = lyap(A, -h^2 * C, 'method', 'expm', 'parallel', true); toc
-norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro')
+fprintf('Relative residual: %e\n', ...
+    norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro'));
 
 %%
 % Let's have a look at the solution

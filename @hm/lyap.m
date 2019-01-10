@@ -26,8 +26,9 @@ function X = lyap(varargin)
 %     and a divide-and-conquer method for linear matrix equations.
 %     arXiv preprint arXiv:1712.04349.
 %
-% [3] Massei, S., Palitta, D., & Robol, L. (2017). Solving rank structured
-%     Sylvester and Lyapunov equations. arXiv preprint arXiv:1711.05493.
+% [3] Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured
+%     Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and 
+%     Applications, 39(4), 1564-1590.
 
 N = 64;
 
@@ -139,14 +140,19 @@ if ~parallel
     end
 else
     n = size(A, 1);
-    if exist('gcp', 'file')
-        pool = gcp;
-        nworkers = pool.NumWorkers * 6;
-    else
-        nworkers = matlabpool('size');
+    
+    try
+        if exist('gcp', 'file')
+            pool = gcp;
+            nworkers = pool.NumWorkers * 6;
+        else
+            nworkers = parpool('size');
+        end
+    catch
+        nworkers = 1;
     end
     
-    X = hm('diagonal', zeros(n, 1));
+    X = hm('zeros', n, n);
     
     XX = cell(1, nworkers);
     for j = 1 : ceil(N / nworkers)

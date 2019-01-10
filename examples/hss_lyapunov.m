@@ -22,27 +22,30 @@ h = 1 / (n + 1);
 % We start by considering the pure HSS solver. We construct the same
 % matrices that we had in the HODLR case.
 
+x = linspace(0, 1, n + 2);
 A = hss('banded', spdiags(ones(n, 1) * [ -1, 2, -1 ], -1:1, n, n), 1, 1);
-C = hss('chebfun2', @(x,y) log(1 + abs(x - y)), [0 1], [0 1], n);
+C = hm2hss(hm('handle', @(i,j) log(1 + abs(x(j+1) - x(i+1)')), n, n));
 
 %%
 % Let us briefly check that all these matrices have a low-rank structure in
 % their off-diagonal blocks:
 
-[ hssrank(A), hssrank(C) ]
+fprintf('hssrank(A) = %d, hssrank(C) = %d\n', hssrank(A), hssrank(C));
 
 %% Solving the equation
 % We can now use LYAP to solve the Lyapunov equation. In this example, we
 % use the sign iteration. This is also the default method used by the LYAP
 % function.
 
-tic; X = lyap(A, -h^2 * C); toc
+tic; X = lyap(A, -h^2 * C); thss = toc;
 
 %%
 % Let us verify that the solution satifies the differential equation. Here,
 % we compute the $L^2$ norm of the residual, relative to the $L^2$ norm of
 % the solution $X$.
-norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro')
+fprintf('[Standard D&C HSS solver] relative residual: %e, time: %fs\n', ...
+    norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro'), ...
+    thss);
 
 %%
 % Let's have a look at the solution
@@ -53,8 +56,11 @@ x = linspace(0, 1, n); mesh(x, x, full(X));
 % of it to speed up the computations.
 sA = spdiags(ones(n, 1) * [-1 2 -1], -1:1, n, n);
 
-tic; X = lyap(A, -h^2*C, sA); toc
-norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro')
+tic; X = lyap(A, -h^2 * C, sA); tsparse = toc;
+
+fprintf('[Sparse D&C HSS solver]   relative residual: %e, time: %fs\n', ...
+    norm(A * X + X * A - h^2 * C, 'fro') / norm(X, 'fro'), ...
+    tsparse);
 
 %%
 % Let's have a look at the solution
