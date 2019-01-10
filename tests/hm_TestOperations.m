@@ -2,6 +2,7 @@ function hm_TestOperations
 clear
 
 hmoption('block-size', 32);
+hssoption('block-size', 32);
 n = 512;
 
 tol = hmoption('threshold');
@@ -21,11 +22,37 @@ H = hm('low-rank', U, V)';
 CheckTestResult(norm(V * U' - full(H)), '<', norm(U) * norm(V) * tol, ...
     'Transposition for low-rank hm');
 
-A = randn(n, n);
-B = randn(n, n);
+A = randn(n, n); hmA = hm(A); 
+B = randn(n, n); hmB = hm(B); hssB = hss(B);
+
 H = hm(A) + hm(B);
 CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol, ...
-    'Sum of the hm representation of unstructured A and unstructured B');
+    'Sum of the HM representation of unstructured A and unstructured B');
+
+H = hmA + B;
+CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Sum of the HM representation of  A and dense B');
+
+H = A + hmB;
+CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Sum of dense  A and HM representation of B');
+
+H = hmA + hssB;
+CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
+    'Sum of the HM representation of  A and HSS representation of  B');
+
+H = hmA - B;
+CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Difference of the HM representation of  A and dense B');
+
+H = A - hmB;
+CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Difference of dense  A and HM representation of B');
+
+H = hmA - hssB;
+CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
+    'Difference of the HM representation of  A and HSS representation of  B');
+
 
 B = tril(triu(randn(n), -3),4);
 H = hm(A) + hm('banded', B, 3, 4);
@@ -52,11 +79,23 @@ H = hm('low-rank', U, V) + hm('low-rank', W, Z);
 CheckTestResult(norm(U*V' + W*Z' - full(H)), '<', (norm(U*V') + norm(W*Z')) * tol, ...
     'Sum of the hm representation of low-rank A and low-rank B');
 
-A = randn(n, n);
-B = randn(n, n);
+A = randn(n, n); hmA = hm(A); 
+B = randn(n, n); hmB = hm(B); hssB = hss(B);
 H = hm(A) * hm(B);
 CheckTestResult(norm(A * B - full(H)), '<', norm(A) * norm(B) * tol, ...
     'Product of the hm representation of unstructured A and unstructured B');
+
+H = hmA * B;
+CheckTestResult(norm(A * B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Product of the HM representation of  A and dense B');
+
+H = A * hmB;
+CheckTestResult(norm(A * B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Product of dense  A and HM representation of B');
+
+H = hmA * hssB;
+CheckTestResult(norm(A * B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
+    'Product of the HM representation of  A and HSS representation of  B');
 
 B = tril(triu(randn(n), -3),4);
 H = hm(A) * hm('banded', B, 3, 4);
@@ -95,6 +134,20 @@ B = hmgallery('rand', n, 10);
 H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the hm representation of random hm A and  B');
+
+A = randn(n, n); hmA = hm(A); 
+B = randn(n, n); hmB = hm(B); hssB = hss(B);
+H = hmA .* B;
+CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Hadamard product of the HM representation of  A and dense B');
+
+H = A .* hmB;
+CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isfloat(H), ...
+    'Hadamard product of dense  A and HM representation of B');
+
+H = hmA .* hssB;
+CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
+    'Hadamard product of the HM representation of  A and HSS representation of  B');
 
 % Power of an HM matrix
 A = hmgallery('rand', n, 10);

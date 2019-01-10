@@ -38,14 +38,18 @@ if isfloat(H1)
     return;
 end
 
-% Multiplication of two H-matrices
-[~, c] = cluster(H1); [r, ~] = cluster(H2);
-if ~check_cluster_equality(c, r)
-    error('H1 * H2: Cluster or dimension mismatch in H1 and H2');
-end
-
-H = hmatrix_mtimes(H1, H2);
-H = compress_hmatrix(H);
-
+% Multiplication of two matrices
+if isa(H1, 'hm') && isa(H2, 'hss')
+    	H = hmatrix_mtimes(H1, hss2hm(H2));	
+elseif isa(H1, 'hm') && ~isa(H2, 'hm')
+	H = full(H1) * H2;
+elseif ~isa(H1, 'hm') && isa(H2, 'hm')
+	H = H1 * full(H2);
+else
+	[~, c] = cluster(H1); [r, ~] = cluster(H2);
+	if ~check_cluster_equality(c, r)
+    		error('H1 * H2: Cluster or dimension mismatch in H1 and H2');	
+	end
+	H = hmatrix_mtimes(H1, H2);
 end
 

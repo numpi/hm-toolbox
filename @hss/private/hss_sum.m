@@ -1,5 +1,5 @@
-function C = hss_sum(A,B,compress)
-C = hss_sum_ric(A,B);
+function C = hss_sum(A, B, compress)
+C = hss_sum_ric(A, B);
 if ~exist('compress', 'var')
     compress = true;
 end

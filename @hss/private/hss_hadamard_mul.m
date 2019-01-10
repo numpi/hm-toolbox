@@ -1,7 +1,13 @@
-function C = hss_hadamard_mul(A,B);
-tol = hssoption('threshold');
+function C = hss_hadamard_mul(A, B, compress);
+if ~exist('compress', 'var')
+    compress = true;
+end
 C = hss_hadamard_mul_ric(A,B);
-C = hss_compress(C,tol);
+if compress
+	tol = hssoption('threshold');
+	C = hss_compress(C,tol);
+end
+
 end
 
 function C = hss_hadamard_mul_ric(A,B)

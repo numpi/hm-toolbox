@@ -1,10 +1,18 @@
-function H = hmatrix_mtimes(H1, H2)
+function H = hmatrix_mtimes(H1, H2, compress)
 %HMATRIX_MTIMES Multiply two H matrices.
-
+if ~exist('compress', 'var')
+    compress = true;
+end
 if size(H1, 2) ~= size(H2, 1)
     error('A * B: Dimension mismatch');
 end
+H = hmatrix_mtimes_ric(H1, H2);
+if compress
+    H = compress_hmatrix(H);
+end
+end
 
+function H = hmatrix_mtimes_ric(H1, H2)
 H = H1;
 
 H.sz = [H1.sz(1), H2.sz(2)];

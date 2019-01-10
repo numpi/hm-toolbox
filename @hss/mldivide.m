@@ -1,23 +1,24 @@
-function X = mldivide(A, B)
+function H = mldivide(H1, H2)
 
-if isa(B,'hss')
-    if ~isa(A, 'hss') && isscalar(A)
-        X = hss_scalar_mul(1 / A, B);
+if isa(H2,'hss')
+    if isscalar(H1)
+        H = hss_scalar_mul(1 / H1, H2);
+    elseif isa(H1, 'hss')
+        H = hss_mldivide(H1, H2);
     else
-        X = hss_mldivide(A, B);
+	H = H1\full(H2);
     end
 else
-    if isa(A, 'hss')
-        if size(A, 1) <= hssoption('block-size')
-            X = full(A) \ B;
+    if size(H1, 1) <= hssoption('block-size') % We might remove this case, not sure is needed
+            H = full(H1) \ H2;
             return;
-        end
-        
-        X = hss_ulv_solve(A,B);        
-    else
-        if isscalar(A)
-            X = hss_scalar_mul(1 / A, B);
-        end
+    end    
+    if isscalar(H2)
+	H = inv(H1) * H2;
+    elseif isa(H2, 'hm')
+	H = hss2hm(H1)\H2;  
+    else   
+        H = hss_ulv_solve(H1, H2);     
     end
 
 end
