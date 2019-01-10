@@ -95,6 +95,26 @@ B = hmgallery('rand', n, 10);
 H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the hm representation of random hm A and  B');
+
+% Power of an HM matrix
+A = hmgallery('rand', n, 10);
+H = A^2;
+CheckTestResult(norm(full(A)^2 - full(H)), '<', norm(full(A))^2 * tol, ...
+    'Square of the hm representation of random hm A');
+
+A = hmgallery('rand', n, 10);
+H = A^3;
+CheckTestResult(norm(full(A)^3 - full(H)), '<', norm(full(A))^3 * tol, ...
+    'Cube of the hm representation of random hm A');
+
+for p = [ 4, 7, 9, 12, 15 ]
+    A = hmgallery('rand', n, 10);
+    A = A / norm(A); % Make sure things stay bounded
+    H = A^p;
+    CheckTestResult(norm(full(A)^p - full(H)), '<', norm(full(A))^p * tol, ...
+        sprintf('%d-th Power of the hm representation of random hm A', p));
+end
+
 % Linear systems
 H = hmgallery('rand', n, 3);
 x = rand(n, 5); b = H*x; y = H \ b;
