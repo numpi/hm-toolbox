@@ -1,15 +1,15 @@
-function X = sqrtm(A)
-%SQRTM Compute the matrix square root of X.
+function X = sqrtm(H)
+%SQRTM Compute the matrix square root of H.
 %
-% Y = SQRT(X) computes a matrix Y such that Y^2 = X. The computed square
+% X = SQRT(H) computes a matrix Y such that X^2 = H. The computed square
 % root is the principal branch of the square root.
 
 converged = false;
 
-threshold = hmoption('threshold') * norm(A);
+threshold = hmoption('threshold') * norm(H);
         
-X = A;
-Y = eye(size(A), 'like', A);
+X = H;
+Y = eye(size(H), 'like', H);
 
 it = 1;
 max_its = 100;

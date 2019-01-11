@@ -1,6 +1,6 @@
 function H = mrdivide(H1, H2)
 %MRDIVIDE solve linear systems with HODLR-matrices
-if isa(H2,'hm')
+if isa(H2, 'hm')
     if size(H2, 1) ~= size(H2, 2)
         error('A / B: Matrix B is not square');
     end

@@ -42,15 +42,15 @@ CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
 
 H = hssA - B;
 CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isfloat(H), ...
-    'Difference of the HSS representation of  A and dense B');
+    'Difference of the HSS representation of A and dense B');
 
 H = A - hssB;
 CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isfloat(H), ...
-    'Difference of dense  A and HSS representation of B');
+    'Difference of dense A and HSS representation of B');
 
 H = hssA - hmB;
 CheckTestResult(norm(A - B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
-    'Difference of the HSS representation of  A and HM representation of  B');
+    'Difference of the HSS representation of A and HM representation of  B');
 
 B = tril(triu(randn(n), -3),4);
 H = hss(A) + hss('banded', B, 3, 4);
@@ -146,6 +146,13 @@ CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isfloat(H), ...
 H = hssA .* hmB;
 CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
     'Hadamard product of the HSS representation of  A and HM representation of  B');
+
+A = randn(n, n); hssA = hss(A);
+CheckTestResult(norm(tril(A) - tril(hssA)), '<', norm(A) * tol, ...
+    'Tril of the HSS representation of A ');
+
+CheckTestResult(norm(triu(A) - full(triu(hssA))), '<', norm(A) * tol, ...
+    'Triu of the HSS representation of A ');
 
 % Power of an HM matrix
 A = hssgallery('rand', n, 10);
