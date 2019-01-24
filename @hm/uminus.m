@@ -1,7 +1,7 @@
 function mH = uminus(H)
 %UMINUS Change the sign of a HODLR Matrix
 if is_leafnode(H)
-    mH = H1;
+    mH = H;
     mH.F = -H.F;
 else
     mH = H;
