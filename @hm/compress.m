@@ -1,10 +1,7 @@
-function H = compress(H, tol)
+function H = compress(H)
 %COMPRESS Recompress the HM representation
 
-if ~exist('tol', 'var')
-    tol = hmoption('threshold');
-end
 
-H = compress_hmatrix(H, tol * norm(H));
+H = compress_hmatrix(H, norm(H));
 
 end

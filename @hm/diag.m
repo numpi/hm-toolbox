@@ -7,6 +7,5 @@ else
     d = [ diag(H.A11) ; diag(H.A22) ];
 end
 
-
 end
 

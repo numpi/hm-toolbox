@@ -1,12 +1,12 @@
-function H = uminus(H1)
+function mH = uminus(H)
 %UMINUS Change the sign of a HODLR Matrix
-if is_leafnode(H1)
-    H = H1;
-    H.F = -H1.F;
+if is_leafnode(H)
+    mH = H;
+    mH.F = -H.F;
 else
-    H = H1;
-    H.A11 = -H1.A11;
-    H.A22 = -H1.A22;
-    H.U21 = -H1.U21;
-    H.U12 = -H1.U12;
+    mH = H;
+    mH.A11 = -H.A11;
+    mH.A22 = -H.A22;
+    mH.U21 = -H.U21;
+    mH.U12 = -H.U12;
 end

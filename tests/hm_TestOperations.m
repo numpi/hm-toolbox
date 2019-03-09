@@ -149,6 +149,13 @@ H = hmA .* hssB;
 CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isa(H, 'hm'), ...
     'Hadamard product of the HM representation of  A and HSS representation of  B');
 
+A = randn(n, n); hmA = hm(A);
+CheckTestResult(norm(tril(A) - tril(hmA)), '<', norm(A) * tol, ...
+    'Tril of the HM representation of A ');
+
+CheckTestResult(norm(triu(A) - full(triu(hmA))), '<', norm(A) * tol, ...
+    'Triu of the HM representation of A ');
+
 % Power of an HM matrix
 A = hmgallery('rand', n, 10);
 H = A^2;

@@ -4,7 +4,7 @@ function Ht = ctranspose(H)
 Ht = H;
 
 if is_leafnode(H)
-    Ht.F = H.F';
+    Ht.F = Ht.F';
     Ht.sz = H.sz(2:-1:1);
 else
     Ht.A11 = H.A11';

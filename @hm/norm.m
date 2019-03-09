@@ -1,19 +1,19 @@
-function nrm = norm(A, nrm_type)
-%NORM Estimate the norm of A
+function nrm = norm(H, nrm_type)
+%NORM Estimate the norm of H
 
 if ~exist('nrm_type', 'var')
     nrm_type = 2;
 end
 
 if ischar(nrm_type) && strcmp(nrm_type, 'fro')
-    nrm = norm_frobenius(A);
+    nrm = norm_frobenius(H);
     return;
 end
 
-n = size(A, 2);
+n = size(H, 2);
 v = randn(n, 1);
 
-At = A';
+Ht = H';
 
 s = 0;
 
@@ -27,8 +27,8 @@ for i = 1 : 10
     
     v = v / s;
     w = v;
-    w = A * w;
-    w = At * w;
+    w = H * w;
+    w = Ht * w;
     v = w;
 end
 
