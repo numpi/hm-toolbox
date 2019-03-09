@@ -29,11 +29,8 @@ classdef hm
 % H = HM('eye', N) constructs an HM representation of the N x N identity 
 %     matrix. 
 %
-% H = HSS('handle', AEVAL, M, N) constructs an HSS matrix
-%     using the random sampling based algorithm in [1]. It requires the
-%     handle function AFUN and AFUNT which perform the matrix-vector
-%     products A*v and A'*v, respectively, and AEVAL which, given two
-%     integer vectors I, J returns the submatrix A(I, J). M and N are the
+% H = HM('handle', AEVAL, M, N) constructs an HM matrix
+%     using the adaptive cross approximation strategy. M and N are the
 %     number of rows and columns of A. 
 %
 % H = HM('low-rank', U, V) construct an HM representation of the low-rank
