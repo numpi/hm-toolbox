@@ -9,7 +9,9 @@ else
     sz = varargin{1};
 
     rowcluster = []; colcluster = [];
-    if nargin >= 3
+    % We copy the cluster only if the third argument has the right
+	% dimensions -- otherwise we use it just as an indication of the type.
+    if nargin >= 3 && all(sz == size(varargin{3}))
         [rowcluster, colcluster] = cluster(varargin{3});
     end
 

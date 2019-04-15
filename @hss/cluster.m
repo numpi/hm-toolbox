@@ -10,7 +10,10 @@ function [p, q] = cluster(H)
 %     The vector R encodes the partitioning of the rows, while C encodes
 %     the one of the columns. 
 
-if H.leafnode
+if isempty(H.leafnode) && isempty(H.topnode)
+	p = 0;
+	q = 0;
+elseif H.leafnode
     p = size(H, 1);
     q = size(H, 2);
 else
