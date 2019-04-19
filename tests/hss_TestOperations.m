@@ -189,6 +189,12 @@ X = H \ B;
 CheckTestResult(norm(H*X - B), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
     'Backslash operator for HSS A \ B (hss rank 3)');
 
+% Inversion and backslash
+B = hssgallery('rand', n, 3);
+X = B / H;
+CheckTestResult(norm(X*H - B), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
+    'Backslash operator for HSS A / B (hss rank 3)');
+
 X = inv(H);
 CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (norm(X)*norm(H) + norm(B)) * tol, ...
     'Inversion (hss rank 3)');

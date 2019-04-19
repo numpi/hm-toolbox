@@ -27,11 +27,6 @@ if ~exist('nrm_type', 'var')
     nrm_type = 2;
 end
 
-% Check if the rktoolbox is in the path
-if ~exist('rat_krylov', 'file')
-    error('rktoolbox not found. Did you forget to add it to the path?');
-end
-
 if ~isstruct(A)
         AA = rk_struct(A);
 else
@@ -50,18 +45,12 @@ if size(poles, 1) == 1
 	poles = [poles; poles];
 end
 
-% Start with the initial basis
-% [VA, KA, HA, param_A] = rat_krylov(AA, u, inf);
-% [VB, KB, HB, param_B] = rat_krylov(BB, v, inf);
-
 % Dimension of the space
 sa = size(u, 2);
 sb = size(v, 2);
 
 bsa = sa;
 bsb = sb;
-
-% Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
 
 % tol can be function tol(r, n) that is given the residual and the norm, or
 % a scalar. In the latter case, we turn it into a function
@@ -83,12 +72,13 @@ while max(sa-bsa, sb-bsb) < k
     else
         next_inf = next_inf(1);
     end
+    
     if ~exist('VA', 'var')
-        [VA, KA, HA, param_A] = rat_krylov(AA, u, poles(1, counter:next_inf));
-        [VB, KB, HB, param_B] = rat_krylov(BB, v, poles(2, counter:next_inf));
+        [VA, KA, HA, param_A] = rk_krylov(AA, u, poles(1, counter:next_inf));
+        [VB, KB, HB, param_B] = rk_krylov(BB, v, poles(2, counter:next_inf));
     else
-        [VA, KA, HA, param_A] = rat_krylov(AA, VA, KA, HA, poles(1, counter:next_inf), param_A);
-        [VB, KB, HB, param_B] = rat_krylov(BB, VB, KB, HB, poles(2, counter:next_inf), param_B);
+        [VA, KA, HA, param_A] = rk_krylov(AA, VA, KA, HA, poles(1, counter:next_inf), param_A);
+        [VB, KB, HB, param_B] = rk_krylov(BB, VB, KB, HB, poles(2, counter:next_inf), param_B);
     end
     
     sa = size(VA, 2);

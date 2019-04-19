@@ -45,7 +45,7 @@ while res > tol
     % possibility of stopping the iteration.
     if ~nrm_converged
         nrm_est = norm(diag(alfa) + diag(beta(1:end-1), 1));
-        if (nrm_est - nrm) / nrm < tol
+        if (nrm_est - nrm) < tol * nrm
             nrm_converged = true;
         end
         nrm = nrm_est;

@@ -39,7 +39,7 @@ while k < min(m,n)
 	b = Afun(ind, 1:n) - U(ind, :) * V';
 	[~, new_ind] = max(abs(b));
 	if debug
-		fprintf('Iteration: %d Pivot: %e\n', k, b(new_ind))
+		fprintf('Iteration: %d Pivot at (%d,%d): %e\n', k, ind, new_ind, b(new_ind))
 	end
 	a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
 	a = a/b(new_ind);

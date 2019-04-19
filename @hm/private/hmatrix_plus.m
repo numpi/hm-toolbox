@@ -4,6 +4,7 @@ if ~exist('compress', 'var')
     compress = true;
 end
 H =  hmatrix_plus_ric(H1, H2);
+
 if compress
     H = compress_hmatrix(H);
 end
