@@ -47,7 +47,7 @@ if (A.topnode == 1)
     end
 else
     Su = [A.B12, A.Rl * S];
-    Tl = [A.B12', A.Wr * T]; % possibile inghippo
+    Tl = [A.B12', A.Wr * T];
     [Us,Su,Vs] = tcomp(Su, tol);
     [Ut,Tl,Vt] = tcomp(Tl, tol);
     k = size(A.B12,2);
@@ -65,7 +65,7 @@ else
     end
     
     Sl = [A.B21, A.Rr * S];
-    Tu = [A.B21', A.Wl * T]; % possibile inghippo
+    Tu = [A.B21', A.Wl * T];
     [Us,Sl,Vs] = tcomp(Sl, tol);
     [Ut,Tu,Vt] = tcomp(Tu, tol);
     k = size(A.B21,2);
