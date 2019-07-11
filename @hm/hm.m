@@ -46,6 +46,9 @@ classdef hm
 %     C as first column and R as first row. if N is larger than C and 
 %     R, respectively, then C and R are padded with zeros. 
 %
+% H = HM('zeros', M, N) constructs the HM representation of the M x N
+%     zero matrix. 
+%
 % All the constructors support an additional 'cluster' keyword that allows
 % to specify custom row and column clusters. These are described as a
 % vector of indices J = [J(1), ..., J(2^P)], such that the partitioning at
