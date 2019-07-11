@@ -12,6 +12,8 @@ else
     C.D = A.D * B.D;
 end
 
+C = hss_compress(C, hssoption('threshold'));
+
 end
 
 function g = bottom_up(A, B)
