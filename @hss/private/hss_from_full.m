@@ -3,7 +3,7 @@ function H = hss_from_full(obj, A)
 %
 % H = HSS_FROM_FULL(A) returns the HSS representation of A, where
 %     truncation is done at the relative tolerance indicated by
-%     hssoption('tolerance'), using the compression method indicated by
+%     hssoption('threshold'), using the compression method indicated by
 %     hssoption('svd').
 %
 % This functions is equivalent to calling H = HSS(A) with no other options,
