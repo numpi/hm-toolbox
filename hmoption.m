@@ -54,7 +54,8 @@ else
                 hm_threshold = max(eps, value);
 			end
 		case 'dense-compression'
-			if ~strcmp(value, 'rrqr') && ~strcmp(value, 'svd')
+			if ~strcmp(value, 'rrqr') && ~strcmp(value, 'svd') && ...
+					~strcmp(value, 'lanczos')
 				error('Invalid value for dense-compression');
 			else
 				hm_dense_compression = value;

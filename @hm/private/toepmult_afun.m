@@ -1,7 +1,7 @@
 function y = toepmult_afun(am, ap, m, n, x, trasp)
 %
 
-if strcmp(trasp, 'trasp')
+if strcmp(trasp, 'transp')
     tmp = am;
     am = ap;
     ap = tmp;

@@ -23,7 +23,7 @@ nrm_converged = false;
 while res > tol
     it = it + 1;
     
-    w = Afun(V(:,end), 'notrasp');
+    w = Afun(V(:,end), 'notransp');
     
     % Reorthogonalize w against U
     w = w - U * (U' * w);
@@ -34,7 +34,7 @@ while res > tol
     U = [ U , w / alfa(end) ];
     
     % Compute beta
-    w = Afun(U(:,end), 'trasp');
+    w = Afun(U(:,end), 'transp');
     w = w - V * (V' * w);
     w = w - V * (V' * w);
     
