@@ -8,13 +8,25 @@ function hm_TestCreation
 hmoption('block-size', 32);
 tol = hmoption('threshold');
 
-n = 100;
-A = randn(n, n);
+for n = [ 100, 1000 ]
+	A = randn(n, n);
 
-H = hm(A);
+	H = hm(A);
 
-CheckTestResult(norm(A - full(H)), '<', 1e3 * norm(A) * eps, ...
-    'Generation of an HM representation for unstructured A');
+	CheckTestResult(norm(A - full(H)), '<', norm(A) * hmoption('threshold'), ...
+		'Generation of an HM representation for unstructured A');
+end
+
+for n = [ 100, 1000 ]
+	x = linspace(0, 1, n);
+	y = x + 1/(2*(n-1));
+	A = 1 ./ (x - y.');
+
+	H = hm(A);
+
+	CheckTestResult(norm(A - full(H)), '<', norm(A) * hmoption('threshold'), ...
+		'Generation of an HM representation for Cauchy A built from dense');
+end
 
 n = 10000;
 A = spdiags(ones(n, 1) * [-1 2 -1], -1:1, n, n);
