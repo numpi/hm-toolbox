@@ -39,7 +39,7 @@ function H = build_hss_tree_rec(m, n, block_size)
 H = hss();
 H.topnode  = 0;
 
-if max(m, n) > block_size && min(m, n) > min(8, block_size)
+if max(m, n) > block_size && min(m, n) > 1
     [m1, m2] = split_indices(m);
     [n1, n2] = split_indices(n);
     

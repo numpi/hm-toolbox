@@ -37,7 +37,7 @@ H = hodlr();
     
 H.sz = [m n];
 
-if max(m, n) > block_size && min(m, n) > min(8, block_size)
+if max(m, n) > block_size && min(m, n) > 1
     [m1, m2] = split_indices(m);
     [n1, n2] = split_indices(n);
     
