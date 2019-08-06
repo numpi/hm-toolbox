@@ -4,7 +4,7 @@ function x = hss_chol_solve(A, b)
 %	       The procedure is based on the implicit generalized Cholesky factorization
 %	       of A and is taken from the paper:
 %
-%	       Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast algorithms for
+%	       Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast algorithodlrs for
 %              hierarchically semiseparable matrices. Numerical Linear Algebra with Applications, 17(6), 953-976.
 %
 if A.leafnode == 1

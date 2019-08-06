@@ -1,7 +1,7 @@
 %% Solving a Lyapunov equation in the HSS format.
 
 %% Available solvers
-% We consider the same problem of the <hm_lyapunov.html HODLR> case.
+% We consider the same problem of the <hodlr_lyapunov.html HODLR> case.
 % However, the sign iteration is not available, since no inverse is
 % implemented in the HSS format.
 %
@@ -24,7 +24,7 @@ h = 1 / (n + 1);
 
 x = linspace(0, 1, n + 2);
 A = hss('banded', spdiags(ones(n, 1) * [ -1, 2, -1 ], -1:1, n, n), 1, 1);
-C = hm2hss(hm('handle', @(i,j) log(1 + abs(x(j+1) - x(i+1)')), n, n));
+C = hodlr2hss(hodlr('handle', @(i,j) log(1 + abs(x(j+1) - x(i+1)')), n, n));
 
 %%
 % Let us briefly check that all these matrices have a low-rank structure in

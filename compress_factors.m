@@ -1,7 +1,7 @@
 function [ U, V ] = compress_factors(Uold, Vold, nrm)
 %COMPRESS_FACTORS Compress a low-rank representation U*V'.
 
-threshold = hmoption('threshold');
+threshold = hodlroption('threshold');
 
 if isempty(Uold)
     U = Uold;

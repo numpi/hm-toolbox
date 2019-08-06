@@ -9,14 +9,14 @@ function H = hss_from_full(obj, A)
 % This functions is equivalent to calling H = HSS(A) with no other options,
 % which is the preferred syntax.
 %
-% The implemenetation and the algorithm is based on the one presented in
+% The implemenetation and the algorithodlr is based on the one presented in
 % the paper
 %
-%     Xia, Jianlin, et al. "Fast algorithms for hierarchically
+%     Xia, Jianlin, et al. "Fast algorithodlrs for hierarchically
 %     semiseparable matrices." Numerical Linear Algebra with Applications
 %     17.6 (2010): 953-976.
 %
-% The complexity of the algorithm, assuming a low HSS rank, is quadratic in
+% The complexity of the algorithodlr, assuming a low HSS rank, is quadratic in
 % the dimension.
 
 % When called with one variable only we are not invoked as a method, therefore,

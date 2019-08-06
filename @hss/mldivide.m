@@ -15,8 +15,8 @@ else
     end    
     if isscalar(H2)
 	H = inv(H1) * H2;
-    elseif isa(H2, 'hm')
-	H = hss2hm(H1)\H2;  
+    elseif isa(H2, 'hodlr')
+	H = hss2hodlr(H1)\H2;  
     else   
         H = hss_ulv_solve(H1, H2);     
     end

@@ -2,7 +2,7 @@ classdef hss
 %HSS HSS matrices
 %
 % H = HSS(A) constructs an HSS representation of the matrix A, using the
-%     algorithm described in [2]. This procedure has a cost O(n^2), where
+%     algorithodlr described in [2]. This procedure has a cost O(n^2), where
 %     n is the size of A, provided that the off-diagonal rank is negligible
 %     with respect to n. 
 %
@@ -30,7 +30,7 @@ classdef hss
 %     matrix. 
 %
 % H = HSS('handle', AFUN, AFUNT, AEVAL, M, N) constructs an HSS matrix
-%     using the random sampling based algorithm in [1]. It requires the
+%     using the random sampling based algorithodlr in [1]. It requires the
 %     handle function AFUN and AFUNT which perform the matrix-vector
 %     products A*v and A'*v, respectively, and AEVAL which, given two
 %     integer vectors I, J returns the submatrix A(I, J). M and N are the
@@ -65,12 +65,12 @@ classdef hss
 %
 % The partitioning of an HSS matrix can be retrieved calling CLUSTER(H).  
 %
-%[1] Martinsson, P. G. (2011). A fast randomized algorithm for computing a
+%[1] Martinsson, P. G. (2011). A fast randomized algorithodlr for computing a
 %    hierarchically semiseparable representation of a matrix. SIAM Journal
 %    on Matrix Analysis and Applications, 32(4), 1251-1274.
 %
 %[2] Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast 
-%    algorithms for hierarchically semiseparable matrices. Numerical 
+%    algorithodlrs for hierarchically semiseparable matrices. Numerical 
 %    Linear Algebra with Applications, 17(6), 953-976.
     
     properties
@@ -159,11 +159,11 @@ classdef hss
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
 
                     case 'cauchy'
-                        %obj = hm2hss(hm('cauchy', varargin{2:end}));
+                        %obj = hodlr2hss(hodlr('cauchy', varargin{2:end}));
                         obj = hss_from_cauchy(varargin{2:end});
 
                     case 'chebfun2'
-                        obj = hm2hss(hm('chebfun2', varargin{2:end}));
+                        obj = hodlr2hss(hodlr('chebfun2', varargin{2:end}));
 
                     case 'diagonal'
                         obj = hss_build_hss_tree(length(varargin{2}), ...

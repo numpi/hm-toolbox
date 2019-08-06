@@ -37,7 +37,7 @@ if issparse(A)
         end
     end
     
-elseif isa(A, 'hm')
+elseif isa(A, 'hodlr')
     [LA,UA] = lu(A);
     
     S = struct(...

@@ -3,7 +3,7 @@ function RunAllTests
 
 max_recursion_depth = 8192;
 
-hm_RunAllTests;
+hodlr_RunAllTests;
 hss_RunAllTests;
 
 end

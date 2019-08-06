@@ -130,7 +130,7 @@ function [V, K, H, w] = add_inf_pole(V, K, H, A, w)
 end
 
 %
-% Modified Gram-Schmidt orthogonalization procedure. 
+% Modified Gram-Schodlridt orthogonalization procedure. 
 %
 % Suggested improvements: work with block-size matrix vector products to
 % get BLAS3 speeds. 

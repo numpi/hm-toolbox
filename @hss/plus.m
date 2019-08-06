@@ -1,10 +1,10 @@
 function H = plus(H1, H2)
 
-if isa(H1, 'hss') && isa(H2, 'hm')
+if isa(H1, 'hss') && isa(H2, 'hodlr')
 	if ~check_cluster_equality(H1, H2)    
     		error('H1 + H2: Cluster or dimension mismatch in H1 and H2');
 	end
-    	H = hss2hm(H1) + H2;	
+    	H = hss2hodlr(H1) + H2;	
 elseif isa(H1, 'hss') && ~isa(H2, 'hss')
 	H = full(H1) + H2;
 elseif ~isa(H1, 'hss') && isa(H2, 'hss')

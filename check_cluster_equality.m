@@ -11,7 +11,7 @@ function eq = check_cluster_equality(H1, H2)
 %     containing the integer of the integer partitions of the clusters 
 %     are equal. 
 
-if isa(H1, 'hm') || isa(H1, 'hss') 
+if isa(H1, 'hodlr') || isa(H1, 'hss') 
     if ~exist('H2', 'var')
         [r, c] = cluster(H1);
         eq = check_cluster_equality(r, c);

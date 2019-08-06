@@ -4,9 +4,9 @@ if (isfloat(H1) && isscalar(H1)) || (isfloat(H2) && isscalar(H2))
     H = H1 * H2;
 elseif isa(H1, 'hss') && isa(H2, 'hss')
     	H = hss_hadamard_mul(H1, H2);
-elseif isa(H1, 'hss') && isa(H2, 'hm')
-    	H = hss2hm(H1) .* H2;	
-elseif isa(H1, 'hss') && ~isa(H2, 'hm')
+elseif isa(H1, 'hss') && isa(H2, 'hodlr')
+    	H = hss2hodlr(H1) .* H2;	
+elseif isa(H1, 'hss') && ~isa(H2, 'hodlr')
 	H = full(H1) .* H2;
 elseif ~isa(H1, 'hss') && isa(H2, 'hss')
 	H = H1 .* full(H2);

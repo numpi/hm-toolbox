@@ -1,7 +1,7 @@
 function x = hss_vec_mat_mul(v, A)
 %X=HSS_MAT_VEC_MUL computes the fast Multiplication of a HSS matrix with a
 %                  (block) vector x from right.
-%                  The algorithm is taken from the paper:
+%                  The algorithodlr is taken from the paper:
 %
 % 		   S. Chandrasekaran, P. Dewilde, M. Gu, W. Lyons, and T. Pals, A fast
 %                  solver for HSS representations via sparse matrices , SIAM J. Matrix Anal.

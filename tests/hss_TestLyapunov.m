@@ -2,7 +2,7 @@ function hss_TestLyapunov
 
 for bs = [ 32, 256 ]
     
-    hmoption('block-size', bs);
+    hodlroption('block-size', bs);
     hssoption('block-size', bs);
     
     % Simpler problem: 2D Laplacian discretized with finite difference, and
@@ -24,7 +24,7 @@ for bs = [ 32, 256 ]
     CheckTestResult(norm(A * X + X * A + C), '<', ...
         4 * norm(A) * norm(X) * hssoption('threshold'), ...
         [ 'Lyapunov equation with HSS coefficients and RHS' ...
-        sprintf(' (sparse arithmetic used for EK, block-size = %d)', bs) ]);
+        sprintf(' (sparse arithodlretic used for EK, block-size = %d)', bs) ]);
     
     % Modify the problem to be unsymmetric, and test the Sylvester solvers.
     % Here we test a non-constant coefficients PDE
@@ -41,7 +41,7 @@ for bs = [ 32, 256 ]
     CheckTestResult(norm(A * X + X * B + C), '<', ...
         2 * (norm(B) + norm(A)) * norm(X) * hssoption('threshold'), ...
         [ 'Sylvester equation with HSS coefficients and RHS' ...
-        sprintf(' (sparse arithmetic used for EK, block-size = %d)', bs) ]);
+        sprintf(' (sparse arithodlretic used for EK, block-size = %d)', bs) ]);
     
 end
 

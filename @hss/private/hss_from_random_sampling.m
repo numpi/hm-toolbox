@@ -3,9 +3,9 @@ function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n)
 % 			   using mat-vec multiplication with random (block) vectors
 %			   and access to (block) diagonal entries.
 %
-% B = HSS_RANDOM_SAMPLING is based on the algorithm in [1].
+% B = HSS_RANDOM_SAMPLING is based on the algorithodlr in [1].
 %
-% [1] Martinsson, Per-Gunnar. "A fast randomized algorithm for computing a
+% [1] Martinsson, Per-Gunnar. "A fast randomized algorithodlr for computing a
 %     hierarchically semiseparable representation of a matrix." SIAM 
 %     Journal on Matrix Analysis and Applications 32.4 (2011): 1251-1274
 

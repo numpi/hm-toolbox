@@ -2,7 +2,7 @@ function F = hss_chol_fact(A)
 % HSS_ULV_SOLV computes the  generalized Cholesky factorization
 %	       of A  taken from the paper:
 %
-%	       Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast algorithms for
+%	       Xia, J., Chandrasekaran, S., Gu, M., & Li, X. S. (2010). Fast algorithodlrs for
 %              hierarchically semiseparable matrices. Numerical Linear Algebra with Applications, 17(6), 953-976.
 %
 
