@@ -30,6 +30,8 @@ Rename the folder to <code>hm-toolbox</code> if needed. Then, add it to your MAT
 You are now ready to create new @hodlr and @hss objects. Check some examples in the
 <code>examples/</code> folder. 
 
+The toolbox is compatible with GNU Octave >= 4.4. 
+
 # References
 
 1. Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and Applications, 39(4), 1564-1590.
