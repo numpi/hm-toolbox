@@ -1,17 +1,9 @@
 language: generic
 sudo: enabled
 install:
-  - sudo add-apt-repository ppa:alexlarsson/flatpak -y
+  - sudo sed -i "s/xenial/cosmic/g" /etc/apt/sources.list
   - sudo apt-get update
-  - while [ $(pgrep apt | wc -l) -ge 1 ]; do sleep 1 ; done
-  - sudo apt-get install -y flatpak unzip
-  - wget https://flathub.org/repo/appstream/org.octave.Octave.flatpakref
-  - sudo flatpak install -y org.octave.Octave.flatpakref
-  - wget http://numpi.dm.unipi.it/_media/software/hm-toolbox/control-3.1.0.tar.gz
-  - wget http://numpi.dm.unipi.it/_media/software/hm-toolbox/chebapprox.tar.gz
-  - tar xvf chebapprox.tar.gz
-  - sudo chmod 777 ~/.local -R
-  - flatpak run org.octave.Octave --no-gui --eval "pkg install control-3.1.0.tar.gz"
+  - sudo apt-get install -y octave octave-control
 
 dist: xenial
 
@@ -21,4 +13,4 @@ notifications:
     - stefano.massei@epfl.ch
 
 script: 
-  - flatpak run org.octave.Octave --no-gui --eval "pkg load control; addpath chebapprox; addpath tests; RunAllTests;"
+  - octave --no-gui --eval "pkg load control; addpath tests; RunAllTests;"
