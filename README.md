@@ -4,7 +4,7 @@
 
 The <code>hm-toolbox</code> is a toolbox implementing the arithmetic of HODLR and HSS matrices in MATLAB. 
 
-The HODLR case is handled in the @hm class, and correspond to H-matrices with partitioning
+The HODLR case is handled in the @hodlr class, and correspond to H-matrices with partitioning
 recursively done in 2 x 2 blocks, where the off-diagonal blocks are of low-rank. The HSS 
 arithmetic uses the same partitioning (with nested bases), and is available through the
 @hss class. 
@@ -27,7 +27,7 @@ Rename the folder to <code>hm-toolbox</code> if needed. Then, add it to your MAT
  >> addpath /path/to/hm-toolbox
 ```
 
-You are now ready to create new @hm and @hss objects. Check some examples in the
+You are now ready to create new @hodlr and @hss objects. Check some examples in the
 <code>examples/</code> folder. 
 
 # References
