@@ -18,11 +18,6 @@ classdef hss
 % H = HSS('banded', A, BL, BU) specifies different lower and upper 
 %     bandwidth BL and BU, respectively.
 %
-% H = HSS('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
-%     containing the samplings of the bivariate function F over a uniform
-%     grid of the square XDOM x YDOM. The procedure relies on separable
-%     approximation of F(X,Y) as provided by the Chebfun package.
-%
 % H = HSS('diagonal', D) constructs the diagonal matrix with the entries of
 %     the vector D on the main diagonal. 
 %
@@ -159,11 +154,7 @@ classdef hss
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
 
                     case 'cauchy'
-                        %obj = hodlr2hss(hodlr('cauchy', varargin{2:end}));
                         obj = hss_from_cauchy(varargin{2:end});
-
-                    case 'chebfun2'
-                        obj = hodlr2hss(hodlr('chebfun2', varargin{2:end}));
 
                     case 'diagonal'
                         obj = hss_build_hss_tree(length(varargin{2}), ...

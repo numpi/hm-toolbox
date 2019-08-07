@@ -18,11 +18,6 @@ classdef hodlr
 %     matrix with elements 1 ./ (x(i) + y(j)). The representation is
 %     constructed using Adaptive Cross approximation with partial pivoting.
 %
-% H = HODLR('chebfun2', F, XDOM, YDOM, M, N) constructs the M x N matrix
-%     containing the samplings of the bivariate function F over a uniform
-%     grid of the square XDOM x YDOM. The procedure relies on separable
-%     approximation of F(X,Y) as provided by the Chebfun package. 
-%
 % H = HODLR('diagonal', D) constructs the diagonal matrix with the entries of
 %     the vector D on the main diagonal. 
 %
@@ -146,23 +141,6 @@ classdef hodlr
                         obj = hodlr('handle', @(i,j) 1 ./ (x(i).' + y(j)), ...
                                     length(x), length(y), 'cluster', ...
                                     rowcluster, colcluster);
-
-                    case 'chebfun2'
-                        if charpos < 6
-                            error('Unsufficient arguments for the chebfun2 constructor');
-                        end
-                        m = varargin{5};
-                        if charpos == 6
-                            n = m;
-                        else
-                            n = varargin{6};
-                        end
-
-                        obj = hodlr_build_hodlr_tree(m, n, ...
-                            hodlroption('block-size'), rowcluster, ...
-                            colcluster); 
-
-                        obj = create_chebfun2_h_matrix(obj, varargin{2:4}, m, n);
                         
                     case 'diagonal'
                         if ~check_cluster_equality(rowcluster, colcluster)
@@ -353,44 +331,6 @@ classdef hodlr
                 
                 H.sz = size(A);
             end
-        end
-        
-        function obj = create_chebfun2_h_matrix(obj, fct, xdom, ydom, m, n)           
-            
-            % if ~exist('chebfun2') && ~exist('chebapprox2')
-            %    error('Chebfun not found: did you forget to add it to the path?');
-            % end
-            
-            x = linspace(xdom(1), xdom(2), n);
-            y = linspace(ydom(1), ydom(2), m);
-            
-            if is_leafnode(obj)
-                obj.F = fct( ones(m,1) * x, y.' * ones(1,n) );
-            else
-                m1 = obj.A11.sz(1);
-                n1 = obj.A11.sz(2);
-                m2 = obj.A22.sz(1);
-                n2 = obj.A22.sz(2);
-
-                obj.A11 = create_chebfun2_h_matrix(obj.A11, fct, ...
-                    [ x(1), x(n1) ], ...
-                    [ y(1), y(m1) ], m1, n1);
-                obj.A22 = create_chebfun2_h_matrix(obj.A22, fct, ...
-                    [ x(n1+1), x(end) ], ...
-                    [ y(m1+1), y(end) ], m2, n2);
-                
-                % Create the low-rank block A12 and A21
-                [obj.U12, obj.V12] = chebfun2_low_rank(fct, ...
-                    [ x(n1+1), x(end) ], ...
-                    [ y(1), y(m1) ], ...
-                    m1, n2);
-                [obj.U21, obj.V21] = chebfun2_low_rank(fct, ...
-                    [ x(1), x(n1) ], ...
-                    [ y(m1+1), y(end) ], ...
-                    m2, n1);
-            end
-            
-            obj = compress_hodlr(obj);
         end
         
         function obj = create_toeplitz_h_matrix(obj, am, ap, n)

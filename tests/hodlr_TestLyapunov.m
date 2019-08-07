@@ -9,7 +9,9 @@ for bs = [ 32, 256 ]
     n = 1024; h = 1 / (n - 1);
     sA = spdiags(ones(n, 1) * [1 -2 1], -1:1, n, n);
     A  = hodlr('banded', sA, 1);
-    C = h^2 * hodlr('chebfun2', @(x,y) log(1 + abs(x - y)), [0, 1], [0, 1], n);
+    t = linspace(0, 1, n);
+    f = @(i,j) log(1 + abs(t(i).' - t(j)));
+    C = h^2 * hodlr('handle', f, n, n);
     
     % Solver 1: completely hodlr
     X = lyap(A, C);
