@@ -1,7 +1,7 @@
 function A = hodlr2hss(B)
-%HM2HSS Conversion between data-sparse formats.
+%HODLR2HSS Conversion between data-sparse formats.
 %
-% A = HM2HSS(B) constructs an HSS representation of the HM matrix B. 
+% A = HODLR2HSS(B) constructs an HSS representation of the HODLR matrix B. 
 
 m = size(B, 1);
 n = size(B, 2);

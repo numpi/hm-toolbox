@@ -5,7 +5,7 @@
 
 n = 16384;
 
-fprintf('\nHM_LINEAR_SYSTEM // Solve a linear system with %d unknowns\n\n', n);
+fprintf('\nHODLR_LINEAR_SYSTEM // Solve a linear system with %d unknowns\n\n', n);
 
 % We construct a banded matrix, and make sure it is invertible by shifting
 % the diagonal entries.

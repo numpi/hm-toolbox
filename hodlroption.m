@@ -1,5 +1,5 @@
 function opt = hodlroption(key, value)
-%HMOPTION Set or get an option for the hodlr toolbox.
+%HODLROPTION Set or get an option for the hodlr toolbox.
 %
 % Valid options are:
 %   'block-size': Integer representing the minimum block size.

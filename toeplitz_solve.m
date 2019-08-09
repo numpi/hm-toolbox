@@ -3,7 +3,7 @@ function x = toeplitz_solve(c, r, b)
 %
 % X = TOEPLITZ_SOLVE(C, R, B) solves the linear system T * X = B using the
 %     algorithodlr presented in [1,2], implemented using the tools in 
-%     hodlr-toolbox. 
+%     hm-toolbox. 
 %
 % [1] 1. J. Xia, Y. Xi, and M. Gu, A superfast structured solver for 
 %     Toeplitz linear systems via randomized sampling, 
