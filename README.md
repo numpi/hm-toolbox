@@ -37,13 +37,9 @@ recent version of Octave on Linux is to enable Flatpak following the instruction
 ```
  flatpak install flathub org.octave.Octave
 ```
-and run Octave from the menu or by typing 
-```
- flatpak run org.octave.Octave
-```
-in a terminal. 
+You can then run Octave from the menu or by typing <code>flatpak run org.octave.Octave</code> in a terminal. 
 
 # References
 
 1. Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and Applications, 39(4), 1564-1590.
-2. Kressner, D., Massei, S., & Robol, L. (2017). Low-rank updates and a divide-and-conquer method for linear matrix equations. arXiv preprint arXiv:1712.04349.
+2. Kressner, D., Massei, S., & Robol, L. (2019). Low-rank updates and a divide-and-conquer method for linear matrix equations. SIAM Journal on Scientific Computing 41 (2), A848-A876.
