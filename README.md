@@ -30,7 +30,18 @@ Rename the folder to <code>hm-toolbox</code> if needed. Then, add it to your MAT
 You are now ready to create new @hodlr and @hss objects. Check some examples in the
 <code>examples/</code> folder. 
 
-The toolbox is compatible with GNU Octave >= 4.4. 
+## Octave compatibility
+The toolbox is compatible with GNU Octave >= 4.4. The easiest way to get a
+recent version of Octave on Linux is to enable Flatpak following the instructions
+[here](https://flatpak.org/setup/), and then run the command 
+```
+ flatpak install flathub org.octave.Octave
+```
+and run Octave from the menu or by typing 
+```
+ flatpak run org.octave.Octave
+```
+in a terminal. 
 
 # References
 
