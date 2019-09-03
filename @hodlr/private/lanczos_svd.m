@@ -50,7 +50,7 @@ while res > tol
         end
         nrm = nrm_est;
     else
-        res = beta(end) / nrm;
+        res = max(abs([ alfa(end), beta(end) ])) / nrm;
     end
     
     % fprintf('Iteration %d, res = %e, nrm_conv = %d\n', it, res, nrm_converged);
