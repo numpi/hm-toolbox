@@ -3,7 +3,7 @@ function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n)
 % 			   using mat-vec multiplication with random (block) vectors
 %			   and access to (block) diagonal entries.
 %
-% B = HSS_RANDOM_SAMPLING is based on the algorithodlr in [1].
+% B = HSS_RANDOM_SAMPLING is based on the algorithm in [1].
 %
 % [1] Martinsson, Per-Gunnar. "A fast randomized algorithodlr for computing a
 %     hierarchically semiseparable representation of a matrix." SIAM 
@@ -16,13 +16,20 @@ tol = hssoption('threshold');
 
 B = obj;
 
+if B.topnode == 1 && B.leafnode == 1
+    [m, n] = size(B);
+    B.D = Aeval((1:m).', 1:n);
+    return
+end
+
 failed = true;
 
-k = 15;
+k = 10;
+a = 10; % additional columns used for testing the residual
 
-Ocol = randn(n, k);
+Ocol = randn(n, k + a);
 Scol = Afun(Ocol);
-Orow = randn(m, k);
+Orow = randn(m, k + a);
 Srow = Afunt(Orow);
 
 bs = 5;
@@ -40,7 +47,7 @@ while failed
     % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
     [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
         hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
-            Ocol, Orow, 0, 0, tol, nrm);
+            Ocol, Orow, 0, 0, tol, nrm, a);
     
     if failed
         % fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);        
@@ -66,7 +73,7 @@ end
 function [B, Scol, Srow, Ocol, Orow, Jcol, ...
           Jrow, U, V, failed] = ...
               hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
-              Ocol, Orow, row, col, tol, nrm)
+              Ocol, Orow, row, col, tol, nrm, a)
           
 	if B.leafnode == 1
         failed = false;
@@ -85,12 +92,15 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         if isempty(B.B12)
             Scol = Scol - B.D * Ocol;
 
-            [Q, rk] = colspan(Scol, tol, nrm);
+            [Q, rk] = colspan(Scol(:, 1:end - a), tol, nrm);
 
-            if rk >= size(Scol, 2) - 10
-                failed = true;
-                Jcol = []; Jrow = []; U = []; V = [];                
-                return;
+            Scol2 = Scol(:,end-a+1:end);
+            Scol2 = Scol2 - Q * (Q' * Scol2);
+
+            if norm(Scol2) > norm(Scol) * tol
+                 failed = true;
+                 Jcol = []; Jrow = []; U = []; V = [];                
+                 return;
             end
 
             [Xcol, Jcol] = interpolative(Q', tol);
@@ -111,9 +121,12 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         if isempty(B.B21)
             Srow = Srow - B.D' * Orow;
         
-            [Q, rk] = colspan(Srow, tol, nrm);          
+            [Q, rk] = colspan(Srow(:,1:end-a), tol, nrm);
 
-            if rk >= size(Srow, 2) - 10
+            Srow2 = Srow(:,end-a+1:end);
+            Srow2 = Srow2 - Q * (Q' * Srow2);
+
+            if norm(Srow2) > norm(Srow) * tol          
                 failed = true;
                 Jcol = []; Jrow = []; U = []; V = [];
                 return;
@@ -136,10 +149,10 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
             Jrow = col + Jrow;
         end
 	else
-		[B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol, nrm);
+		[B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol, nrm, a);
         
         if ~failed1        
-            [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2, failed2]  = hss_from_random_sampling_rec(B.A22, Aeval, Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), row + B.ml, col + B.nl, tol, nrm);
+            [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2, failed2]  = hss_from_random_sampling_rec(B.A22, Aeval, Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), row + B.ml, col + B.nl, tol, nrm, a);
         end
         
         if (failed1 || failed2)

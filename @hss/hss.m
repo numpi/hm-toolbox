@@ -154,7 +154,7 @@ classdef hss
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
 
                     case 'cauchy'
-                        obj = hss_from_cauchy(varargin{2:end});
+                        obj = hodlr2hss(hodlr(varargin{1:end}));
 
                     case 'diagonal'
                         obj = hss_build_hss_tree(length(varargin{2}), ...
