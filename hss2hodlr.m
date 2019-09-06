@@ -1,7 +1,7 @@
 function B = hss2hodlr(A)
-%HSS2HM Conversion from HSS to HM format. 
+%HSS2HODLR Conversion from HSS to HODLR format. 
 %
-% B = HSS2HM(A) constructs an HM representation of the HSS matrix A. 
+% B = HSS2HODLR(A) constructs an HODLR representation of the HSS matrix A. 
 
 B = hss2hodlr_rec(A, hodlr());
 

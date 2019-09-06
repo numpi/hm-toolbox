@@ -1,9 +1,19 @@
 function varargout = hssgallery(name, varargin)
-%HMGALLERY Generate examples of H-matrices.
+%HSSGALLERY Generate examples of H-matrices.
 %
 % H = HSSGALLERY('laplacian', n) generates a n x n discretization of the
 % Laplacian operator on [-1, 1] using a grid of n+1 points, assuming
 % Dirichlet boundary conditions.
+%
+% H = HSSGALLERY('haber', n) generates a 6n x 6n discretization for the
+% Heat diffusion problem described in [1]. 
+%
+% H = HSSGALLERY('rand', n, k) generates an n x n random HODLR matrix
+% with HODLR rank equal to K. 
+%
+% [1] Haber, Aleksandar, and Michel Verhaegen. "Sparse solution of the 
+%     Lyapunov equation for large-scale interconnected systems." 
+%     Automatica 73 (2016): 256-268.
 
 switch name
     case 'rand'

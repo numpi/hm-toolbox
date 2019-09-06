@@ -30,9 +30,16 @@ Rename the folder to <code>hm-toolbox</code> if needed. Then, add it to your MAT
 You are now ready to create new @hodlr and @hss objects. Check some examples in the
 <code>examples/</code> folder. 
 
-The toolbox is compatible with GNU Octave >= 4.4. 
+## Octave compatibility
+The toolbox is compatible with GNU Octave >= 4.4. The easiest way to get a
+recent version of Octave on Linux is to enable Flatpak following the instructions
+[here](https://flatpak.org/setup/), and then run the command 
+```
+ flatpak install flathub org.octave.Octave
+```
+You can then run Octave from the menu or by typing <code>flatpak run org.octave.Octave</code> in a terminal. 
 
 # References
 
 1. Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and Applications, 39(4), 1564-1590.
-2. Kressner, D., Massei, S., & Robol, L. (2017). Low-rank updates and a divide-and-conquer method for linear matrix equations. arXiv preprint arXiv:1712.04349.
+2. Kressner, D., Massei, S., & Robol, L. (2019). Low-rank updates and a divide-and-conquer method for linear matrix equations. SIAM Journal on Scientific Computing 41 (2), A848-A876.
