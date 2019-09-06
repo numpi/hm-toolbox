@@ -30,6 +30,10 @@ while res > tol
     w = w - U * (U' * w);
     
     alfa = [ alfa, norm(w) ];
+
+    if alfa(end) == 0
+        break;
+    end
     
     U = [ U , w / alfa(end) ];
     
@@ -39,6 +43,11 @@ while res > tol
     w = w - V * (V' * w);
     
     beta = [ beta, norm(w) ];
+    
+    if beta(end) == 0
+        break;
+    end
+    
     V = [ V, w / beta(end) ];
     
     % Estimate the norm: if we have a good estimate, evaluate the
@@ -53,16 +62,21 @@ while res > tol
         res = max(abs([ alfa(end), beta(end) ])) / nrm;
     end
     
-    % fprintf('Iteration %d, res = %e, nrm_conv = %d\n', it, res, nrm_converged);
+    % fprintf('Iteration %d, res = %e, nrm_conv = %d, nrm = %e\n', it, res, nrm_converged, nrm);
 end
 
-[Ul, S, Vl] = svd(diag(alfa) + diag(beta(1:end-1), 1));
+if length(alfa) == length(beta)
+    [Ul, S, Vl] = svd(diag(alfa) + diag(beta(1:end-1), 1));
+else
+    [Ul, S, Vl] = svd([ diag(alfa(1:end-1)), zeros(length(beta),1)  ] + ...
+                      [ zeros(length(beta), 1), diag(beta) ], 'econ');
+end
 
-% Possibly perform recompressione
+% Possibly perform recompression
 rk = sum(diag(S) > tol * S(1,1));
 
 U = U * Ul(:,1:rk);
-V = V(:,1:end-1) * Vl(:,1:rk);
+V = V(:,1:size(Vl, 1)) * Vl(:,1:rk);
 S = S(1:rk, 1:rk);
 
 end

@@ -44,13 +44,13 @@ else
 end
 
 while failed
-    % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
+    %fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
     [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
         hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
             Ocol, Orow, 0, 0, tol, nrm, a);
     
     if failed
-        % fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);        
+        %fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);        
         Ocol = [ Ocol, randn(n, bs) ];
         Scol = [ Scol, Afun(Ocol(:, end-bs+1:end))  ];
         Orow = [ Orow, randn(m, bs) ];
@@ -96,8 +96,9 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
             Scol2 = Scol(:,end-a+1:end);
             Scol2 = Scol2 - Q * (Q' * Scol2);
-
-            if norm(Scol2) > norm(Scol) * tol
+            %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice	   
+	    km = 1;
+            if norm(Scol2) * km > norm(Scol) * tol
                  failed = true;
                  Jcol = []; Jrow = []; U = []; V = [];                
                  return;
@@ -125,8 +126,10 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
 
             Srow2 = Srow(:,end-a+1:end);
             Srow2 = Srow2 - Q * (Q' * Srow2);
+            %km = 1 + 11 * sqrt(size(Q,2) * size(Srow, 1)); % Martinsson's constant
+	    km = 1;
 
-            if norm(Srow2) > norm(Srow) * tol          
+            if norm(Srow2) * km > norm(Srow) * tol          
                 failed = true;
                 Jcol = []; Jrow = []; U = []; V = [];
                 return;
