@@ -13,7 +13,7 @@ for j = 1 : n
 	[nrm, jj] = max(colnrm(j:end));
 	jj = j + jj - 1;
 	
-	if nrm < tol
+	if nrm * sqrt(n - j) < tol
 		j = j - 1;
 		break;
 	end
