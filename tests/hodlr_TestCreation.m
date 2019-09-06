@@ -15,6 +15,12 @@ for n = [ 100, 1000 ]
 
 	CheckTestResult(norm(A - full(H)), '<', norm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for unstructured A');
+
+	A = sprand(n, n, 4 / n);
+	H = hodlr(A);
+
+	CheckTestResult(norm(full(A) - full(H)), '<', norm(full(A)) * hodlroption('threshold'), ...
+		'Generation of an hodlr representation for a sparse A');
 end
 
 for n = [ 100, 1000 ]
