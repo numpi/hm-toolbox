@@ -54,5 +54,21 @@ H = hss(diag(rand(n, 1)) + tril(rand(n, k) * rand(k, n)) + triu(rand(n, k) * ran
 CheckTestResult(hssrank(H), '<=', 2*k, ...
     'Checking the rank of dense matrices (dense constructor)');
 
+for n = [ 100, 1000 ]
+	x = linspace(0, 1, n);
+	y = x + 1/(2*(n-1));
+	A = 1 ./ (x - y.');
+
+	H = hss(A);
+
+	CheckTestResult(norm(A - full(H)), '<', norm(A) * hssoption('threshold'), ...
+		'Generation of an HSS representation for Cauchy A built from dense');
+    
+    H = hss('cauchy', -y, x);
+    
+    CheckTestResult(norm(A - full(H)), '<', log2(n) * norm(A) * hssoption('threshold'), ...
+		'Generation of an HSS representation for Cauchy A built with the Cauchy constructor');
+end
+
 
 end
