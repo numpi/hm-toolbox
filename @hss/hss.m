@@ -141,10 +141,10 @@ classdef hss
                                 colcluster);
                     obj = hss_from_full(obj, A);
                 end
-                
+
                 return;
             end
-            
+
             if nargin > 1
                 switch varargin{1}
                     case 'banded'
