@@ -7,10 +7,25 @@ function opt = hodlroption(key, value)
 %   'dense-compression': Can be either 'rrqr' or 'svd', and selects the
 %       method used to compress unstructured dense matrices when calling
 %       hodlrA = hodlr(A);
+%
+% The special option HODLROPTION('clear') can be used to load all the
+% default values, clearing all the previous HODLROPTION commands. 
 
 global hodlr_block_size
 global hodlr_threshold
 global hodlr_dense_compression
+
+if strcmp(key, 'clear')
+    if exist('value', 'var')
+        error('Specifying a value is unsupported for the special option "clear"');
+    end
+    
+    clear hodlr_block_size;
+    clear hodlr_threshold;
+    clear hodlr_dense_compression;
+    
+    return;
+end
 
 if isempty(hodlr_dense_compression)
 	hodlr_dense_compression = 'rrqr';
