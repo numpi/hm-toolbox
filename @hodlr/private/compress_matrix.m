@@ -2,7 +2,7 @@ function [U,V] = compress_matrix(A)
 %COMPRESS_MATRIX Compress a dense matrix into low rank format.
 
 threshold = hodlroption('threshold');
-compression = hodlroption('dense-compression');
+compression = hodlroption('compression');
 
 if max(size(A)) < 256
 	compression = 'svd';

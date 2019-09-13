@@ -29,6 +29,9 @@ for j = 1 : 2
 	r = r / scl;
 
 	v = rand(n, 1);
+	if j == 2
+		v = v + 1i * rand(n, 1);
+	end
 
 	tic;
 	x = toeplitz_solve(c, r, v);
