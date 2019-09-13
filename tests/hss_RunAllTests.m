@@ -7,6 +7,8 @@ hss_TestCreation;
 
 hss_TestOperations;
 
+hss_TestVarious;
+
 hss_TestLyapunov;
 
 rmpath ../

@@ -44,13 +44,13 @@ else
 end
 
 while failed
-    %fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
+    % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
     [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
         hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
             Ocol, Orow, 0, 0, tol, nrm, a);
     
     if failed
-        %fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);        
+        % fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);
         Ocol = [ Ocol, randn(n, bs) ];
         Scol = [ Scol, Afun(Ocol(:, end-bs+1:end))  ];
         Orow = [ Orow, randn(m, bs) ];
@@ -92,15 +92,18 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         if isempty(B.B12)
             Scol = Scol - B.D * Ocol;
 
-            [Q, rk] = colspan(Scol(:, 1:end - a), tol, nrm);
+            [Q, ~] = colspan(Scol(:, 1:end - a), ...
+				sqrt(size(Scol, 2)) * eps, nrm);
 
-            Scol2 = Scol(:,end-a+1:end);
+            Scol2 = Scol(:, end-a+1:end);
             Scol2 = Scol2 - Q * (Q' * Scol2);
+
             %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice	   
-	    km = 1;
-            if norm(Scol2) * km > norm(Scol) * tol
+			km = 1;
+
+            if norm(Scol2) * km > nrm * tol
                  failed = true;
-                 Jcol = []; Jrow = []; U = []; V = [];                
+                 Jcol = []; Jrow = []; U = []; V = [];
                  return;
             end
 
@@ -121,26 +124,27 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         % Compute span of the rows
         if isempty(B.B21)
             Srow = Srow - B.D' * Orow;
-        
-            [Q, rk] = colspan(Srow(:,1:end-a), tol, nrm);
+            [Q, ~] = colspan(Srow(:,1:end-a), ...
+				sqrt(size(Srow, 2)) * eps, nrm);
 
             Srow2 = Srow(:,end-a+1:end);
             Srow2 = Srow2 - Q * (Q' * Srow2);
-            %km = 1 + 11 * sqrt(size(Q,2) * size(Srow, 1)); % Martinsson's constant
-	    km = 1;
 
-            if norm(Srow2) * km > norm(Srow) * tol          
+            %km = 1 + 11 * sqrt(size(Q,2) * size(Srow, 1)); % Martinsson's constant
+			km = 1;
+
+            if norm(Srow2) * km > nrm * tol
                 failed = true;
                 Jcol = []; Jrow = []; U = []; V = [];
                 return;
             end
 
-            [Xrow, Jrow] = interpolative(Q.', tol);
+            [Xrow, Jrow] = interpolative(Q', tol);
 
-            B.V = Xrow.';
+            B.V = Xrow';
             Srow = Srow(Jrow, :);
 
-            V = Xrow.';
+            V = Xrow';
 
             B.B21 = Jrow;
 
@@ -178,7 +182,6 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, ...
         Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
         
         if isempty(B.B12)
-        
             B.B12 = Aeval(Jcol1, Jrow2);
             B.B21 = Aeval(Jcol2, Jrow1);            
 

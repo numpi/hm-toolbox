@@ -20,7 +20,7 @@ d1  = d0.^2;
 dm1 = exp(1i * pi / n) * d1;
 
 G = [ 1 , 2*r(1) ; zeros(n-1, 1), r(end:-1:2).' + c(2:end) ];
-H = [ c(end:-1:2) - r(2:end).' , zeros(n-1,1) ; 0 1 ];
+H = [ conj(c(end:-1:2)) - r(2:end)' , zeros(n-1,1) ; 0 1 ];
 
 Gh = ifft(G) * sqrt(n);
 Fh = ifft((d0.' * ones(1, 2)) .* H) * sqrt(n);
