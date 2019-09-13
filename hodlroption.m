@@ -4,16 +4,16 @@ function opt = hodlroption(key, value)
 % Valid options are:
 %   'block-size': Integer representing the minimum block size.
 %   'threshold': Value used for off-diagonal truncation.
-%   'dense-compression': Can be either 'rrqr' or 'svd', and selects the
+%   'compression': Can be either 'qr' or 'svd', and selects the
 %       method used to compress unstructured dense matrices when calling
 %       hodlrA = hodlr(A);
 
 global hodlr_block_size
 global hodlr_threshold
-global hodlr_dense_compression
+global hodlr_compression
 
-if isempty(hodlr_dense_compression)
-	hodlr_dense_compression = 'rrqr';
+if isempty(hodlr_compression)
+	hodlr_compression = 'qr';
 end
 
 if isempty(hodlr_block_size)
@@ -34,8 +34,8 @@ if ~exist('value', 'var')
             opt = hodlr_block_size;
         case 'threshold'
             opt = hodlr_threshold;
-		case 'dense-compression'
-			opt = hodlr_dense_compression;
+		case 'compression'
+			opt = hodlr_compression;
         otherwise
             error('Unsupported option specified');
     end
@@ -53,12 +53,12 @@ else
             else
                 hodlr_threshold = max(eps, value);
 			end
-		case 'dense-compression'
-			if ~strcmp(value, 'rrqr') && ~strcmp(value, 'svd') && ...
+		case 'compression'
+			if ~strcmp(value, 'qr') && ~strcmp(value, 'svd') && ...
 					~strcmp(value, 'lanczos')
 				error('Invalid value for dense-compression');
 			else
-				hodlr_dense_compression = value;
+				hodlr_compression = value;
 			end
         otherwise
             error('Unsupported option specified');

@@ -18,7 +18,7 @@ switch compression
 
 		U = U(:,1:k) * S(1:k,1:k);
 		V = V(:,1:k);	
-	case 'rrqr'
+	case 'qr'
 		[U, V] = prrqr(A, threshold);
 		V = V';
 	case 'lanczos'
