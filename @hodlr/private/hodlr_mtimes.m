@@ -1,17 +1,24 @@
-function H = hodlr_mtimes(H1, H2, compress)
-%HODLRATRIX_MTIMES Multiply two H matrices.
-if ~exist('compress', 'var')
-    compress = true;
-end
+function H = hodlr_mtimes(H1, H2)
+%HODLRATRIX_MTIMES Multiply two HODLR matrices.
+
 if size(H1, 2) ~= size(H2, 1)
     error('A * B: Dimension mismatch');
 end
-nrm = normest_Afun(@(x) H1 * (H2 * x), @(x) H2' * (H1' * x), size(H2, 2)); % estimate the norm of the product
+
+% Estimate the norm of the product -- we are happy with a rough bound here,
+% since the power iteration will give a lower bound anyway, so we do not
+% risk being too aggressive with truncations. 
+nrm = normest_Afun(...
+	@(x) H1 * (H2 * x), @(x) H2' * (H1' * x), size(H2, 2), 1e-2);
+
 H = hodlr_mtimes_ric(H1, H2, nrm);
 
-if compress
-    H = compress_hodlr(H, nrm);
-end
+% After the last level of recursion, the recompression needs to be done
+% only at the top level --- since all the other levels have been already
+% compressed by the calls to hodlr_rank_update. 
+[H.U12, H.V12] = compress_factors(H.U12, H.V12, nrm);
+[H.U21, H.V21] = compress_factors(H.U21, H.V21, nrm);
+
 end
 
 function H = hodlr_mtimes_ric(H1, H2, nrm)
@@ -33,12 +40,12 @@ else
     H.U12 = [ hodlr_mtimes_dense(H1.A11, H2.U12), H1.U12 ];
     H.V12 = [ H2.V12, dense_mtimes_hodlr(H1.V12.', H2.A22).' ];
     
-    % [H.U12, H.V12] = compress_factors(H.U12, H.V12, norm(H.U12, 'fro') * norm(H.V12, 'fro'));
+    % [H.U12, H.V12] = compress_factors(H.U12, H.V12, nrm);
     
     H.U21 = [ hodlr_mtimes_dense(H1.A22, H2.U21), H1.U21 ];
     H.V21 = [ H2.V21, dense_mtimes_hodlr(H1.V21.', H2.A11).' ];
     
-    % [H.U21, H.V21] = compress_factors(H.U21, H.V21, norm(H.U21, 'fro') * norm(H.V21, 'fro'));
+    % [H.U21, H.V21] = compress_factors(H.U21, H.V21, nrm);
 end
 
 end

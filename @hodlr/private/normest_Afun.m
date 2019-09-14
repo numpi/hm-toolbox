@@ -1,14 +1,27 @@
-function nrm = normest_Afun(Afun, Afunt, n)
+function nrm = normest_Afun(Afun, Afunt, n, tol)
+
+if ~exist('tol', 'var')
+	tol = 1e-3;
+end
+
 s = 0;
+
 v = randn(n, 1);
-for i = 1 : 10
+
+for i = 1 : 30
     olds = s;
-    s = norm(v);
-    if abs(olds - s) < abs(s) * 1e-3 || s == 0
+	
+    s = norm(v); v = v / s;
+    
+	% This version might be used in case we want to implement a subspace
+	% iteration --- that might be more efficient for blocking. At the
+	% moment the vector iteration is faster. 
+	%[v, s] = qr(v, 0); s = norm(s);
+	
+    if abs(sqrt(olds) - sqrt(s)) < abs(s) * tol || s == 0
         break;
     end
     
-    v = v / s;
     w = v;
     w = Afun(w);
     w = Afunt(w);
@@ -16,4 +29,5 @@ for i = 1 : 10
 end
 
 nrm = sqrt(s);
+
 end

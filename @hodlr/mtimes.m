@@ -19,7 +19,7 @@ end
 
 % Multiplication H * v
 if isfloat(H2)
-    if isscalar(H2)
+    if isscalar(H2) || all(size(H2) == 1)
         if H2 == 0
             H = hodlr('diagonal', zeros(size(H1,1), 1));
             return;
