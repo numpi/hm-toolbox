@@ -1,7 +1,7 @@
 function H = mldivide(H1, H2)
 
 if isa(H2,'hss')
-    if isscalar(H1) && all(size(H2) == 1)
+    if isscalar(H1) && all(size(H1) == 1)
         H = hss_scalar_mul(1 / H1, H2);
     elseif isa(H1, 'hss')
         H = hss_mldivide(H1, H2);
