@@ -35,6 +35,10 @@ z = ifft(b);
 y = C \ z;
 x = d0' .* fft(y);
 
+if isreal(c) && isreal(r) && isreal(b)
+	x = real(x);
+end
+
 end
 
 function z = toep_cauchy_matvec(c, r, omega, v)
