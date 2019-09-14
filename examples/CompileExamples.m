@@ -1,4 +1,4 @@
-function html_file = CompileExamples
+function html_file = CompileExamples(varargin)
 %COMPILEGUIDE Compile the toolbox guide from .m files.
 
 % Create a parpool if available, so we don't skew timings later on
@@ -12,11 +12,16 @@ else
     publish_cmd = @(file) publish(file);
 end
 
-doc_files = { ...
-    'hodlr_linear_system.m', ...
-    'hodlr_lyapunov.m', ...
-    'hss_lyapunov.m'
-    };
+if nargin == 0
+	doc_files = { ...
+		'hodlr_linear_system.m', ...
+		'hodlr_lyapunov.m', ...
+		'hss_lyapunov.m', ...
+		'hm_expm.m'
+		};
+else
+	doc_files = varargin;
+end
 
 main_file = 'examples.m';
 

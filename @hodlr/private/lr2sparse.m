@@ -43,7 +43,7 @@ else
     % Resort indices
     i = permi(i);
     j = permj(j);
-    [~,ind] = sort(j+1i*i,'ComparisonMethod','real');
+    [~,ind] = sort(real(j+1i*i));
     i = i(ind);
     j = j(ind);
     
