@@ -1,21 +1,22 @@
-%% Solving a rank structured linear system
+%% Solving a rank-structured linear system
 %
 % Solve a linear system defined by the sum of a banded matrix with a
 % low-rank one, using the HODLR representation.
 
 n = 16384;
 
-fprintf('\nHODLR_LINEAR_SYSTEM // Solve a linear system with %d unknowns\n\n', n);
-
+%%
 % We construct a banded matrix, and make sure it is invertible by shifting
 % the diagonal entries.
 spA = spdiags(rand(n, 3) + 2 * ones(n, 1) * [ 0 1 0 ], -1 : 1, n, n);
 bandA = 1; % Bandwidth of A
 
+%%
 % We construct its HODLR representation, and sum a random low-rank matrix
 U = rand(n, 2); V = rand(n, 2);
 A = hodlr('banded', spA, bandA) + hodlr('low-rank', U, V);
 
+%%
 % Construct a random RHS ans solve the linear system
 b = rand(n, 1);
 x = A \ b;
@@ -28,6 +29,7 @@ if exist('timeit')
         timeit(@() A \ b, 1));
 end
 
+%%
 % If more solutions are needed, it might be useful to precompute the LU
 % factorization.
 [L, U] = lu(A);

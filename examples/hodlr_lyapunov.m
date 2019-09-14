@@ -32,11 +32,13 @@ h = 1 / (n + 1);
 
 A = hodlr('banded', spdiags(ones(n, 1) * [ -1, 2, -1 ], -1:1, n, n), 1);
 
-% To build C, instead, we rely on adaptive cross approximation
+%%
+% To build $C$, instead, we rely on adaptive cross approximation
 
 x = linspace(0, 1, n + 2);
 C = hodlr('handle', @(i,j) log(1 + abs(x(j+1) - x(i+1)')), n, n);
 
+%%
 % Let us briefly check that all these matrices have a low-rank structure in
 % their off-diagonal blocks:
 fprintf('hodlrrank(A) = %d, hodlrrank(C) = %d\n', hodlrrank(A), hodlrrank(C));
