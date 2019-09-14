@@ -1,11 +1,6 @@
 function html_file = CompileExamples(varargin)
 %COMPILEGUIDE Compile the toolbox guide from .m files.
 
-% Create a parpool if available, so we don't skew timings later on
-parfor i = 1 : 10
-    % Nothing to do here
-end
-
 if exist('stylesheet.xsl', 'file')
     publish_cmd = @(file) publish(file, 'stylesheet', 'stylesheet.xsl');
 else
@@ -26,7 +21,9 @@ end
 main_file = 'examples.m';
 
 for i = 1 : length(doc_files)
+	fprintf('Publishing file %s ... ', doc_files{i});
     publish_cmd(doc_files{i});
+	fprintf('done\n');
 end
 
 html_file = publish_cmd(main_file);
