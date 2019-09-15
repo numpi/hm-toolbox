@@ -54,7 +54,7 @@ n = 2048; h = 1 / (n - 1);
 % banded constructore in HM-TOOLBOX to obtained an HSS and HODLR
 % representation. 
 
-sA = - (1/h^2) * spdiags(ones(n, 1) * [-1 2 -1], -1:1, n, n);
+sA = -h^2 \ spdiags(ones(n,1) * [-1 2 -1], -1:1, n, n);
 hodlrA = hodlr('banded', sA);
 hssA = hss('banded', sA);
 
@@ -106,7 +106,7 @@ spy(hss_expA);
 
 %% 
 % Note that the ranks have increased, but are still moderate, and indeed
-% the HSS and HODLRE storage are quite effective for this problem. 
+% the HSS and HODLR storage are quite effective for this problem. 
 %
 % Again, we check the residual by comparing with the dense solver. 
 

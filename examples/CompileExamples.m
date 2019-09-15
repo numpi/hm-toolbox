@@ -2,7 +2,8 @@ function html_file = CompileExamples(varargin)
 %COMPILEGUIDE Compile the toolbox guide from .m files.
 
 if exist('stylesheet.xsl', 'file')
-    publish_cmd = @(file) publish(file, 'stylesheet', 'stylesheet.xsl');
+    publish_cmd = @(file) publish(file, 'stylesheet', 'stylesheet.xsl', ...
+		'figureSnapMethod', 'print');
 else
     publish_cmd = @(file) publish(file);
 end
