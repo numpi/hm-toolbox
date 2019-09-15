@@ -48,8 +48,13 @@ fprintf('[Standard D&C HSS solver] relative residual: %e, time: %fs\n', ...
     thss);
 
 %%
-% Let's have a look at the solution
-x = linspace(0, 1, n); mesh(x, x, full(X));
+% Let's have a look at the solution; we reduce the number of points since
+% we do not need to zoom into the details. 
+XX = full(X);
+x = linspace(0, 1, n);
+x = x(1:10:end);
+mesh(x, x, XX(1:10:end,1:10:end));
+
 
 %% Using the sparse solver
 % Since in this case we have a sparse representation of A, we can make use
