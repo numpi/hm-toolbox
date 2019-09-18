@@ -186,6 +186,6 @@ norm(T * x - b)
 %     Values of Matrices with Displacement Structure." SIAM Review 61.2 
 %     (2019): 319-344.
 % 
-% [1] Xia, Jianlin, Yuanzhe Xi, and Ming Gu. "A superfast structured solver 
+% [2] Xia, Jianlin, Yuanzhe Xi, and Ming Gu. "A superfast structured solver 
 %   for Toeplitz linear systems via randomized sampling." SIAM Journal on 
 %   Matrix Analysis and Applications 33.3 (2012): 837-858.
