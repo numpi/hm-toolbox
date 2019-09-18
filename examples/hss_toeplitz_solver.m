@@ -68,13 +68,17 @@ norm(F - U*V.')
 
 %%
 % We can modify the displacement relation to transform the Toeplitz matrix
-% in another matrices that has a particular structure. Let $\Omega_n$
+% in another matricx that has a particular structure. Let $\Omega_n$
 % denote the matrix of the Fourier transform, scaled to be unitary. Then,
 % since $Z_1$ is circulant, $\Omega_n Z_1 \Omega_n^*$ is diagonal, and in
 % particular it has the $n$-th roots of the unity on the diagonal. We call
 % such matrix $D_1$. 
+%
+% Here we use the fact that the Fourier matrix as implemented in MATLAB 
+% can be obtained by properly flipping a Vandermonde matrix with the roots
+% of the unity as nodes. 
 
-Omega = sqrt(n) \ vander(exp(2i * pi / n .* (0:n-1)));
+Omega = sqrt(n) \ rot90(vander(exp(2i*pi/6.*(1:6))), 2);
 D1 = Omega * Z1 * Omega';
 
 %%
@@ -114,6 +118,7 @@ dm1 = exp(1i * pi / n) * d1;
 
 U = [ 1 , 2*r(1) ; zeros(n-1, 1), r(end:-1:2).' + c(2:end) ];
 V = [ conj(c(end:-1:2)) - r(2:end)' , zeros(n-1,1) ; 0 1 ];
+
 %%
 % Multiplying the displacement relation from the left by $\Omega_n$ and
 % from the right by $D_0^* \Omega_n^*$ yields the new relation
