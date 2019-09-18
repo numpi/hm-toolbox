@@ -78,7 +78,7 @@ norm(F - U*V.')
 % can be obtained by properly flipping a Vandermonde matrix with the roots
 % of the unity as nodes. 
 
-Omega = sqrt(n) \ rot90(vander(exp(2i*pi/6.*(1:6))), 2);
+Omega = sqrt(n) \ rot90(vander(exp(2i*pi/n.*(1:n))), 2);
 D1 = Omega * Z1 * Omega';
 
 %%
