@@ -98,6 +98,7 @@ Dm1 = Omega * D0 * Zm1 * D0' * Omega';
 
 plot(real(diag(D1)),  imag(diag(D1)),  'bo', ...
 	 real(diag(Dm1)), imag(diag(Dm1)), 'rx');
+axis([-1 1 -1 1]);
 legend('Eigenvalues of Z1', 'Eigenvalues of Zm1');
 
 
