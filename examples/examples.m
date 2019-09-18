@@ -20,6 +20,8 @@
 %
 % * <hodlr_linear_system.html Solving a linear system> with rank structured
 %      matrix, using the HODLR format.
+% * <hss_toeplitz_solver.html Solving a Toeplitz linear system> shows how
+%     to construct a superfast Toeplitz solver using HSS matrices. 
 
 %% Matrix functions
 % * <hm_expm.html Computing the matrix exponential> showcases
