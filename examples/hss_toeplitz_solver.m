@@ -6,7 +6,7 @@
 % Toeplitz matrices are matrices with constant diagonal elements; they are
 % completely determined by the first column and row, and indeed there is a
 % MATLAB function that generates the full matrix starting by this
-% information. We can generate such matrix by constructing a random column
+% information. We can generate an example by constructing a random column
 % and row as follows:
 
 n = 6;
@@ -17,7 +17,7 @@ c(1) = r(1);
 T = toeplitz(c, r)
 
 %%
-% Note that we have forced the first element of the vectors C and R to be
+% Note that we have forced the first element of the vectors |c| and |r| to be
 % equal, to make sure that matrix is well-defined. Suppose that we want to
 % solve a linear system with a Toeplitz matrix: $Tx = b$. 
 %
@@ -27,7 +27,7 @@ b = randn(n, 1);
 x = T \ b;
 
 %%
-% However, this scales cubically, and given the particular structure of the
+% Unfortunately, this approach scales cubically, and given the particular structure of the
 % matrices it is natural to ask if a more efficient method might be
 % developed. 
 %
@@ -84,7 +84,8 @@ D1 = Omega * Z1 * Omega';
 %%
 % In a similar fashion, if we define $D_0 = \mathrm{diag}(1, \omega_{2n},
 % \ldots, \omega_{2n}^{n-1})$, where $\omega_{2n}$ is $e^{\frac{i\pi}{n}}$,
-% we have the relation $\Omega_n D_0 Z_{-1} D_0^* \Omega_n^* = D_{-1}$, where 
+% we have the relation 
+% $$\Omega_n D_0 Z_{-1} D_0^* \Omega_n^* = D_{-1},$$ where 
 % $D_{-1} = \omega_{2n} D_1$. 
 
 om = exp(1i * pi / n);
@@ -104,7 +105,7 @@ legend('Eigenvalues of Z1', 'Eigenvalues of Zm1');
 %
 % We now exploit the displacement relation to develop a superfast
 % algorithm. To test it, we are going to need a larger example, so we
-% regenerate our data with a larger n, but not too large so we will be able
+% regenerate our data with a larger $n$, but not too large so we will be able
 % to verify our computations. 
 
 n = 4096;
@@ -131,15 +132,15 @@ V = [ conj(c(end:-1:2)) - r(2:end)' , zeros(n-1,1) ; 0 1 ];
 % 
 
 %% 
-% The previous relation tells us that the matrix $C$ has a Cauchy-like
+% The previous relation tells us that the matrix $C$ has a _Cauchy-like_
 % structure; since the coefficients of the displacement equation are 
 % diagonal, we can explicitly write its entries as:
 %
 % $$ 
-%   \displaystyle C_{ij} = \frac{G_i H_j^T}{\omega_{2n}^{2(i-1)} - \omega_{2n}^{2j-1)}}
+%   C_{ij} = \frac{G_i H_j^T}{\omega_{2n}^{2(i-1)} - \omega_{2n}^{2j-1)}}
 % $$
 %
-% It turns out that the off-diagonal blocks of $C$ are Cauchy matrices
+% It turns out that the off-diagonal blocks of $C$ are Cauchy-like matrices
 % involving nodes contained in separated domains, so we expect them to be
 % numerically low-rank [1]. 
 % 
@@ -148,15 +149,16 @@ V = [ conj(c(end:-1:2)) - r(2:end)' , zeros(n-1,1) ; 0 1 ];
 % $C$ and $C^T$ relying on the fast toeplitz product using the FFT, we
 % can use the HSS constructor to build the HSS representation of $C$. 
 %
-% To avoid implementing the matrix-vector product, we can also rely on the
-% HODLR constructor that using Adaptive Cross Approximation only requires
-% the matrix evaluation at an index (i,j). 
+% For simplicity, in this example we also rely on the
+% HODLR constructor that, using Adaptive Cross Approximation, only requires
+% the matrix evaluation at an index $(i,j)$. 
 
 Gh = ifft(U) * sqrt(n);
 Fh = ifft((d0.' * ones(1, 2)) .* V) * sqrt(n);
 
 C = hodlr2hss(hodlr('handle', ...
-	@(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n));
+	@(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), ...
+	n, n));
 
 %% 
 % Now, we can solve the linear system with $T$ by inverting the relation
@@ -168,13 +170,13 @@ x = d0' .* fft(y);
 
 %%
 % As a final test, we check the accuracy of the solution (that should be
-% compared with $\| T \|_2$, which we do not test because it might be
+% compared with $\| T \|_2$, which we do not compute because it might be
 % expensive).
 norm(T * x - b)
 
 %%
 % The algorithm described here is implemented using the randomized
-% constructor in place of ACA in the function TOEPLITZ_SOLVE, which is
+% constructor in place of the Adaptive Cross in the function |toeplitz_solve|, which is
 % included the toolbox. 
 
 %% References
