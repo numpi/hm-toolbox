@@ -2,9 +2,11 @@ function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
 %EK_SYLV Approximate the solution of a Sylvester equation AX + XB + U*V' = 0.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
-%     Sylvester equation in the factored form XU * XV'.
+%     Sylvester equation in the factored form XU * XV'. The integer K is
+%     the maximum number of iteration to perform, and the default tolerance
+%     is 1e-8. 
 %
-% [XU, VA] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA
+% [XU, XV] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA
 %     and VB, and the optional parameters TOL and DEBUG control the
 %     stopping criterion and the debugging during the iteration.
 %

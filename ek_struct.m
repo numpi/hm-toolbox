@@ -75,6 +75,48 @@ elseif isa(A, 'hss')
             'isreal', S.isreal, ...
             'nrm', S.nrm);
     end
+else
+    % In this case we are probably dealing with a dense matrix, so we try
+    % Cholesky first in the symmetric case, and otherwise resort to a
+    % standard LU factorization
+    if exist('cholesky', 'var') && cholesky
+        [R, g, pA] = chol(A);
+        
+        if (g ~= 0)
+            % warning('Matrix is not posdef, resorting to LU');
+            [S, ST] = ek_struct(A, false);
+            return;
+        end
+        
+        S = struct(...
+            'solve', @(nu, mu, x) sparse_solve(nu, mu, R', R, pA', pA, x), ...
+            'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
+            'isreal', isreal(A), ...
+            'nrm', normest(A, 1e-2));
+        ST = S;
+        
+    else
+        % We use this syntax to be able to call sparse_solve even if this
+        % is the case of a generic matrix. 
+        [LA, UA, pA] = lu(A);
+        qA = 1; % This constructs an equivalent of the identity matrix 
+                % in practice, without the need to allocate it. 
+        
+        S = struct(...
+            'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x), ...
+            'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
+            'isreal', isreal(A), ...
+            'nrm', normest(A, 1e-2));
+        
+        if nargout >= 2
+            ST = struct(...
+                'solve', @(nu, mu, x) sparse_solve(nu, mu, UA', LA', pA', qA', x), ...
+                'multiply', @(rho, eta, x) rho * A' * x - eta * x, ...
+                'isreal', S.isreal, ...
+                'nrm', S.nrm);
+        end
+    end
+    
 end
 
 end
