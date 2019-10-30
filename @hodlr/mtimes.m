@@ -21,7 +21,9 @@ end
 if isfloat(H2)
     if isscalar(H2) || all(size(H2) == 1)
         if H2 == 0
-            H = hodlr('diagonal', zeros(size(H1,1), 1));
+	    [m, n] = size(H1);
+	    [r, c] = cluster(H1);
+            H = hodlr('zeros', m, n, 'cluster', r, c);
             return;
         end
         
