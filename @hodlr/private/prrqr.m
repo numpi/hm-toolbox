@@ -1,5 +1,5 @@
-function [Q, R, p] = rrqr(A, tol, debug)
-%RRQR Rank-Revealing QR factorization with early termination. 
+function [Q, R, p] = prrqr(A, tol, debug)
+%PRRQR Rank-Revealing QR factorization with early termination. 
 %
 % [Q, R, P] = RRQR(A, TOL) computes a rank-revealing QR factorization of
 %     the matrix A, with early termination in case A is low-rank up to some
