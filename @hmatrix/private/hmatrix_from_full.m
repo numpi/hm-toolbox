@@ -8,7 +8,7 @@ function H = hmatrix_from_full_rec(H, A)
 		if H.admissible
 			[H.U, H.V] = compress_matrix(A);
 		else
-			H.F = A;
+			H.F = full(A);
 		end
 	else
 		[m1, n1] = size(H.A11);

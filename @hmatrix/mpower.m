@@ -7,10 +7,6 @@ if ~isscalar(p) || floor(p) ~= p
     error('Only integer powers are supported');
 end
 
-if ~check_cluster_equality(H)
-    error('A^p is only supported for square matrices with square diagonal blocks');
-end
-
 if p < 0
     H = inv(H)^(-p);
     return;
