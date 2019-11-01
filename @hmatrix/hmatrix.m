@@ -29,6 +29,9 @@ classdef hmatrix
                         obj = hmatrix_from_aca(varargin{2:4});          
                     case 'eye'
                         obj = hmatrix_eye(varargin{2});
+                    case 'banded'
+                        % At the moment we just rely on the Lanczos constructor
+                        obj = hmatrix(varargin{2});
                     otherwise
                         error('Unsupported constructor');
                 end
