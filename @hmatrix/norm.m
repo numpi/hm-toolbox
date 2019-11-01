@@ -11,8 +11,8 @@ if ischar(nrm_type) && strcmp(nrm_type, 'fro')
 end
 
 n = size(H, 2);
-
-nrm = normest_Afun(@(x) H * x, @(x) H' * x, n); 
+Ht = H';
+nrm = normest_Afun(@(x) H * x, @(x) Ht * x, n); 
 
 end
 

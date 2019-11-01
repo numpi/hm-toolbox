@@ -5,8 +5,8 @@ Ht = H;
 
 if is_leafnode(H)
     if H.admissible
-	H.U = conj(U);
-	H.V = conj(V);
+	H.U = conj(H.U);
+	H.V = conj(H.V);
     else
     	Ht.F = conj(H.F);
     end
