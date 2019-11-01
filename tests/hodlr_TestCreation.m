@@ -30,12 +30,12 @@ for n = [ 100, 1000 ]
 
 	H = hodlr(A);
 
-	CheckTestResult(norm(A - full(H)), '<', norm(A) * hodlroption('threshold'), ...
+	CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for Cauchy A built from dense');
     
     H = hodlr('cauchy', -y, x);
     
-    CheckTestResult(norm(A - full(H)), '<', log2(n) * norm(A) * hodlroption('threshold'), ...
+    CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for Cauchy A built with the Cauchy constructor');
 end
 
