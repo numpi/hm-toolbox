@@ -19,7 +19,7 @@ function H = hmatrix_mtimes(H1, H2)
 			H.U = H1 * H2.U;
 			H.V = H2.V;
 		else
-			H.F = H1.F * H2.F;
+			H.F = full(H1) * full(H2);
 		end
 	else
 		H.A11 = H1.A11 * H2.A11 + H1.A12 * H2.A21;
