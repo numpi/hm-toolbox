@@ -9,7 +9,7 @@ Q = eye(m);
 colnrm = arrayfun(@(i) norm(A(:,i)), 1 : n);
 p = 1 : n;
 
-for j = 1 : n
+for j = 1 : min(m, n)
 	[nrm, jj] = max(colnrm(j:end));
 	jj = j + jj - 1;
 	
