@@ -97,7 +97,6 @@ CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * hodlroption('threshold
 
 % Generate random clustering
 cluster = cumsum(randi(32, 1, 16));
-
 n = cluster(end);
 
 A = spdiags(randn(n, 1) * rand(1, 10), -4:5, n, n);
