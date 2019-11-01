@@ -39,12 +39,12 @@ for j = 1 : min(m, n - 1)
 			sqrt(mx), sqrt(v(1)), sqrt(v(1)) * tol * sqrt(n));
 	end
 	
-	if sqrt(mx) < tol * sqrt(v(1)) * sqrt(min(m, n))
+	if sqrt(mx) < tol * sqrt(v(1))
 		R = A(1:j-1, :);
 
 		Q = eye(m, j-1);
-		for jj = j-1 : -1 : 1
-			Q(jj:end,:) = Q(jj:end,:) - Pb{jj} * Pu{jj} * (Pu{jj}' * Q(jj:end,:));
+        for jj = j-1 : -1 : 1
+            Q(jj:end,:) = Q(jj:end,:) - Pb{jj} * Pu{jj} * (Pu{jj}' * Q(jj:end,:));
         end
         
         if nargout == 2
