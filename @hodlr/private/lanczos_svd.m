@@ -23,6 +23,22 @@ nrm_converged = false;
 while res > tol
     it = it + 1;
     
+    if it > min(m,n) / 2
+        if m < n
+            A = Afun(eye(m), 'transp');
+        else
+            A = Afun(eye(n), 'notransp');
+        end
+        
+        [U, S, V] = svd(A, 'econ');
+        rk = sum(diag(S) > tol * S(1,1));
+
+        U = U(:,1:rk);
+        V = V(:,1:rk);
+        S = S(1:rk, 1:rk);
+        return;
+    end
+    
     w = Afun(V(:,end), 'notransp');
     
     % Reorthogonalize w against U
@@ -70,6 +86,13 @@ if length(alfa) == length(beta)
 else
     [Ul, S, Vl] = svd([ diag(alfa(1:end-1)), zeros(length(beta),1)  ] + ...
                       [ zeros(length(beta), 1), diag(beta) ], 'econ');
+end
+
+if isempty(S)
+    U = zeros(m, 0);
+    S = [];
+    V = zeros(n, 0);
+    return;
 end
 
 % Possibly perform recompression
