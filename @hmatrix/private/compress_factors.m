@@ -12,7 +12,7 @@ else
     
     [U,S,V] = svd(RU * RV');
     
-    if ~exist('nrm', 'var')
+    if ~exist('nrm', 'var') || isempty(nrm)
         nrm = S(1,1);
     end
     
