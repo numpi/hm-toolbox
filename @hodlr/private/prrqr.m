@@ -39,7 +39,7 @@ for j = 1 : min(m, n - 1)
 			sqrt(mx), sqrt(v(1)), sqrt(v(1)) * tol * sqrt(n));
 	end
 	
-	if sqrt(mx) < tol * sqrt(v(1))
+	if sqrt(mx) < tol * sqrt(v(1)) / sqrt(j)
 		R = A(1:j-1, :);
 
 		Q = eye(m, j-1);
