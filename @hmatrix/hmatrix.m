@@ -32,6 +32,8 @@ classdef hmatrix
                     case 'banded'
                         % At the moment we just rely on the Lanczos constructor
                         obj = hmatrix(varargin{2});
+                    case 'low-rank'
+                        obj = hmatrix_from_low_rank(varargin{2}, varargin{3});
                     otherwise
                         error('Unsupported constructor');
                 end

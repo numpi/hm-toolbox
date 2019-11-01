@@ -27,5 +27,4 @@ else
     tH.A12.U = zeros(m1, 0);
     tH.A12.V = zeros(n2, 0);
     tH.A12.admissible = true;    
-    
 end
