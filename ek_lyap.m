@@ -8,8 +8,11 @@ function [Xu, VA, D, it] = ek_lyap(A, u, k, tol, debug, varargin)
 %     the optional parameters TOL and DEBUG control the stopping criterion
 %     and the debugging during the iteration.
 
-% [XU, VA, D, it] = EK_LYAP(A, U, K, TOL, DEBUG, 'kernel', K) solves A X + X A' + u * K * u' = 0,
-%     where K is a symmetric matrix. It also returns the K D such that
+% [XU, VA, D, it] = EK_LYAP(A, U, K, TOL, DEBUG, 'kernel', K) solves 
+%
+%        A X + X A' + u * K * u' = 0,
+%
+%     where K is a symmetric matrix. It also returns the D such that
 %     X = XU * D * XU' and the number of iterations needed for convergence.
 
 if ~exist('debug', 'var')
@@ -17,8 +20,12 @@ if ~exist('debug', 'var')
 end
 
 p = inputParser;
-addOptional(p, 'nrmtype', 2, @(x) (isnumeric(x) && x == 2) || strcmp(x, 'fro'));
+
+addOptional(p, 'nrmtype', 2, ...
+    @(x) (isnumeric(x) && x == 2) || strcmp(x, 'fro'));
+
 addParameter(p, 'kernel', 1);
+
 parse(p, varargin{:});
 
 K = p.Results.kernel;

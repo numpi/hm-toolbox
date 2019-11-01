@@ -68,7 +68,7 @@ norm(F - U*V.')
 
 %%
 % We can modify the displacement relation to transform the Toeplitz matrix
-% in another matricx that has a particular structure. Let $\Omega_n$
+% in another matrix that has a particular structure. Let $\Omega_n$
 % denote the matrix of the Fourier transform, scaled to be unitary. Then,
 % since $Z_1$ is circulant, $\Omega_n Z_1 \Omega_n^*$ is diagonal, and in
 % particular it has the $n$-th roots of the unity on the diagonal. We call
@@ -85,7 +85,9 @@ D1 = Omega * Z1 * Omega';
 % In a similar fashion, if we define $D_0 = \mathrm{diag}(1, \omega_{2n},
 % \ldots, \omega_{2n}^{n-1})$, where $\omega_{2n}$ is $e^{\frac{i\pi}{n}}$,
 % we have the relation 
-% $$\Omega_n D_0 Z_{-1} D_0^* \Omega_n^* = D_{-1},$$ where 
+% $$
+%   \Omega_n D_0 Z_{-1} D_0^* \Omega_n^* = D_{-1},
+% $$ where 
 % $D_{-1} = \omega_{2n} D_1$. 
 
 om = exp(1i * pi / n);
@@ -138,7 +140,7 @@ V = [ conj(c(end:-1:2)) - r(2:end)' , zeros(n-1,1) ; 0 1 ];
 % diagonal, we can explicitly write its entries as:
 %
 % $$ 
-%   C_{ij} = \frac{G_i H_j^T}{\omega_{2n}^{2(i-1)} - \omega_{2n}^{2j-1)}}
+%   C_{ij} = \frac{G_i H_j^T}{\omega_{2n}^{2(i-1)} - \omega_{2n}^{(2j-1)}}
 % $$
 %
 % It turns out that the off-diagonal blocks of $C$ are Cauchy-like matrices
