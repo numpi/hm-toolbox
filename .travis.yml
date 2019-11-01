@@ -12,5 +12,9 @@ notifications:
     - leo@robol.it
     - stefano.massei@epfl.ch
 
-script: 
-  - octave --no-gui --eval "pkg load control; addpath tests; RunAllTests;"
+jobs:
+  include:
+    - stage: unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'qr'); hssoption('compression', 'qr'); RunAllTests;"
+    - stage_ unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'svd'); hssoption('compression', 'svd'); RunAllTests;"
