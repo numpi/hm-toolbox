@@ -17,15 +17,18 @@ classdef hmatrix
     
     methods
         function obj = hmatrix(varargin)
-	    obj.admissible = false;
+            obj.admissible = false;
+            
             if nargin == 0
                 return;
-            end
+            end            
             
             if ischar(varargin{1})
                 switch varargin{1}
                     case 'handle'
                         obj = hmatrix_from_aca(varargin{2:4});          
+                    case 'eye'
+                        obj = hmatrix_eye(varargin{2});
                     otherwise
                         error('Unsupported constructor');
                 end
