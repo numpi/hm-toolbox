@@ -66,7 +66,7 @@ for n = [ 100, 1000 ]
     
     H = hss('cauchy', -y, x);
     
-    CheckTestResult(norm(A - full(H)), '<', log2(n) * norm(A) * hssoption('threshold'), ...
+    CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * hssoption('threshold'), ...
 		'Generation of an HSS representation for Cauchy A built with the Cauchy constructor');
 end
 

@@ -14,7 +14,15 @@ notifications:
 
 jobs:
   include:
-    - stage: unit tests
-      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'qr'); hssoption('compression', 'qr'); RunAllTests;"
-    - stage: unit tests
-      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'svd'); hssoption('compression', 'svd'); RunAllTests;"
+    - name: "Unit Tests / HODLR / QR compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'qr'); hodlr_RunAllTests;"
+    - name: "Unit Tests / HODLR / SVD compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hodlroption('compression', 'svd'); hodlr_RunAllTests;"
+    - name: "Unit Tests / HSS / QR compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hssoption('compression', 'qr'); hss_RunAllTests;"
+    - name: "Unit Tests / HSS / SVD compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; addpath tests; hssoption('compression', 'svd'); hss_RunAllTests;"
