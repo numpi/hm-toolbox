@@ -1,9 +1,11 @@
-function H = hmatrix_from_low_rank(U, V)
+function H = hmatrix_from_low_rank(H, U, V)
 
 m = size(U, 1);
 n = size(V, 1);
 
-H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
+if isempty(H)
+    H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
+end
 
 H = hmatrix_low_rank_ric(H, U, V);
 

@@ -1,8 +1,13 @@
-function H = hmatrix_from_full(A)
-	[m, n] = size(A);
+function H = hmatrix_from_full(H, A)
+[m, n] = size(A);
+
+if isempty(H)
 	H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
-	H = hmatrix_from_full_rec(H, A);
 end
+
+H = hmatrix_from_full_rec(H, A);
+end
+
 function H = hmatrix_from_full_rec(H, A)
 	if is_leafnode(H)
 		if H.admissible

@@ -1,7 +1,13 @@
-function H = hmatrix_from_aca(Afun, m, n)
+function H = hmatrix_from_aca(H, Afun, m, n)
+
+if isempty(H)
 	H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
-	H = hmatrix_from_aca_rec(H, Afun);
 end
+
+H = hmatrix_from_aca_rec(H, Afun);
+
+end
+
 function H = hmatrix_from_aca_rec(H, Afun)
 	[m, n] = size(H);
 	if is_leafnode(H)

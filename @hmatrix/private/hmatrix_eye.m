@@ -1,7 +1,9 @@
-function H = hmatrix_eye(n)
+function H = hmatrix_eye(H, n)
 %HMATRIX_EYE Identity matrix
 
-H = hmatrix_build_default_tree(n, n, hmatrixoption('block-size'));
+if isempty(H)
+    H = hmatrix_build_default_tree(n, n, hmatrixoption('block-size'));
+end
 
 H = hmatrix_eye_ric(H);
 
