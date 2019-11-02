@@ -5,7 +5,7 @@ if isfloat(H2) % H * v
         if is_leafnode(H1)
             if H1.admissible
                 H.U = H1.U * H2;
-                H.V = H2.V;
+                H.V = H1.V;
             else	
                 H.F = H1.F * H2;
             end
