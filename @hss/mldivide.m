@@ -10,17 +10,17 @@ if isa(H2,'hss')
     end
 else
     if size(H1, 1) <= hssoption('block-size') % We might remove this case, not sure is needed
-            H = full(H1) \ H2;
-            return;
-    end    
+        H = full(H1) \ H2;
+        return;
+    end
     if isscalar(H2) && all(size(H2) == 1)
         H = inv(H1) * H2;
     elseif isa(H2, 'hodlr')
-        H = hss2hodlr(H1)\H2;  
-    else   
-        H = hss_ulv_solve(H1, H2);     
+        H = hss2hodlr(H1)\H2;
+    else
+        H = hss_ulv_solve(H1, H2);
     end
-
+    
 end
 end
 

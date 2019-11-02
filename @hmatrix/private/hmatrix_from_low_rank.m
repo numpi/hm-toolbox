@@ -14,7 +14,7 @@ end
 function H = hmatrix_low_rank_ric(H, U, V)
 
 if is_leafnode(H)
-    if H.admissible        
+    if H.admissible
         H.U = U;
         H.V = V;
     else

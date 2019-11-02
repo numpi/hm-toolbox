@@ -37,12 +37,12 @@ if B.leafnode
 else
     mmid = B.ml;
     nmid = B.nl;
-
+    
     B.B12 = S;
     B.B21 = S;
     B.Rl = eye(size(S,1)); B.Rr = eye(size(S,1));
     B.Wl = eye(size(S,1)); B.Wr = eye(size(S,1));
-
+    
     B.A11 = hss_build_low_rank_ric(B.A11, U(1:mmid,:) , V(1:nmid,:), S);
     B.A22 = hss_build_low_rank_ric(B.A22, U(mmid+1:end,:), V(nmid+1:end,:), S);
 end

@@ -28,9 +28,9 @@ if ~exist('nrm_type', 'var')
 end
 
 if ~isstruct(A)
-        AA = rk_struct(A);
+    AA = rk_struct(A);
 else
-        AA = A;
+    AA = A;
 end
 
 if ~isstruct(B)
@@ -42,7 +42,7 @@ nrmA = AA.nrm;
 nrmB = BB.nrm;
 
 if size(poles, 1) == 1
-	poles = [poles; poles];
+    poles = [poles; poles];
 end
 
 % Dimension of the space
@@ -68,7 +68,7 @@ while max(sa-bsa, sb-bsb) < k
     % fprintf('Using poles: (%e, %e)\n', poles(1,counter), poles(2,counter));
     next_inf = counter + find(min(poles(:, counter:end), [], 1) == inf) - 1;
     if isempty(next_inf)
-	    next_inf = size(poles, 2);
+        next_inf = size(poles, 2);
     else
         next_inf = next_inf(1);
     end
@@ -117,7 +117,7 @@ end
 
 [UU,SS,VV] = svd(Y);
 
-rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false); 
+rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));

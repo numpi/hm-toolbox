@@ -34,9 +34,9 @@ else
     if B.ml ~= B.nl
         error('Diagonal constructor is only supported for square matrices');
     end
-
+    
     mmid = B.ml;
-
+    
     B.A11 = hss_build_diagonal_ric(B.A11, v(1:mmid));
     B.A22 = hss_build_diagonal_ric(B.A22, v(mmid+1:end));
 end

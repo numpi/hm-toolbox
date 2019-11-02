@@ -22,8 +22,8 @@ H = hss('low-rank', U, V)';
 CheckTestResult(norm(V * U' - full(H)), '<', norm(U) * norm(V) * tol, ...
     'Transposition for low-rank HSS');
 
-A = randn(n, n); hssA = hss(A); 
-B = randn(n, n); hssB = hss(B); hodlrB = hodlr(B); 
+A = randn(n, n); hssA = hss(A);
+B = randn(n, n); hssB = hss(B); hodlrB = hodlr(B);
 H = hss(A) + hss(B);
 CheckTestResult(norm(A + B - full(H)), '<', norm(A) * tol, ...
     'Sum of the HSS representation of unstructured A and unstructured B');
@@ -133,8 +133,8 @@ H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the HSS representation of random hss A and  B');
 
-A = randn(n, n); hssA = hss(A); 
-B = randn(n, n); hssB = hss(B); hodlrB = hodlr(B); 
+A = randn(n, n); hssA = hss(A);
+B = randn(n, n); hssB = hss(B); hodlrB = hodlr(B);
 H = hssA .* B;
 CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isfloat(H), ...
     'Hadamard product of the HSS representation of  A and dense B');

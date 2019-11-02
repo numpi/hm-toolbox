@@ -27,7 +27,7 @@ function X = lyap(varargin)
 %     arXiv preprint arXiv:1712.04349.
 %
 % [3] Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured
-%     Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and 
+%     Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and
 %     Applications, 39(4), 1564-1590.
 
 N = 64;

@@ -19,7 +19,7 @@ if n <= nb,
     if (m == n)
         beta(end) = 0;
         Y(m,n)=1;
-        n1  = n-1; 
+        n1  = n-1;
     else
         n1 = n;
     end
@@ -31,22 +31,22 @@ if n <= nb,
     end
     T = zeros(n);
     for j = 1:n,
-       T(1:j-1,j) = -beta(j)*T(1:j-1,1:j-1)*(Y(:,1:j-1)'*Y(:,j));
-       T(j,j) = beta(j);
+        T(1:j-1,j) = -beta(j)*T(1:j-1,1:j-1)*(Y(:,1:j-1)'*Y(:,j));
+        T(j,j) = beta(j);
     end
 else
     % Compute QR recursively a la Elmroth and Gustavson.
-    n1 = floor(n/2); 
+    n1 = floor(n/2);
     j1 = n1+1;
     
     [Y1, T1, A(:, 1:n1)] = qrWY( A(:, 1:n1) );
     x = Y1*T1';
     A(:, j1:n) = A(:, j1:n) - (x*(Y1'*A(1:m, j1:n)));
-   
+    
     [Y2, T2, A(j1:m,j1:n)] = qrWY( A(j1:m,j1:n) );
-    Y2 = [zeros(size(Y1,1)-size(Y2,1),size(Y2,2));Y2]; 
-        
-    Y = [Y1,Y2];   
+    Y2 = [zeros(size(Y1,1)-size(Y2,1),size(Y2,2));Y2];
+    
+    Y = [Y1,Y2];
     m2 = size(T1,2);
     n2= size(T2,1);
     T3 = -x'*(Y2*T2);

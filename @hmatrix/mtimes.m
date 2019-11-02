@@ -6,7 +6,7 @@ if isfloat(H2) % H * v
             if H1.admissible
                 H.U = H1.U * H2;
                 H.V = H1.V;
-            else	
+            else
                 H.F = H1.F * H2;
             end
         else
@@ -21,9 +21,9 @@ if isfloat(H2) % H * v
     
     return;
 elseif isfloat(H1) % v * H
-	H = (H2' * H1')';
+    H = (H2' * H1')';
 elseif isa(H1, 'hmatrix') && isa(H2, 'hmatrix') % Multiplication of two matrices
-	H = hmatrix_mtimes(H1, H2);
+    H = hmatrix_mtimes(H1, H2);
 end
 
 end

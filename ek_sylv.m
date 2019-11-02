@@ -4,7 +4,7 @@ function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
 %     Sylvester equation in the factored form XU * XV'. The integer K is
 %     the maximum number of iteration to perform, and the default tolerance
-%     is 1e-8. 
+%     is 1e-8.
 %
 % [XU, XV] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA
 %     and VB, and the optional parameters TOL and DEBUG control the
@@ -109,7 +109,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
     As = HA / KA(1:end-bsa,:);
     Bs = HB / KB(1:end-bsb,:);
     Cs = zeros(size(As, 1), size(Bs, 1));
-
+    
     if ~exist('Cprojected', 'var')
         Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
     end
@@ -135,7 +135,7 @@ end
 [UU,SS,VV] = svd(Y);
 
 switch nrmtype
-    case 2        
+    case 2
         s = diag(SS);
         rk = sum( arrayfun(@(ss) tol(ss, s(1)), s) == 1);
     case 'fro'

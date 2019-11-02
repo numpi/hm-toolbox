@@ -1,18 +1,18 @@
 function [p, q] = cluster(H)
-%CLUSTER Obtain the partitioning of the indices at the lowest level. 
+%CLUSTER Obtain the partitioning of the indices at the lowest level.
 %
 % [R, C] = CLUSTER(H) obtains a description of the clustering of the matrix
 %     H as an array of indices [P(1), ..., P(L)] such that the partitioning
-%     of the matrix at the lowest level is: 
+%     of the matrix at the lowest level is:
 %
 %             (1, P(1))    (P(1), P(2))   ...   (P(L-1), P(L))
 %
 %     The vector R encodes the partitioning of the rows, while C encodes
-%     the one of the columns. 
+%     the one of the columns.
 
 if isempty(H.leafnode) && isempty(H.topnode)
-	p = 0;
-	q = 0;
+    p = 0;
+    q = 0;
 elseif H.leafnode
     p = size(H, 1);
     q = size(H, 2);

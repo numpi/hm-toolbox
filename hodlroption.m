@@ -13,7 +13,7 @@ global hodlr_threshold
 global hodlr_compression
 
 if isempty(hodlr_compression)
-	hodlr_compression = 'qr';
+    hodlr_compression = 'qr';
 end
 
 if isempty(hodlr_block_size)
@@ -34,8 +34,8 @@ if ~exist('value', 'var')
             opt = hodlr_block_size;
         case 'threshold'
             opt = hodlr_threshold;
-		case 'compression'
-			opt = hodlr_compression;
+        case 'compression'
+            opt = hodlr_compression;
         otherwise
             error('Unsupported option specified');
     end
@@ -52,14 +52,14 @@ else
                 error('threshold has to be positive');
             else
                 hodlr_threshold = max(eps, value);
-			end
-		case 'compression'
-			if ~strcmp(value, 'qr') && ~strcmp(value, 'svd') && ...
-					~strcmp(value, 'lanczos')
-				error('Invalid value for dense-compression');
-			else
-				hodlr_compression = value;
-			end
+            end
+        case 'compression'
+            if ~strcmp(value, 'qr') && ~strcmp(value, 'svd') && ...
+                    ~strcmp(value, 'lanczos')
+                error('Invalid value for dense-compression');
+            else
+                hodlr_compression = value;
+            end
         otherwise
             error('Unsupported option specified');
     end

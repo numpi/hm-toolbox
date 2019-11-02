@@ -12,7 +12,7 @@ if is_leafnode(H)
     else
         tH.F = triu(H.F);
     end
-else    
+else
     tH.A12 = H.A12;
     tH.A11 = triu(H.A11);
     tH.A22 = triu(H.A22);
@@ -20,11 +20,11 @@ else
     % Zero the upper off-diagonal block
     [~, n1] = size(H.A11);
     [m2, ~] = size(H.A22);
-
+    
     % Zero off-diagonal blocks
     tH.A21 = hmatrix;
     tH.A21.sz = [m2 n1];
     tH.A21.U = zeros(m2, 0);
     tH.A21.V = zeros(n1, 0);
-    tH.A21.admissible = true;        
+    tH.A21.admissible = true;
 end

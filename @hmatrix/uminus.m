@@ -2,11 +2,11 @@ function mH = uminus(H)
 %UMINUS Change the sign of a HMATRIX Matrix
 mH = H;
 if is_leafnode(H)
-	if H.admissible
-		mH.U = -H.U;
-        else
-    		mH.F = -H.F;
-	end
+    if H.admissible
+        mH.U = -H.U;
+    else
+        mH.F = -H.F;
+    end
 else
     mH.A11 = -H.A11;
     mH.A12 = -H.A12;

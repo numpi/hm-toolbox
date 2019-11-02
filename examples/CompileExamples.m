@@ -3,29 +3,29 @@ function html_file = CompileExamples(varargin)
 
 if exist('stylesheet.xsl', 'file')
     publish_cmd = @(file) publish(file, 'stylesheet', 'stylesheet.xsl', ...
-		'figureSnapMethod', 'print');
+        'figureSnapMethod', 'print');
 else
     publish_cmd = @(file) publish(file);
 end
 
 if nargin == 0
-	doc_files = { ...
-		'hodlr_linear_system.m', ...
-		'hodlr_lyapunov.m', ...
-		'hss_lyapunov.m', ...
-		'hss_toeplitz_solver.m', ...
-		'hm_expm.m'
-		};
+    doc_files = { ...
+        'hodlr_linear_system.m', ...
+        'hodlr_lyapunov.m', ...
+        'hss_lyapunov.m', ...
+        'hss_toeplitz_solver.m', ...
+        'hm_expm.m'
+        };
 else
-	doc_files = varargin;
+    doc_files = varargin;
 end
 
 main_file = 'examples.m';
 
 for i = 1 : length(doc_files)
-	fprintf('Publishing file %s ... ', doc_files{i});
+    fprintf('Publishing file %s ... ', doc_files{i});
     publish_cmd(doc_files{i});
-	fprintf('done\n');
+    fprintf('done\n');
 end
 
 html_file = publish_cmd(main_file);

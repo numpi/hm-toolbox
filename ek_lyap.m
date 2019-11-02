@@ -8,7 +8,7 @@ function [Xu, VA, D, it] = ek_lyap(A, u, k, tol, debug, varargin)
 %     the optional parameters TOL and DEBUG control the stopping criterion
 %     and the debugging during the iteration.
 
-% [XU, VA, D, it] = EK_LYAP(A, U, K, TOL, DEBUG, 'kernel', K) solves 
+% [XU, VA, D, it] = EK_LYAP(A, U, K, TOL, DEBUG, 'kernel', K) solves
 %
 %        A X + X A' + u * K * u' = 0,
 %
@@ -92,7 +92,7 @@ while sa - 2*bsa < k
         
         return;
     end
-
+    
     if ~exist('VA', 'var')
         [VA, KA, HA, params] = ek_krylov(AA, u);
     else
@@ -134,7 +134,7 @@ end
 [QQ, DD] = eig(.5 * (Y+ Y'));
 
 switch nrmtype
-    case 2        
+    case 2
         s = sort(abs(diag(DD)));
         rk = sum( arrayfun(@(ss) tol(ss, s(end)), s) == 1 );
     case 'fro'

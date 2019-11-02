@@ -4,8 +4,8 @@ if ~exist('compress', 'var')
 end
 C = hss_hadamard_mul_ric(A,B);
 if compress
-	tol = hssoption('threshold');
-	C = hss_compress(C,tol);
+    tol = hssoption('threshold');
+    C = hss_compress(C,tol);
 end
 
 end
