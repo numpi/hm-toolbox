@@ -118,7 +118,7 @@ classdef hmatrix
                         obj = hmatrix_eye(H, varargin{2});
                     case 'banded'
                         % At the moment we just rely on the Lanczos constructor
-                        obj = hmatrix(H, varargin{2});
+                        obj = hmatrix_from_full(H, varargin{2});
                     case 'low-rank'
                         obj = hmatrix_from_low_rank(H, varargin{2}, varargin{3});
                     otherwise

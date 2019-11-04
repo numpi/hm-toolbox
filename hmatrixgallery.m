@@ -1,5 +1,5 @@
-function varargout = hodlrgallery(name, varargin)
-%HODLRGALLERY Generate examples of H-matrices.
+function varargout = hmatrixgallery(name, varargin)
+%HMATRIXGALLERY Generate examples of H-matrices.
 %
 % H = HMATRIXGALLERY('laplacian', n) generates a n x n discretization of the
 % Laplacian operator on [-1, 1] using a grid of n+1 points, assuming

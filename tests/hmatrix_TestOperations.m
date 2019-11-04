@@ -56,12 +56,9 @@ CheckTestResult(norm(U*V' + W*Z' - full(H)), '<', (norm(U*V') + norm(W*Z')) * to
 
 A = randn(n, n); hmatrixA = hmatrix(A);
 B = randn(n, n); hmatrixB = hmatrix(B);
-H = hmatrix(A) * hmatrix(B);
+H = hmatrixA * hmatrixB;
 CheckTestResult(norm(A * B - full(H)), '<', norm(A) * norm(B) * tol, ...
     'Product of the hmatrix representation of unstructured A and unstructured B');
-
-
-
 
 B = tril(triu(randn(n), -3),4);
 H = hmatrix(A) * hmatrix('banded', B, 3, 4);
@@ -100,13 +97,6 @@ B = hmatrixgallery('rand', n, 10);
 H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the hmatrix representation of random hmatrix A and  B');
-
-A = randn(n, n); hmatrixA = hmatrix(A);
-B = randn(n, n); hmatrixB = hmatrix(B);
-
-
-
-
 
 A = randn(n, n); hmatrixA = hmatrix(A);
 CheckTestResult(norm(tril(A) - full(tril(hmatrixA))), '<', norm(A) * tol, ...
