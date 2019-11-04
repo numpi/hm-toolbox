@@ -30,13 +30,13 @@ end
 
 if C.leafnode == 1
     C.D = A.D .* B.D;
-    C.U = [];
-    C.V = [];
-    for j = 1:size(A.U,2)  % Is there a better way?
-        C.U = [C.U, diag(A.U(:,j)) * B.U];
-    end
-    for j = 1:size(A.V,2)  % Is there a better way?
-        C.V = [C.V, diag(A.V(:,j)) * B.V];
+
+    C.U = zeros(size(A.U, 1), size(A.U, 2) * size(B.U, 2));
+    C.V = zeros(size(A.V, 1), size(A.V, 2) * size(B.V, 2));
+    k = size(B.U, 2);
+    for j = 1 : size(A.U,2)
+        C.U(:,(j-1)*k+1:j*k) = A.U(:,j) .* B.U;
+        C.V(:,(j-1)*k+1:j*k) = A.V(:,j) .* B.V;
     end
 else
     C.B12 = kron(A.B12, B.B12);

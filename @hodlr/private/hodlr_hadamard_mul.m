@@ -20,18 +20,23 @@ else
             size(H1.V12, 1) ~= size(H2.V12, 1) || size(H2.V21, 1) ~= size(H2.V21, 1)
         error('HODLR_HADAMARD_MUL:: the two hodlr matrices have not compatible partitioning')
     end
-    H.U12 = [];
-    H.V12 = [];
-    for j = 1:size(H1.U12,2)
-        H.U12 = [H.U12, diag(H1.U12(:,j)) * H2.U12];
-        H.V12 = [H.V12, diag(H1.V12(:,j)) * H2.V12];
+
+    H.U12 = zeros(size(H1.U12, 1), size(H1.U12, 2) * size(H2.U12, 2));
+    H.V12 = zeros(size(H1.V12, 1), size(H1.V12, 2) * size(H2.V12, 2));
+    k = size(H2.U12, 2);
+    for j = 1 : size(H1.U12,2)
+        H.U12(:,(j-1)*k+1:j*k) = H1.U12(:,j) .* H2.U12;
+        H.V12(:,(j-1)*k+1:j*k) = H1.V12(:,j) .* H2.V12;
     end
-    H.U21 = [];
-    H.V21 = [];
-    for j = 1:size(H1.U21,2)
-        H.U21 = [H.U21, diag(H1.U21(:,j)) * H2.U21];
-        H.V21 = [H.V21, diag(H1.V21(:,j)) * H2.V21];
+
+    H.U21 = zeros(size(H1.U21, 1), size(H1.U21, 2) * size(H2.U21, 2));
+    H.V21 = zeros(size(H1.V21, 1), size(H1.V21, 2) * size(H2.V21, 2));
+    k = size(H2.U21, 2);
+    for j = 1 : size(H1.U21,2)
+        H.U21(:,(j-1)*k+1:j*k) = H1.U21(:,j) .* H2.U21;
+        H.V21(:,(j-1)*k+1:j*k) = H1.V21(:,j) .* H2.V21;
     end
+
     H.A11 = hodlr_hadamard_mul_ric(H1.A11, H2.A11);
     H.A22 = hodlr_hadamard_mul_ric(H1.A22, H2.A22);
 end
