@@ -1,5 +1,5 @@
 function H = hodlr2hmatrix(H1)
-%HODLR2HMATRIX Convert a HODLR matrix into HMATRIX format. 
+%HODLR2HMATRIX Convert a HODLR matrix into HMATRIX format.
 
 H = hmatrix;
 H.sz = H1.sz;

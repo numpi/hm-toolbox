@@ -9,7 +9,7 @@ if isa(H1,'hodlr')
         error('A \ B: Dimension mismatch');
     end
     if isa(H2, 'hss')
-	H2 = hss2hodlr(H2);
+        H2 = hss2hodlr(H2);
     end
     if isempty(H1.U21) % Upper triangular system
         H = solve_upper_triangular(H1, H2);

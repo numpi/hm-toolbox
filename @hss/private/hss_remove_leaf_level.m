@@ -2,7 +2,7 @@ function X = hss_remove_leaf_level(X)
 %
 
 if X.leafnode == 1
-   error('Cannot remove a level on a single level HSS');
+    error('Cannot remove a level on a single level HSS');
 else
     if X.A11.leafnode == 1
         was_topnode = (X.topnode == 1);

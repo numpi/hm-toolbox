@@ -12,7 +12,7 @@ if is_leafnode(H)
     end
 else
     F = norm(H.A11, 'fro')^2 + norm(H.A22, 'fro')^2 + ...
-        norm(H.A12, 'fro')^2 + norm(H.A21, 'fro')^2;    
+        norm(H.A12, 'fro')^2 + norm(H.A21, 'fro')^2;
     F = sqrt(F);
 end
 

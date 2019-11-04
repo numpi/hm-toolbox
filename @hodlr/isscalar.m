@@ -1,3 +1,3 @@
 function r = isscalar(A)
-    r = false;
+r = false;
 end

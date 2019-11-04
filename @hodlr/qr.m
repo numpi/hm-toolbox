@@ -18,7 +18,7 @@ function [Y, T, A] = qr(A)
 
 if m~=n | ~check_cluster_equality(A), error('Input matrix must be square and have a square partition.'); end
 BL = zeros(0,0); BR = zeros(0,n);
-C = zeros(0,n);    
+C = zeros(0,n);
 Anrm = norm(A);
 
 [Y, YBL, YBR, YC, T, A] = qr_iter(A, BL, BR, C, Anrm);
@@ -38,8 +38,8 @@ m = size(A,1);
 q = size(C,1);
 
 if size(BL,1)>0,
-   [BL,R] = qr(BL,0);
-   BR = R*BR;
+    [BL,R] = qr(BL,0);
+    BR = R*BR;
 end
 p = size(BR,1);
 
@@ -61,12 +61,12 @@ else
     SR = [A.V12, A.A22'*YBL1, BC(:,n1+1:end)'];
     [ SL, SR ] = compress_factors(SL, SR, Anrm);
     SL = T1'*SL;
-
+    
     % Update second block column
     [ A.U12, A.V12 ] = compress_factors( [A.U12, -YA11*SL] , [A.V12, SR], Anrm );
     A.A22 = hodlr_rank_update(A.A22, YBL1, -SR* ( YBR1 * SL )', Anrm);
     BC(:,n1+1:end) = BC(:,n1+1:end) - (YC1*SL)*SR';
-
+    
     % Compute QR decomposition of second block column
     [m2,n2] = size(A.A22);
     
@@ -91,7 +91,7 @@ else
     T12R = [ YA22'*YBL1, YBR2', YC2' ];
     [ T12L, T12R ] = compress_factors( T12L, T12R, 1 );
     T.U12 = -T1*T12L;
-    T.V12 = T2'*T12R; 
-end   
+    T.V12 = T2'*T12R;
+end
 
 end

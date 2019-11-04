@@ -4,7 +4,7 @@ if ~exist('compress', 'var')
 end
 H = hodlr_hadamard_mul_ric(H1, H2);
 if compress
-	    H = compress_hodlr(H);
+    H = compress_hodlr(H);
 end
 end
 

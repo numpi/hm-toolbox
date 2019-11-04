@@ -22,7 +22,7 @@ H = hodlr('low-rank', U, V)';
 CheckTestResult(norm(V * U' - full(H)), '<', norm(U) * norm(V) * tol, ...
     'Transposition for low-rank hodlr');
 
-A = randn(n, n); hodlrA = hodlr(A); 
+A = randn(n, n); hodlrA = hodlr(A);
 B = randn(n, n); hodlrB = hodlr(B); hssB = hss(B);
 
 H = hodlr(A) + hodlr(B);
@@ -79,7 +79,7 @@ H = hodlr('low-rank', U, V) + hodlr('low-rank', W, Z);
 CheckTestResult(norm(U*V' + W*Z' - full(H)), '<', (norm(U*V') + norm(W*Z')) * tol, ...
     'Sum of the hodlr representation of low-rank A and low-rank B');
 
-A = randn(n, n); hodlrA = hodlr(A); 
+A = randn(n, n); hodlrA = hodlr(A);
 B = randn(n, n); hodlrB = hodlr(B); hssB = hss(B);
 H = hodlr(A) * hodlr(B);
 CheckTestResult(norm(A * B - full(H)), '<', norm(A) * norm(B) * tol, ...
@@ -135,7 +135,7 @@ H = A .* B;
 CheckTestResult(norm(full(A) .* full(B) - full(H)), '<', norm(full(A) .* full(B)) * tol, ...
     'Hadamard product of the hodlr representation of random hodlr A and  B');
 
-A = randn(n, n); hodlrA = hodlr(A); 
+A = randn(n, n); hodlrA = hodlr(A);
 B = randn(n, n); hodlrB = hodlr(B); hssB = hss(B);
 H = hodlrA .* B;
 CheckTestResult(norm(A .* B - full(H)), '<', norm(A) * tol && isfloat(H), ...

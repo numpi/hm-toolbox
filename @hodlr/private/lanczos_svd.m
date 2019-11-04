@@ -25,14 +25,14 @@ while res > tol
     
     if it > min(m,n) / 2
         if m < n
-            A = Afun(eye(m), 'transp');
+            A = Afun(eye(m), 'transp')';
         else
             A = Afun(eye(n), 'notransp');
         end
         
         [U, S, V] = svd(A, 'econ');
         rk = sum(diag(S) > tol * S(1,1));
-
+        
         U = U(:,1:rk);
         V = V(:,1:rk);
         S = S(1:rk, 1:rk);
@@ -46,7 +46,7 @@ while res > tol
     w = w - U * (U' * w);
     
     alfa = [ alfa, norm(w) ];
-
+    
     if alfa(end) == 0
         break;
     end
@@ -85,7 +85,7 @@ if length(alfa) == length(beta)
     [Ul, S, Vl] = svd(diag(alfa) + diag(beta(1:end-1), 1));
 else
     [Ul, S, Vl] = svd([ diag(alfa(1:end-1)), zeros(length(beta),1)  ] + ...
-                      [ zeros(length(beta), 1), diag(beta) ], 'econ');
+        [ zeros(length(beta), 1), diag(beta) ], 'econ');
 end
 
 if isempty(S)

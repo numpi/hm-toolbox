@@ -4,9 +4,9 @@ function opt = hmoption(varargin)
 warning('HMOPTION is deprecated. Please use HODLROPTION');
 
 if nargin > 1
-	hodlroption(varargin{:});
+    hodlroption(varargin{:});
 else
-	opt = hodlroption(varargin{:});
+    opt = hodlroption(varargin{:});
 end
 
 end

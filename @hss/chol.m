@@ -6,7 +6,7 @@ function F = chol(A)
 %      This can be used to compute X = A\B with the command
 %      X = CHOL_SOLVE(F, B);
 if ~issymmetric(A)
-	A = hss_symmetrize(A);
+    A = hss_symmetrize(A);
 end
 F = hss_chol_fact(A);
 end

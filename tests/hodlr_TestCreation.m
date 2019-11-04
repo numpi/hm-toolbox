@@ -9,34 +9,34 @@ hodlroption('block-size', 32);
 tol = hodlroption('threshold');
 
 for n = [ 100, 1000 ]
-	A = randn(n, n);
-
-	H = hodlr(A);
-
-	CheckTestResult(norm(A - full(H)), '<', norm(A) * hodlroption('threshold'), ...
-		'Generation of an hodlr representation for unstructured A');
-
-	A = sprand(n, n, 4 / n);
-	H = hodlr(A);
-
-	CheckTestResult(norm(full(A) - full(H)), '<', norm(full(A)) * hodlroption('threshold'), ...
-		'Generation of an hodlr representation for a sparse A');
+    A = randn(n, n);
+    
+    H = hodlr(A);
+    
+    CheckTestResult(norm(A - full(H)), '<', norm(A) * hodlroption('threshold'), ...
+        'Generation of an hodlr representation for unstructured A');
+    
+    A = sprand(n, n, 4 / n);
+    H = hodlr(A);
+    
+    CheckTestResult(norm(full(A) - full(H)), '<', norm(full(A)) * hodlroption('threshold'), ...
+        'Generation of an hodlr representation for a sparse A');
 end
 
 for n = [ 100, 1000 ]
-	x = linspace(0, 1, n);
-	y = x + 1/(2*(n-1));
-	A = 1 ./ (x - y.');
-
-	H = hodlr(A);
-
-	CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * hodlroption('threshold'), ...
-		'Generation of an hodlr representation for Cauchy A built from dense');
+    x = linspace(0, 1, n);
+    y = x + 1/(2*(n-1));
+    A = 1 ./ (x - y.');
+    
+    H = hodlr(A);
+    
+    CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * hodlroption('threshold'), ...
+        'Generation of an hodlr representation for Cauchy A built from dense');
     
     H = hodlr('cauchy', -y, x);
     
     CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * hodlroption('threshold'), ...
-		'Generation of an hodlr representation for Cauchy A built with the Cauchy constructor');
+        'Generation of an hodlr representation for Cauchy A built with the Cauchy constructor');
 end
 
 n = 10000;

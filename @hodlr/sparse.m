@@ -20,10 +20,10 @@ if is_leafnode(H),
     else
         [i, j, vals] = find( ( abs(H.F)>tol ).*H.F );
         [m, n] = size(H.F);
-        A = sparse(i, j, vals, m, n);        
+        A = sparse(i, j, vals, m, n);
     end
 else
     A = [ sparse(H.A11, tol), lr2sparse(H.U12, H.V12, tol);
-          lr2sparse(H.U21, H.V21, tol), sparse(H.A22, tol) ];
-end        
+        lr2sparse(H.U21, H.V21, tol), sparse(H.A22, tol) ];
+end
 

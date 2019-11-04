@@ -12,7 +12,7 @@ end
 
 n = size(H, 2);
 
-nrm = normest_Afun(@(x) H * x, @(x) H' * x, n); 
+nrm = normest_Afun(@(x) H * x, @(x) H' * x, n);
 
 end
 

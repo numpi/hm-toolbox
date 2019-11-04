@@ -97,10 +97,10 @@ else
         
     else
         % We use this syntax to be able to call sparse_solve even if this
-        % is the case of a generic matrix. 
+        % is the case of a generic matrix.
         [LA, UA, pA] = lu(A);
-        qA = 1; % This constructs an equivalent of the identity matrix 
-                % in practice, without the need to allocate it. 
+        qA = 1; % This constructs an equivalent of the identity matrix
+        % in practice, without the need to allocate it.
         
         S = struct(...
             'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x), ...
