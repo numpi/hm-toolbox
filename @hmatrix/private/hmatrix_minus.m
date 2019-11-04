@@ -1,7 +1,7 @@
-function H = hmatrix_plus(H1, H2)
+function H = hmatrix_minus(H1, H2)
 
 if any(H1.sz ~= H2.sz)
-    error('HMATRIX_PLUS:: non conformal partitioning')
+    error('HMATRIX_MINUS:: non conformal partitioning')
 end
 
 H = hmatrix;

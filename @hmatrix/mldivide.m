@@ -1,5 +1,6 @@
 function H = mldivide(H1, H2)
-if isscalar(H1) || all(size(H1) == 1)
+
+if all(size(H1) == 1)
     H = (1/H1) * H2;
     return;
 end
@@ -10,6 +11,7 @@ elseif iszero(H1.A21)
     H = solve_upper_triangular(H1, H2);
 else
     [L, U] = lu(H1);
-    H = L \ (U \ H2);
+    y = L \ H2;
+    H = U \ y;
 end
 end
