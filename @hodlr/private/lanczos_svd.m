@@ -25,7 +25,7 @@ while res > tol
     
     if it > min(m,n) / 2
         if m < n
-            A = Afun(eye(m), 'transp');
+            A = Afun(eye(m), 'transp')';
         else
             A = Afun(eye(n), 'notransp');
         end
