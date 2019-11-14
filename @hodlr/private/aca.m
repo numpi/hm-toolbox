@@ -1,6 +1,6 @@
 function [U, V] = aca(Afun, m, n, tol, comp, debug)
 %
-% Construct a low-rank representation of C = 1 / (x(i) + y(j))
+% Construct a low-rank representation of C = Afun([1:m], [1:n])
 % by means of adaptive cross approximation with partial pivoting (heuristic)
 %
 % ----------------------INPUT--------------------------------------------------
@@ -30,35 +30,47 @@ k = 1;
 ind = 1;
 
 % Select the first pivot
-first_indices = unique(randi(m, 4, 1));
+first_indices = randsample([1:m], 5);
 rows = Afun(first_indices, 1:n);
 
 [~, ind] = max(max(abs(rows), [], 2));
-
+ind = first_indices(ind);
+taken_row = ind;
 while k < min(m,n)
-	b = Afun(ind, 1:n) - U(ind, :) * V';
-	[~, new_ind] = max(abs(b));
-	if debug
-		fprintf('Iteration: %d Pivot at (%d,%d): %e\n', k, ind, new_ind, b(new_ind))
-	end
-	a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
-	a = a/b(new_ind);
-	U = [U, a];
-	V = [V, b'];
-	[~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));  
-        if tind >= ind
-		ind = tind + 1;
-	else
-		ind =tind;
-	end
 
-	if k == 1
-		nrm = norm(a) * norm(b);
+    b = Afun(ind, 1:n) - U(ind, :) * V';
+    [~, new_ind] = max(abs(b));
+    if debug
+        fprintf('Iteration: %d Pivot at (%d,%d): %e\n', k, ind, new_ind, b(new_ind))
+    end
+    a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
+    a = a/b(new_ind);
+    U = [U, a];
+    V = [V, b'];
+    [~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
+    if tind >= ind
+        ind = tind + 1;
+    else
+        ind = tind;
+    end
+    if k == 1
+        nrm = norm(a) * norm(b);
+    end
+    k = k + 1;
+    tnrm = norm(a) * norm(b);
+    nrm = max(nrm, tnrm);
+    if  tnrm < tol * nrm && k < min(m,n) - 1 % If the heuristic criterion detect convergence we still perform a sample on a few rows in the residual
+	first_indices = randsample(setdiff([1:m], taken_row), min(m - length(taken_row), 10));
+	rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
+	[mx, ind] = max(max(abs(rows), [], 2));
+	if mx < tol * nrm
+        	break
+	else
+		ind = first_indices(ind);
 	end
-	k = k + 1;
-	if norm(a) * norm(b) < tol * nrm
-		break
-	end
+    end
+    taken_row = [taken_row, ind];
+
 end
 if comp
 	[QU, RU] = qr(U, 0); % Re-compression
@@ -68,4 +80,3 @@ if comp
 	U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
     V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
 end
-
