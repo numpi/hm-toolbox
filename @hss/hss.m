@@ -154,7 +154,13 @@ classdef hss
                         obj = hss_from_banded(obj, varargin{2:charpos-1});
 
                     case 'cauchy'
+                        % If we need to do this, make sure that hodlroption
+                        % matches hssoption according to the threshold, at
+                        % least for this operation.
+                        hodlr_tol = hodlroption('threshold');
+                        hodlroption('threshold', hssoption('threshold'));                        
                         obj = hodlr2hss(hodlr(varargin{1:end}));
+                        hodlroption('threshold', hodlr_tol);
 
                     case 'diagonal'
                         obj = hss_build_hss_tree(length(varargin{2}), ...
