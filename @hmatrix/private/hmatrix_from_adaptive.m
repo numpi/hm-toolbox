@@ -35,8 +35,8 @@ else
         % can merge them and avoid having a deep tree for no gain.
         if ~isempty(H.A11.F) && ~isempty(H.A12.F) && ...
                 ~isempty(H.A21.F) && ~isempty(H.A22.F)
-            H.F = [ H.A11.F , H.A12.F ; H.A21.F , H.A22.F ];
-            H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
+            %H.F = [ H.A11.F , H.A12.F ; H.A21.F , H.A22.F ];
+            %H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
         end
     end            
 end

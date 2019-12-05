@@ -35,7 +35,7 @@ N = 64;
 p = inputParser;
 
 A = varargin{1};
-if length(varargin) == 2 || ~isa(varargin{3}, 'hodlr')
+if length(varargin) == 2 || issparse(varargin{3})
     C = varargin{2};
     is_lyapunov = true;
 else
@@ -48,6 +48,15 @@ addParameter(p, 'debug', false, @islogical);
 addParameter(p, 'expm',  'pade', @ischar);
 addParameter(p, 'method', 'd&c', @ischar);
 addParameter(p, 'parallel', false, @islogical);
+
+if isa(C, 'hmatrix')
+    if is_lyapunov
+        X = dac_lyap_blr(A, C);
+    else
+        X = dac_lyap_blr(A, B, C);
+    end
+    return;
+end
 
 for first_keyword = 1 : length(varargin)
     if ischar(varargin{first_keyword})

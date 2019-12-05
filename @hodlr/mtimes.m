@@ -17,6 +17,11 @@ if isa(H1, 'hss') || isa(H2, 'hss')
     return;
 end
 
+if isa(H2, 'hmatrix')
+    H = hodlr2hmatrix(H1) * H2;
+    return;
+end
+
 % Multiplication H * v
 if isfloat(H2)
     if isscalar(H2) || all(size(H2) == 1)

@@ -1,4 +1,10 @@
 function H = mtimes(H1, H2)
+
+if isa(H2, 'hodlr')
+    H = H1 * hodlr2hmatrix(H2);
+    return;
+end
+
 if isfloat(H2) % H * v
     if isscalar(H2) || all(size(H2) == 1)
         H = H1;
