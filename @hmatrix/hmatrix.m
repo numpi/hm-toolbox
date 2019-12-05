@@ -112,6 +112,17 @@ classdef hmatrix
             
             if ischar(varargin{1})
                 switch varargin{1}
+                    case 'adaptive'
+                        if ~isempty(H)
+                            error('The adaptive constructor cannot be used with a prescribed cluster');
+                        end
+                        
+                        if nargin <= 4                        
+                            obj = hmatrix_from_adaptive(varargin{2:4}, []);
+                        else
+                            obj = hmatrix_from_adaptive(varargin{2:5});
+                        end
+                        
                     case 'handle'
                         obj = hmatrix_from_aca(H, varargin{2:4});
                     case 'eye'
