@@ -17,7 +17,7 @@ if isa(H2,'hodlr') %case of hierarchical right-hand side
         H.U21 = [H2.U21, H1.U21];
         H.V21 = [H2.V21, -dense_mtimes_hodlr(H1.V21', H.A11)' ];
         
-        if isempty(H.A22.U12) && ~is_leafnode(H1.A22)
+        if isempty(H1.A22.U12) && ~is_leafnode(H1.A22) % Check this!
             H.U21 = solve_lower_triangular(H1.A22, H.U21);
             H.A22 = solve_lower_triangular(H1.A22, ...
                 hodlr_rank_update(H2.A22, -H1.U21 * (H1.V21' * H.U12), H2.V12));
