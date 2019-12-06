@@ -26,6 +26,12 @@ if ~exist('nrmtype', 'var')
     nrmtype = 2;
 end
 
+if size(u, 2) == 0
+    Xu = u;
+    Xv = v;
+    return;
+end
+
 if ~isstruct(A)
     if issparse(A)
         AA = ek_struct(A, issymmetric(A));
@@ -137,11 +143,11 @@ end
 switch nrmtype
     case 2
         s = diag(SS);
-        rk = sum( arrayfun(@(ss) tol(ss, s(1)), s) == 1);
+        rk = sum( arrayfun(@(ss) tol(ss, s(1)), s) == 0);
     case 'fro'
         d = sort(diag(SS));
         s = cumsum(d);
-        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 1 );
+        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 0 );
 end
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));

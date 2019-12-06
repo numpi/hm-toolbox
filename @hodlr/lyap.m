@@ -35,7 +35,7 @@ N = 64;
 p = inputParser;
 
 A = varargin{1};
-if length(varargin) == 2 || issparse(varargin{3})
+if length(varargin) == 2 || issparse(varargin{3}) || ischar(varargin{3})
     C = varargin{2};
     is_lyapunov = true;
 else

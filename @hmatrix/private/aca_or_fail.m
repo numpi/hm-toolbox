@@ -37,7 +37,7 @@ k = 1;
 ind = 1;
 
 % Select the first pivot
-first_indices = randsample([1:m], 5);
+first_indices = randsample([1:m], 10);
 rows = Afun(first_indices, 1:n);
 
 [~, ind] = max(max(abs(rows), [], 2));
@@ -56,7 +56,7 @@ while k < min(m,n)
     	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), 10));
         rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
         [mx, ind] = max(max(abs(rows), [], 2));
-        if mx < tol * nrm
+        if mx <= tol * nrm
         	return;
         else
     		ind = first_indices(ind);    

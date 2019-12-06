@@ -136,11 +136,11 @@ end
 switch nrmtype
     case 2
         s = sort(abs(diag(DD)));
-        rk = sum( arrayfun(@(ss) tol(ss, s(end)), s) == 1 );
+        rk = sum( arrayfun(@(ss) tol(ss, s(end)), s) == 0 );
     case 'fro'
         d = sort(abs(diag(DD)));
         s = cumsum(d);
-        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 1 );
+        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 0 );
 end
 
 [~,ii] = sort(diag(abs(DD))); ii = ii(end:-1:end-rk+1);
