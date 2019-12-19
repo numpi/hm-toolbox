@@ -7,13 +7,18 @@ function F = norm_frobenius(H)
 if is_leafnode(H)
     F = norm(H.F, 'fro');
 else
-    F = norm(H.A11, 'fro')^2 + norm(H.A22, 'fro')^2;
+    F11 = norm(H.A11, 'fro');
+    F22 = norm(H.A22, 'fro');
     
-    % Add the contribution of the low-rank parts
-    F = F + sum(sum((H.U21' * H.U21) .* (H.V21' * H.V21)));
-    F = F + sum(sum((H.U12' * H.U12) .* (H.V12' * H.V12)));
+    % Contribution from the block (2,1)
+    [~, RU] = qr(H.U21, 0); [~, RV] = qr(H.V21, 0);
+    F21 = norm(RU * RV', 'fro');
     
-    F = sqrt(F);
+    % Contribution from the block (1,2)
+    [~, RU] = qr(H.U12, 0); [~, RV] = qr(H.V12, 0);
+    F12 = norm(RU * RV', 'fro');
+    
+    F = norm([ F11, F12, F21, F22 ]);
 end
 
 
