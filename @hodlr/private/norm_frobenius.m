@@ -11,12 +11,14 @@ else
     F22 = norm(H.A22, 'fro');
     
     % Contribution from the block (2,1)
-    [~, RU] = qr(H.U21, 0); [~, RV] = qr(H.V21, 0);
-    F21 = norm(RU * RV', 'fro');
+    [~, RU] = qr(H.U21, 0); %[~, RV] = qr(H.V21, 0);
+    %F21 = norm(RU * RV', 'fro');
+    F21 = norm(H.V21 * RU, 'fro');
     
     % Contribution from the block (1,2)
-    [~, RU] = qr(H.U12, 0); [~, RV] = qr(H.V12, 0);
-    F12 = norm(RU * RV', 'fro');
+    [~, RU] = qr(H.U12, 0); %[~, RV] = qr(H.V12, 0);
+    %F12 = norm(RU * RV', 'fro');
+    F12 = norm(H.V12 * RU, 'fro');
     
     F = norm([ F11, F12, F21, F22 ]);
 end
