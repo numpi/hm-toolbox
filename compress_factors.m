@@ -13,18 +13,24 @@ else
     [U,S,V] = svd(RU * RV');
     
     if ~exist('nrm', 'var')
-        nrm = S(1,1);
+        switch hodlroption('norm')
+            case 2
+                nrm = S(1,1);
+            case 'fro'
+                nrm = norm(diag(S));
+        end
     end
     
-    %rk = sum(diag(S) > threshold);
-    %rk = min(sum(diag(S) > S(1,1) * threshold),50);
-    
-    % 2 norm of the residuals after truncation
     t = diag(S);
-    % t = cumsum(t(end:-1:1));
     
     % Numerical rank of the outer product
-    rk = sum(t > nrm * threshold);
+    switch hodlroption('norm')
+        case 2
+            rk = sum(t > nrm * threshold);
+        case 'fro'
+            tt = sqrt(cumsum(t(end:-1:1).^2));
+            rk = sum(tt > nrm * threshold);
+    end
     
     U = QU * U(:,1:rk) * S(1:rk,1:rk);
     V = QV * V(:,1:rk);

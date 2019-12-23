@@ -9,6 +9,7 @@ function opt = hssoption(key, value)
 global hss_block_size
 global hss_threshold
 global hss_compression
+global hss_norm
 
 if isempty(hss_block_size)
     hss_block_size = 256;
@@ -20,6 +21,10 @@ end
 
 if isempty(hss_threshold)
     hss_threshold = 1e-12;
+end
+
+if isempty(hss_norm)
+    hss_norm = 2;
 end
 
 if ~exist('key', 'var')
@@ -34,6 +39,8 @@ if ~exist('value', 'var')
             opt = hss_threshold;
         case 'compression'
             opt = hss_compression;
+        case 'norm'
+            opt = hss_norm;
         otherwise
             error('Unsupported option specified');
     end
@@ -55,7 +62,13 @@ else
             if strcmp(value,'qr') || strcmp(value, 'svd')
                 hss_compression = value;
             else
-                error('Unsupported type of compression');
+               error('Invalid valud for compression');
+            end
+         case 'norm'
+            if ( ischar(value) && ~strcmp(value, 'fro') ) && value ~= 2
+                error('Invalid valud for norm');
+            else
+                hss_norm = value;
             end
         otherwise
             error('Unsupported option specified');

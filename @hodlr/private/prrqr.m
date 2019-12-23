@@ -1,4 +1,4 @@
-function [Q, R, p] = prrqr(A, tol, debug)
+function [Q, R, p] = prrqr(A, tol, debug, relative)
 %PRRQR Rank-Revealing QR factorization with early termination. 
 %
 % [Q, R, P] = RRQR(A, TOL) computes a rank-revealing QR factorization of
@@ -13,6 +13,10 @@ function [Q, R, p] = prrqr(A, tol, debug)
 
 if ~exist('debug', 'var')
 	debug = false;
+end
+
+if ~exist('relative', 'var')
+    relative = true;
 end
 
 [m, n] = size(A);
@@ -37,9 +41,24 @@ for j = 1 : min(m, n - 1)
 	if debug
 		fprintf('Column norm: %e, Max col norm: %e, Threshold: %e\n', ...
 			sqrt(mx), sqrt(v(1)), sqrt(v(1)) * tol * sqrt(n));
-	end
+    end
+    
+    switch hodlroption('norm')
+        case 2
+            if relative
+                stop = sqrt(mx) < sqrt(v(1)) / sqrt(n-j) * tol;
+            else
+                stop = sqrt(mx) < 1 / sqrt(n-j) * tol;
+            end
+        case 'fro'
+            if relative
+                stop = sqrt(sum(v(j:end))) < sqrt(sum(v(1:j-1))) * tol;
+            else
+                stop = sqrt(sum(v(j:end))) < tol;
+            end
+    end
 	
-	if sqrt(mx) < tol * sqrt(v(1)) / sqrt(j)
+    if stop
 		R = A(1:j-1, :);
 
 		Q = eye(m, j-1);
@@ -52,48 +71,49 @@ for j = 1 : min(m, n - 1)
             ip(p) = 1:n;
             R = R(:,ip);
         end
-		
-		return;
-	end
-	
-	% Memorize the permutation of columns
-	t = p(j+l-1);
-	p(j+l-1) = p(j);
-	p(j) = t;
-	
-	% Update A as well
-	w = A(:,l+j-1); A(:,l+j-1) = A(:,j);
-	A(:,j) = w; w = w(j:end);
-	
-	% Compute the Householder reflector that maps the vector to a multiple
-	% of ej
-	[b, u] = householder_reflector(w);
-	
-	% Apply it to A
-	A(j:end, j:end) = A(j:end,j:end) - b * u * (u' * A(j:end,j:end));
-	
-	% ...and to Q -- but this has to be delayed because we do not (yet)
-	% know the number of columns that are necessary in Q. So we store the
-	% Householder vectors and scalars instead. 
-	Pu = [ Pu, u ];
-	Pb = [ Pb, b ];
-	
-	% Downdate the norms -- we selectively recompute them to make sure
-	% there is not an excess of cancellation in this operation.
-	for k = j + 1 : n
-		if v(k) < A(j,k) * 1.05
-			v(k) = norm(A(j+1:end,k))^2;
-		else
-			v(k) = v(k) - A(j,k)^2;
-		end
-	end
+        
+        return;
+    end
+    
+    % Memorize the permutation of columns
+    t = p(j+l-1);
+    p(j+l-1) = p(j);
+    p(j) = t;
+    
+    % Update A as well
+    w = A(:,l+j-1); A(:,l+j-1) = A(:,j);
+    A(:,j) = w; w = w(j:end);
+    
+    % Compute the Householder reflector that maps the vector to a multiple
+    % of ej
+    [b, u] = householder_reflector(w);
+    
+    % Apply it to A
+    A(j:end, j:end) = A(j:end,j:end) - b * u * (u' * A(j:end,j:end));
+    
+    % ...and to Q -- but this has to be delayed because we do not (yet)
+    % know the number of columns that are necessary in Q. So we store the
+    % Householder vectors and scalars instead.
+    Pu = [ Pu, u ];
+    Pb = [ Pb, b ];
+    
+    % Downdate the norms
+    for k = j + 1 : n
+        % FIXME: We might detect when the cancellation occurs, and
+        % selectively recompute these entries. 
+        %if v(k) < A(j,k) * 2
+            v(k) = norm(A(j+1:end,k))^2;
+        %else
+        %    v(k) = v(k) - A(j,k)^2;
+        %end
+    end
 end
 
 R = A;
-
-Q = eye(n);
-for j = n - 1 : -1 : 1
-	Q(j:end,:) = Q(j:end,:) - Pb{j} * Pu{j} * (Pu{j}' * Q(j:end,:));
+        
+Q = eye(m);
+for jj = j : -1 : 1
+    Q(jj:end,:) = Q(jj:end,:) - Pb{jj} * Pu{jj} * (Pu{jj}' * Q(jj:end,:));
 end
 
 if nargout == 2
@@ -107,6 +127,10 @@ end
 function [b, u] = householder_reflector(w)
 	u = w;
 	b = norm(u);
-	u(1) = u(1) + b * sign(u(1));
+    s = sign(u(1));
+    if s == 0
+        s = 1;
+    end
+	u(1) = u(1) + b * s;
 	b = 2 / dot(u, u);
 end

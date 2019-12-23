@@ -79,8 +79,7 @@ else
         A.A11.Wr = A.A11.Wr * Ut;
         A.A11 = backward_stage(A.A11, tol, Su, Tu, tcomp);
         A.A22 = backward_stage(A.A22, tol, Sl, Tl, tcomp);
-    else
-        
+    else        
         A.A22.U = A.A22.U * Us;
         A.A11.V = A.A11.V * Ut;
     end
