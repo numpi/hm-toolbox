@@ -268,13 +268,10 @@ end
 
 switch hssoption('compression')
     case 'qr'
-        [Q, R, P] = qr(B, 0);
-        
-        % Select only the important columns out of Q
-        rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
-        IP = zeros(1, length(P)); IP(P) = 1 : length(P);
-        U = Q(:, 1:rk);
-        Z = R(1:rk, IP)';
+        [Q, R, P] = prrqr(B, tol);        
+        IP = zeros(1, length(P)); IP(P) = 1 : length(P);        
+        U = Q;
+        Z = R(:, IP)';
         
     case 'svd'
         [U, B, Z] = svd(B, 'econ');
@@ -282,7 +279,14 @@ switch hssoption('compression')
         if tol == 0
             rk = size(B, 1);
         else
-            rk = sum(diag(B) > tol * B(1,1));
+            switch hssoption('norm')
+                case 2
+                    rk = sum(diag(B) > tol * B(1,1));
+                case 'fro'
+                    t = diag(B);
+                    tt = sqrt(cumsum(t(end:-1:1).^2));
+                    rk = sum(tt > tol * tt(end));
+            end
         end
         
         U = U(:, 1:rk);

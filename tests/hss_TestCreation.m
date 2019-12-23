@@ -7,13 +7,18 @@ function hss_TestCreation
 % code.
 clear
 hssoption('block-size', 32);
+hnrm = @(A) norm(A, hssoption('norm'));
+C = @(A) sqrt(max(size(A)));
+    
+
+tol = hssoption('threshold');
 
 n = 512;
 A = randn(n, n);
 
 H = hss(A);
 
-CheckTestResult(norm(A - full(H)), '<', 1e3 * norm(A) * eps, ...
+CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
     'Generation of an HSS representation for unstructured A');
 
 n = 2^15;
@@ -22,7 +27,7 @@ H = hss('banded', A, 2, 3);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * eps, ...
+CheckTestResult(norm(A*v - H*v), '<', C(A) * hnrm(H) * tol * norm(v), ...
     'Generation of an HSS representation for banded A');
 
 n = 2^15;
@@ -33,7 +38,7 @@ v = randn(n, 10);
 
 H = hss('low-rank', U, V);
 
-CheckTestResult(norm(U * (V'*v) - H*v), '<', norm(v) * sqrt(n) * norm(U) * norm(V) * eps, ...
+CheckTestResult(norm(U * (V'*v) - H*v), '<', C(A) * hnrm(H) * tol * norm(v), ...
     'Generation of an HSS representation for U * V^T ');
 
 n = 2^15;
@@ -44,7 +49,7 @@ v = randn(n, 10);
 
 H = hss('low-rank', U, V, B);
 
-CheckTestResult(norm(U * B *(V'*v) - H*v), '<', norm(v) * sqrt(n) * norm(U) * norm(V) * eps, ...
+CheckTestResult(norm(U * B *(V'*v) - H*v), '<', C(A) * hnrm(H) * tol * norm(v), ...
     'Generation of an HSS representation for U * B * V^T ');
 
 n = 1024;
@@ -61,12 +66,12 @@ for n = [ 100, 1000 ]
 
 	H = hss(A);
 
-	CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * hssoption('threshold'), ...
+	CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
 		'Generation of an HSS representation for Cauchy A built from dense');
     
     H = hss('cauchy', -y, x);
     
-    CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * hssoption('threshold'), ...
+    CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
 		'Generation of an HSS representation for Cauchy A built with the Cauchy constructor');
 end
 
