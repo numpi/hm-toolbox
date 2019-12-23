@@ -78,22 +78,23 @@ for j = 1 : min(m, n - 1)
     Pu = [ Pu, u ];
     Pb = [ Pb, b ];
     
-    % Downdate the norms -- we selectively recompute them to make sure
-    % there is not an excess of cancellation in this operation.
+    % Downdate the norms
     for k = j + 1 : n
-        if v(k) < A(j,k) * 1.05
+        % FIXME: We might detect when the cancellation occurs, and
+        % selectively recompute these entries. 
+        %if v(k) < A(j,k) * 2
             v(k) = norm(A(j+1:end,k))^2;
-        else
-            v(k) = v(k) - A(j,k)^2;
-        end
+        %else
+        %    v(k) = v(k) - A(j,k)^2;
+        %end
     end
 end
 
 R = A;
-
-Q = eye(n);
-for j = n - 1 : -1 : 1
-    Q(j:end,:) = Q(j:end,:) - Pb{j} * Pu{j} * (Pu{j}' * Q(j:end,:));
+        
+Q = eye(m);
+for jj = j : -1 : 1
+    Q(jj:end,:) = Q(jj:end,:) - Pb{jj} * Pu{jj} * (Pu{jj}' * Q(jj:end,:));
 end
 
 if nargout == 2
