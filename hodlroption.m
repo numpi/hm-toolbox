@@ -71,7 +71,7 @@ else
 				hodlr_compression = value;
             end
         case 'norm'
-            if value ~= 2 && ~strcmp(value, 'fro')
+            if ( ischar(value) && ~strcmp(value, 'fro') ) && value ~= 2
                 error('Invalid valud for norm');
             else
                 hodlr_norm = value;

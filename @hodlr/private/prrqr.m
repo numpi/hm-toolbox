@@ -37,9 +37,16 @@ for j = 1 : min(m, n - 1)
 	if debug
 		fprintf('Column norm: %e, Max col norm: %e, Threshold: %e\n', ...
 			sqrt(mx), sqrt(v(1)), sqrt(v(1)) * tol * sqrt(n));
-	end
+    end
+    
+    switch hodlroption('norm')
+        case 2
+            stop = sqrt(mx) < sqrt(v(1)) / sqrt(n-j) * tol;
+        case 'fro'
+            stop = norm(v(j:end)) < norm(v(1:j-1)) * tol;
+    end
 	
-	if sqrt(mx) < tol * sqrt(v(1)) / sqrt(j)
+	if stop
 		R = A(1:j-1, :);
 
 		Q = eye(m, j-1);

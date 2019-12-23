@@ -14,7 +14,14 @@ switch compression
 	case 'svd'
 		[U,S,V] = svd(full(A));
 
-		k = sum(abs(diag(S)) > S(1,1) * threshold);
+        switch hodlroption('norm')
+            case 2
+                k = sum(abs(diag(S)) > S(1,1) * threshold);
+            case 'fro'
+                t = diag(S);
+                tt = sqrt(cumsum(t(end:-1:1).^2));
+                k = sum(tt > tt(end) * threshold);
+        end                
 
 		U = U(:,1:k) * S(1:k,1:k);
 		V = V(:,1:k);	
