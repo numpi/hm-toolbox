@@ -8,18 +8,20 @@ function hodlr_TestCreation
 hodlroption('block-size', 32);
 tol = hodlroption('threshold');
 
+hnrm = @(A) norm(A, hodlroption('norm'));
+
 for n = [ 100, 1000 ]
 	A = randn(n, n);
 
 	H = hodlr(A);
 
-	CheckTestResult(norm(A - full(H)), '<', norm(A) * hodlroption('threshold'), ...
+	CheckTestResult(hnrm(A - full(H)), '<', hnrm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for unstructured A');
 
 	A = sprand(n, n, 4 / n);
 	H = hodlr(A);
 
-	CheckTestResult(norm(full(A) - full(H)), '<', norm(full(A)) * hodlroption('threshold'), ...
+	CheckTestResult(hnrm(full(A) - full(H)), '<', hnrm(full(A)) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for a sparse A');
 end
 
@@ -30,12 +32,12 @@ for n = [ 100, 1000 ]
 
 	H = hodlr(A);
 
-	CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * hodlroption('threshold'), ...
+	CheckTestResult(hnrm(A - full(H)), '<', 10 * hnrm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for Cauchy A built from dense');
     
     H = hodlr('cauchy', -y, x);
     
-    CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * hodlroption('threshold'), ...
+    CheckTestResult(hnrm(A - full(H)), '<', 10 * log2(n) * hnrm(A) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for Cauchy A built with the Cauchy constructor');
 end
 
@@ -45,7 +47,7 @@ H = hodlr('tridiagonal', A);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * eps, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * eps, ...
     'Generation of an hodlr representation for tridiagonal A');
 
 A = spdiags(randn(n, 1) * rand(1, 10), -4:5, n, n);
@@ -53,7 +55,7 @@ H = hodlr('banded', A);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for banded A');
 
 k = 4;
@@ -61,7 +63,7 @@ U = rand(n, k); V = rand(n, k);
 
 A = hodlr('low-rank', U, V);
 
-CheckTestResult(norm(A*v - U*(V'*v)), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - U*(V'*v)), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for low-rank A');
 
 n = 2048;
@@ -74,7 +76,7 @@ A = toeplitz(c, r);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for banded Toeplitz A');
 
 c = rand(n, 1) .* (.5.^(1 : n)'); r = rand(1, n) .* (.75.^(1 : n)); r(1) = c(1);
@@ -82,7 +84,7 @@ H = hodlr('toeplitz', c, r);
 
 A = toeplitz(c, r);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for Toeplitz A');
 
 % Function samples
@@ -92,7 +94,7 @@ H = hodlr('handle', @(i,j) f(x(j), x(i)'), n, n);
 
 A = f( x, x' );
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * hodlroption('threshold'), ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * hodlroption('threshold'), ...
     'Generation of an hodlr representation for A that samples f(x,y)');
 
 % Generate random clustering
@@ -105,7 +107,7 @@ H = hodlr('banded', A, 'cluster', cluster);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for banded A (nonstandard clustering)');
 
 k = 4;
@@ -113,7 +115,7 @@ U = rand(n, k); V = rand(n, k);
 
 A = hodlr('low-rank', U, V, 'cluster', cluster);
 
-CheckTestResult(norm(A*v - U*(V'*v)), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - U*(V'*v)), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for low-rank A (nonstandard clustering)');
 
 c = rand(10, 1); r = rand(1, 8); r(1) = c(1);
@@ -124,7 +126,7 @@ A = toeplitz(c, r);
 
 v = randn(n, 1);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for banded Toeplitz A (nonstandard clustering)');
 
 c = rand(n, 1) .* (.5.^(1 : n)'); r = rand(1, n) .* (.75.^(1 : n)); r(1) = c(1);
@@ -132,7 +134,7 @@ H = hodlr('toeplitz', c, r, 'cluster', cluster);
 
 A = toeplitz(c, r);
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * tol, ...
+CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for Toeplitz A (nonstandard clustering)');
 
 

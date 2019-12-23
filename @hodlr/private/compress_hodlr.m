@@ -3,7 +3,7 @@ function H = compress_hodlr(H, nrm)
 %
 
 if ~exist('nrm', 'var')
-    nrm = norm(H, 2);
+    nrm = norm(H, hodlroption('norm'));
 end
 
 if ~is_leafnode(H)

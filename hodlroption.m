@@ -7,10 +7,14 @@ function opt = hodlroption(key, value)
 %   'compression': Can be either 'qr' or 'svd', and selects the
 %       method used to compress unstructured dense matrices when calling
 %       hodlrA = hodlr(A);
+%   'norm': The norm used for truncation. Can be either 2, or 'fro', and
+%       the truncation is performed relative to the norm of the entire
+%       matrix. 
 
 global hodlr_block_size
 global hodlr_threshold
 global hodlr_compression
+global hodlr_norm
 
 if isempty(hodlr_compression)
 	hodlr_compression = 'qr';
@@ -22,6 +26,10 @@ end
 
 if isempty(hodlr_threshold)
     hodlr_threshold = 1e-12;
+end
+
+if isempty(hodlr_norm)
+    hodlr_norm = 2;
 end
 
 if ~exist('key', 'var')
@@ -36,6 +44,8 @@ if ~exist('value', 'var')
             opt = hodlr_threshold;
 		case 'compression'
 			opt = hodlr_compression;
+        case 'norm'
+            opt = hodlr_norm;
         otherwise
             error('Unsupported option specified');
     end
@@ -59,7 +69,13 @@ else
 				error('Invalid value for dense-compression');
 			else
 				hodlr_compression = value;
-			end
+            end
+        case 'norm'
+            if value ~= 2 && ~strcmp(value, 'fro')
+                error('Invalid valud for norm');
+            else
+                hodlr_norm = value;
+            end
         otherwise
             error('Unsupported option specified');
     end

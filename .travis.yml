@@ -17,10 +17,16 @@ jobs:
     - name: "Unit Tests / HODLR / QR compression"
       stage: unit tests
       script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'qr'); hodlr_RunAllTests;"
-    - name: "Unit Tests / HODLR / SVD compression"
+    - name: "Unit Tests / HODLR / SVD compression / 2-norm"
       stage: unit tests
       script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'svd'); hodlr_RunAllTests;"
-    - name: "Unit Tests / HSS / QR compression"
+    - name: "Unit Tests / HODLR / QR compression / 2-norm"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'qr'); hodlroption('norm', 'fro'); hodlr_RunAllTests;"
+    - name: "Unit Tests / HODLR / SVD compression / Frobenius norm"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'svd'); hodlroption('norm', 'fro'); hodlr_RunAllTests;"
+    - name: "Unit Tests / HSS / QR compression / Frobenius norm"
       stage: unit tests
       script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hssoption('compression', 'qr'); hss_RunAllTests;"
     - name: "Unit Tests / HSS / SVD compression"
