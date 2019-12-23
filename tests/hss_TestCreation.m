@@ -66,12 +66,12 @@ for n = [ 100, 1000 ]
 
 	H = hss(A);
 
-	CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
+	CheckTestResult(hnrm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
 		'Generation of an HSS representation for Cauchy A built from dense');
     
     H = hss('cauchy', -y, x);
     
-    CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
+    CheckTestResult(hnrm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
 		'Generation of an HSS representation for Cauchy A built with the Cauchy constructor');
 end
 
