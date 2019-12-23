@@ -120,7 +120,7 @@ classdef hmatrix
                         if nargin <= 4                        
                             obj = hmatrix_from_adaptive(varargin{2:4}, []);
                         else
-                            obj = hmatrix_from_adaptive(varargin{2:5});
+                            obj = hmatrix_from_adaptive(varargin{2:end});
                         end
                         
                     case 'handle'

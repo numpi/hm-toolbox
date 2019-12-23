@@ -35,7 +35,7 @@ tol = hmatrixoption('threshold');
 if is_leafnode(C) && C.admissible
     if is_sparse
         if is_lyapunov
-            M = ek_struct(sA);
+            M = ek_struct(sA, issymmetric(sA));
             [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol);
         else
             [X.U, X.V] = ek_sylv(sA, sB, C.U, C.V, inf, tol);

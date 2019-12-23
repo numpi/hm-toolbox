@@ -29,8 +29,6 @@ if isempty(maxrank)
     maxrank = round(min(m,n) / 10);
 end
 
-debug = 1;
-
 U = zeros(m, 0);
 V = zeros(n, 0);
 k = 1;

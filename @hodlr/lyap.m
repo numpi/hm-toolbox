@@ -50,11 +50,7 @@ addParameter(p, 'method', 'd&c', @ischar);
 addParameter(p, 'parallel', false, @islogical);
 
 if isa(C, 'hmatrix')
-    if is_lyapunov
-        X = dac_lyap_blr(A, C);
-    else
-        X = dac_lyap_blr(A, B, C);
-    end
+    X = dac_lyap_blr(varargin{:});
     return;
 end
 
