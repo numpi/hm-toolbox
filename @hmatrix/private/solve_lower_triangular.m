@@ -11,7 +11,7 @@ if isa(H2, 'hmatrix')
                 H.V = H2.V;
                 H.admissible = true;
             else
-                H.F = H1.F\H2.F;
+                H.F = H1.F\full(H2);
             end
         end
     else
