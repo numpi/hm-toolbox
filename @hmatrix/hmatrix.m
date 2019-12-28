@@ -89,6 +89,9 @@ classdef hmatrix
                 return;
             end
             
+            % Identify the block we are working on
+            progress_fcn = @(l,i,j,s) 1;
+            
             % Similarly to @hodlr and @hss, we allow the user to specify a
             % custer, which needs to be an empty @hmatrix object with just
             % the sizes and the admissibility flags set correctly.
@@ -110,6 +113,15 @@ classdef hmatrix
                 end
             end
             
+            for j = 1 : length(varargin)
+                if strcmp(varargin{j}, 'progress')                    
+                    % Filter out the progress option
+                    varargin = varargin([ 1 : j-1, j+1:length(varargin) ]);
+                    progress_fcn = @(l,i,j,s) fprintf('Level %d / block (%d, %d): status %s\n', l, i, j, s);
+                    break;
+                end
+            end
+            
             if ischar(varargin{1})
                 switch varargin{1}
                     case 'adaptive'
@@ -124,7 +136,7 @@ classdef hmatrix
                         end
                         
                     case 'handle'
-                        obj = hmatrix_from_aca(H, varargin{2:4});
+                        obj = hmatrix_from_aca(H, varargin{2:4}, progress_fcn);
                     case 'eye'
                         obj = hmatrix_eye(H, varargin{2});
                     case 'banded'
