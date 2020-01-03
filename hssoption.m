@@ -5,11 +5,30 @@ function opt = hssoption(key, value)
 %   'block-size': Integer representing the minimum block size.
 %   'threshold': Value used for off-diagonal truncation.
 %   'compression': String indicating the strategy of compression (qr or svd)
+%   'norm': The norm used for truncation. Can be either 2, or 'fro', and
+%       the truncation is performed relative to the norm of the entire
+%       matrix. 
+%
+% The special option HSSOPTION('clear') can be used to load all the
+% default values, clearing all the previous HSSOPTION commands.
 
 global hss_block_size
 global hss_threshold
 global hss_compression
 global hss_norm
+
+if strcmp(key, 'clear')
+    if exist('value', 'var')
+        error('Specifying a value is unsupported for the special option "clear"');
+    end
+    
+    clear hss_block_size;
+    clear hss_threshold;
+    clear hss_compression;
+    clear hss_norm;
+    
+    return;
+end
 
 if isempty(hss_block_size)
     hss_block_size = 256;

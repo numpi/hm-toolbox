@@ -10,11 +10,27 @@ function opt = hodlroption(key, value)
 %   'norm': The norm used for truncation. Can be either 2, or 'fro', and
 %       the truncation is performed relative to the norm of the entire
 %       matrix. 
+%
+% The special option HODLROPTION('clear') can be used to load all the
+% default values, clearing all the previous HODLROPTION commands. 
 
 global hodlr_block_size
 global hodlr_threshold
 global hodlr_compression
 global hodlr_norm
+
+if strcmp(key, 'clear')
+    if exist('value', 'var')
+        error('Specifying a value is unsupported for the special option "clear"');
+    end
+    
+    clear hodlr_block_size;
+    clear hodlr_threshold;
+    clear hodlr_compression;
+    clear hodlr_norm;
+    
+    return;
+end
 
 if isempty(hodlr_compression)
 	hodlr_compression = 'qr';
