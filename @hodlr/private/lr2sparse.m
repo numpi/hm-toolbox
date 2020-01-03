@@ -1,6 +1,6 @@
 function A = lr2sparse(U, V, tol)
 % Sparse (approximation) of factorized matrix U*V'
-    
+
 m = size(U,1); n = size(V,1);
 if m*n == 0, return, end
 
@@ -10,23 +10,23 @@ if tol == 0,
     i = find( any(U,2) ); j = find( any(V,2) );
     A(i,j) = sparse( U(i,:)*V(j,:)' );
 else
-% Optional step 0: Equilibrate U and V (sometimes helps)
-%    [U,RU] = qr(U,0);
-%    [V,RV] = qr(V,0);
-%    [QU, D, QV] = svd( RU*RV');
-%    D = sqrt(D);
-%    U = U*QU*D;
-%    V = V*QV*D;
+    % Optional step 0: Equilibrate U and V (sometimes helps)
+    %    [U,RU] = qr(U,0);
+    %    [V,RV] = qr(V,0);
+    %    [QU, D, QV] = svd( RU*RV');
+    %    D = sqrt(D);
+    %    U = U*QU*D;
+    %    V = V*QV*D;
     
     % Step 1: Find entries (i,j) for which
     % norm(U(i,:))*norm(V(i,:)) > tol.
     
     normsU = sqrt(sum(U.^2,2));
     normsV = sqrt(sum(V.^2,2));
-
+    
     [normsU,permi] = sort(normsU, 'descend');
     [normsV,permj] = sort(normsV, 'descend');
-
+    
     i = []; j = [];
     for col = 1:size(V,1),
         % Find first entry <= tol / normsV(col)
@@ -50,7 +50,7 @@ else
     % Step 2: Evaluate all remaining entries column by column
     aj = accumarray(j,1);
     vals = zeros(length(i),1);
-   
+    
     ind = 1;
     for entries = aj',
         % current row indices and column index
@@ -64,5 +64,5 @@ else
     vals = vals(ind);
     i = i(ind); j = j(ind);
     
-    A = sparse( i, j, vals, m, n );    
+    A = sparse( i, j, vals, m, n );
 end

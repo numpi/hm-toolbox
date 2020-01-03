@@ -27,7 +27,7 @@ function X = lyap(varargin)
 %     arXiv preprint arXiv:1712.04349.
 %
 % [3] Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured
-%     Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and 
+%     Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and
 %     Applications, 39(4), 1564-1590.
 
 N = 64;
@@ -35,7 +35,7 @@ N = 64;
 p = inputParser;
 
 A = varargin{1};
-if length(varargin) == 2 || ~isa(varargin{3}, 'hodlr')
+if length(varargin) == 2 || issparse(varargin{3}) || ischar(varargin{3})
     C = varargin{2};
     is_lyapunov = true;
 else
@@ -48,6 +48,11 @@ addParameter(p, 'debug', false, @islogical);
 addParameter(p, 'expm',  'pade', @ischar);
 addParameter(p, 'method', 'd&c', @ischar);
 addParameter(p, 'parallel', false, @islogical);
+
+if isa(C, 'hmatrix')
+    X = dac_lyap_blr(varargin{:});
+    return;
+end
 
 for first_keyword = 1 : length(varargin)
     if ischar(varargin{first_keyword})

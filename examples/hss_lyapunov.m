@@ -49,7 +49,7 @@ fprintf('[Standard D&C HSS solver] relative residual: %e, time: %fs\n', ...
 
 %%
 % Let's have a look at the solution; we reduce the number of points since
-% we do not need to zoom into the details. 
+% we do not need to zoom into the details.
 XX = full(X);
 x = linspace(0, 1, n);
 x = x(1:10:end);
@@ -69,7 +69,7 @@ fprintf('[Sparse D&C HSS solver]   relative residual: %e, time: %fs\n', ...
 
 %%
 % Let's have a look at the solution; we reduce the number of points since
-% we do not need to zoom into the details. 
+% we do not need to zoom into the details.
 XX = full(X);
 x = linspace(0, 1, n);
 x = x(1:10:end);

@@ -18,10 +18,10 @@ function [U, V] = aca(Afun, m, n, tol, comp, debug)
 % -----------------------------------------------------------------------------
 
 if ~exist('comp', 'var')
-	comp = 0;
+    comp = 0;
 end
 if ~exist('debug', 'var')
-	debug = 0;
+    debug = 0;
 end
 
 U = zeros(m, 0);
@@ -51,8 +51,10 @@ while k < min(m,n)
     if tind >= ind
         ind = tind + 1;
     else
+
         ind = tind;
     end
+
     if k == 1
         nrm = norm(a) * norm(b);
     end
@@ -71,12 +73,13 @@ while k < min(m,n)
     end
     taken_row = [taken_row, ind];
 
+
 end
 if comp
-	[QU, RU] = qr(U, 0); % Re-compression
-	[QV, RV] = qr(V, 0);
-	[U, S, V] = svd(RU * RV', 'econ');
-	rk = sum(diag(S) > tol * S(1,1));
-	U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
+    [QU, RU] = qr(U, 0); % Re-compression
+    [QV, RV] = qr(V, 0);
+    [U, S, V] = svd(RU * RV', 'econ');
+    rk = sum(diag(S) > tol * S(1,1));
+    U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
     V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
 end

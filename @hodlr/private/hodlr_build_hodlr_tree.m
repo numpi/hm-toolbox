@@ -1,40 +1,40 @@
 function H = hodlr_build_hodlr_tree(m, n, block_size, partitionm, partitionn)
-    if isempty(partitionm)
-        H = build_hodlr_tree_rec(m, n, block_size);
+if isempty(partitionm)
+    H = build_hodlr_tree_rec(m, n, block_size);
+else
+    check_partitioning(partitionm, m);
+    
+    if ~exist('partitionn', 'var')
+        partitionn = partitionm;
     else
-        check_partitioning(partitionm, m);
-        
-        if ~exist('partitionn', 'var')
-            partitionn = partitionm;
-        else
-            check_partitioning(partitionn, n);
-        end
-        
-        
-        if length(partitionn) ~= length(partitionm)
-            error('Row and column partitioning must have the same number of elements');
-        end
-        
-        H = build_hodlr_tree_partition_rec(m, n, partitionm, partitionn);
+        check_partitioning(partitionn, n);
     end
+    
+    
+    if length(partitionn) ~= length(partitionm)
+        error('Row and column partitioning must have the same number of elements');
+    end
+    
+    H = build_hodlr_tree_partition_rec(m, n, partitionm, partitionn);
+end
 end
 
 function check_partitioning(partition, n)
-   for j = 2 : length(partition)
-       if partition(j) < partition(j-1)
-           error('The cluster vector must be non decreasing');
-       end
-   end
-   
-   if partition(end) ~= n
-       error('The last element of the cluster must be the dimension');
-   end   
+for j = 2 : length(partition)
+    if partition(j) < partition(j-1)
+        error('The cluster vector must be non decreasing');
+    end
+end
+
+if partition(end) ~= n
+    error('The last element of the cluster must be the dimension');
+end
 end
 
 function H = build_hodlr_tree_rec(m, n, block_size)
 
 H = hodlr();
-    
+
 H.sz = [m n];
 
 if max(m, n) > block_size && min(m, n) > 1
@@ -82,9 +82,9 @@ if lp > 1
         H.U21 = zeros(m2, 0); H.V21 = zeros(n1, 0);
     end
 else
-   H.F = zeros(m, n); 
+    H.F = zeros(m, n);
 end
-    
+
 end
 
 function [n1, n2] = split_indices(n)

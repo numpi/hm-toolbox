@@ -1,64 +1,64 @@
 classdef hodlr
-%HODLR
-%
-% H = HODLR(A) constructs the HODLR representation of a matrix A by
-%     approximating the off-diagonal blocks at all levels using truncated 
-%     SVDs.
-%
-% H = HODLR('banded', A) constructs an HODLR representation of a banded matrix
-%     A. The matrix A can be either sparse or dense. 
-%
-% H = HODLR('banded', A, B) can be used to specify the symmetric bandwidth B 
-%     of the matrix A.
-%
-% H = HODLR('banded', A, BL, BU) specifies different lower and upper 
-%     bandwidth BL and BU, respectively.
-%
-% H = HODLR('cauchy', x, y) constructs an HODLR representation of the Cauchy
-%     matrix with elements 1 ./ (x(i) + y(j)). The representation is
-%     constructed using Adaptive Cross approximation with partial pivoting.
-%
-% H = HODLR('diagonal', D) constructs the diagonal matrix with the entries of
-%     the vector D on the main diagonal. 
-%
-% H = HODLR('eye', N) constructs an HODLR representation of the N x N identity 
-%     matrix. 
-%
-% H = HODLR('handle', AEVAL, M, N) constructs an HODLR matrix
-%     using the adaptive cross approximation strategy. M and N are the
-%     number of rows and columns of A. 
-%
-% H = HODLR('low-rank', U, V) construct an HODLR representation of the low-rank
-%     matrix U*V'. 
-%
-% H = HODLR('ones', M, N) constructs an HODLR representation of the rank-1
-%     M x N matrix of all ones. 
-%
-% H = HODLR('toeplitz', C, R) constructs the Toeplitz matrix with C as first
-%     column and R as first row. 
-%
-% H = HODLR('toeplitz', C, R, N) constructs the N x N Toeplitz matrix with 
-%     C as first column and R as first row. if N is larger than C and 
-%     R, respectively, then C and R are padded with zeros. 
-%
-% H = HODLR('zeros', M, N) constructs the HODLR representation of the M x N
-%     zero matrix. 
-%
-% All the constructors support an additional 'cluster' keyword that allows
-% to specify custom row and column clusters. These are described as a
-% vector of indices J = [J(1), ..., J(2^P)], such that the partitioning at
-% the lowest level P is 
-%
-%        (1, J(1))    (J(1)+1, J(2))   ...   (J(2^(P-1)+1), J(2^P)), 
-%
-% J(2^P) = N. If J(I) = J(I+1) the corresponding leafnode is assumed to be
-% missing from the tree. The cluster can be specified with the syntax
-%
-%   H = HODLR(..., 'cluster', rowcluster, colcluster). 
-%
-% If colcluster is omitted then it is assumed that rowcluster == colcluster.
-%
-% The partitioning of an HODLR matrix can be retrieved calling CLUSTER(H).
+    %HODLR
+    %
+    % H = HODLR(A) constructs the HODLR representation of a matrix A by
+    %     approximating the off-diagonal blocks at all levels using truncated
+    %     SVDs.
+    %
+    % H = HODLR('banded', A) constructs an HODLR representation of a banded matrix
+    %     A. The matrix A can be either sparse or dense.
+    %
+    % H = HODLR('banded', A, B) can be used to specify the symmetric bandwidth B
+    %     of the matrix A.
+    %
+    % H = HODLR('banded', A, BL, BU) specifies different lower and upper
+    %     bandwidth BL and BU, respectively.
+    %
+    % H = HODLR('cauchy', x, y) constructs an HODLR representation of the Cauchy
+    %     matrix with elements 1 ./ (x(i) + y(j)). The representation is
+    %     constructed using Adaptive Cross approximation with partial pivoting.
+    %
+    % H = HODLR('diagonal', D) constructs the diagonal matrix with the entries of
+    %     the vector D on the main diagonal.
+    %
+    % H = HODLR('eye', N) constructs an HODLR representation of the N x N identity
+    %     matrix.
+    %
+    % H = HODLR('handle', AEVAL, M, N) constructs an HODLR matrix
+    %     using the adaptive cross approximation strategy. M and N are the
+    %     number of rows and columns of A.
+    %
+    % H = HODLR('low-rank', U, V) construct an HODLR representation of the low-rank
+    %     matrix U*V'.
+    %
+    % H = HODLR('ones', M, N) constructs an HODLR representation of the rank-1
+    %     M x N matrix of all ones.
+    %
+    % H = HODLR('toeplitz', C, R) constructs the Toeplitz matrix with C as first
+    %     column and R as first row.
+    %
+    % H = HODLR('toeplitz', C, R, N) constructs the N x N Toeplitz matrix with
+    %     C as first column and R as first row. if N is larger than C and
+    %     R, respectively, then C and R are padded with zeros.
+    %
+    % H = HODLR('zeros', M, N) constructs the HODLR representation of the M x N
+    %     zero matrix.
+    %
+    % All the constructors support an additional 'cluster' keyword that allows
+    % to specify custom row and column clusters. These are described as a
+    % vector of indices J = [J(1), ..., J(2^P)], such that the partitioning at
+    % the lowest level P is
+    %
+    %        (1, J(1))    (J(1)+1, J(2))   ...   (J(2^(P-1)+1), J(2^P)),
+    %
+    % J(2^P) = N. If J(I) = J(I+1) the corresponding leafnode is assumed to be
+    % missing from the tree. The cluster can be specified with the syntax
+    %
+    %   H = HODLR(..., 'cluster', rowcluster, colcluster).
+    %
+    % If colcluster is omitted then it is assumed that rowcluster == colcluster.
+    %
+    % The partitioning of an HODLR matrix can be retrieved calling CLUSTER(H).
     
     properties
         % top and bottom blocks of the matrix.
@@ -113,8 +113,8 @@ classdef hodlr
                 A = varargin{1};
                 
                 obj = hodlr_build_hodlr_tree(size(A, 1), size(A, 2), ...
-                            hodlroption('block-size'), rowcluster, ...
-                            colcluster);
+                    hodlroption('block-size'), rowcluster, ...
+                    colcluster);
                 
                 obj = create_h_matrix(obj, varargin{1});
                 return;
@@ -126,38 +126,38 @@ classdef hodlr
                         if ~check_cluster_equality(rowcluster, colcluster)
                             error('row and column cluster must match for banded matrices');
                         end
-
+                        
                         obj = hodlr_build_hodlr_tree(size(varargin{2}, 1), ...
                             size(varargin{2}, 2), ...
                             hodlroption('block-size'), rowcluster, ...
-                            colcluster);                        
+                            colcluster);
                         
                         obj = create_banded_h_matrix(obj, varargin{2:charpos - 1});
-
+                        
                     case 'cauchy'
                         x = varargin{2};
                         y = varargin{3};
                         
                         obj = hodlr('handle', @(i,j) 1 ./ (x(i).' + y(j)), ...
-                                    length(x), length(y), 'cluster', ...
-                                    rowcluster, colcluster);
+                            length(x), length(y), 'cluster', ...
+                            rowcluster, colcluster);
                         
                     case 'diagonal'
                         if ~check_cluster_equality(rowcluster, colcluster)
                             error('row and column cluster must match for diagonal matrices');
                         end
-
+                        
                         D = varargin{2}; D = D(:);
                         obj = hodlr('banded', spdiags(D, 0, ...
-                            length(D), length(D)), varargin{3:end});                        
-
+                            length(D), length(D)), varargin{3:end});
+                        
                     case 'eye'
                         n = varargin{2};
-
+                        
                         if ~check_cluster_equality(rowcluster, colcluster)
                             error('row and column cluster must match for the identity matrix');
                         end
-
+                        
                         obj = hodlr('diagonal', ones(n, 1), 'cluster', rowcluster);
                         
                     case 'handle'
@@ -167,10 +167,10 @@ classdef hodlr
                         
                         obj = hodlr_build_hodlr_tree(m, n, ...
                             hodlroption('block-size'), rowcluster, ...
-                            colcluster); 
+                            colcluster);
                         
                         obj = hodlr_from_aca(obj, Aeval, 1, m, 1, n);
-
+                        
                     case 'low-rank'
                         obj = hodlr_build_hodlr_tree(size(varargin{2}, 1), ...
                             size(varargin{3}, 1), ...
@@ -178,7 +178,7 @@ classdef hodlr
                             colcluster);
                         
                         obj = create_low_rank_h_matrix(obj, varargin{2:charpos - 1});
-
+                        
                     case 'ones'
                         m = varargin{2};
                         if charpos > 3
@@ -186,10 +186,10 @@ classdef hodlr
                         else
                             n = m;
                         end
-
+                        
                         obj = hodlr('low-rank', ones(m, 1), ones(n, 1), ...
                             'cluster', rowcluster, colcluster);
-
+                        
                     case 'toeplitz'
                         n = length(varargin{2});
                         if charpos > 4
@@ -198,13 +198,13 @@ classdef hodlr
                         
                         obj = hodlr_build_hodlr_tree(n, n, ...
                             hodlroption('block-size'), rowcluster, ...
-                            colcluster); 
+                            colcluster);
                         
                         obj = create_toeplitz_h_matrix(obj, varargin{2:charpos-1});
-
+                        
                     case 'tridiagonal'
                         obj = create_tridiagonal_h_matrix(obj, varargin{2});
-
+                        
                     case 'zeros'
                         m = varargin{2};
                         if charpos > 3
@@ -214,7 +214,7 @@ classdef hodlr
                         end
                         obj = hodlr_build_hodlr_tree(m, n, ...
                             hodlroption('block-size'), rowcluster, colcluster);
-
+                        
                     otherwise
                         error('Unsupported constructor mode');
                 end
@@ -265,7 +265,7 @@ classdef hodlr
                 H.F = full(A);
             else
                 [m, n] = size(H);
-
+                
                 if m ~= n
                     error('The construction of banded matrices is supported only for square diagonal blocks');
                 end
@@ -375,11 +375,14 @@ classdef hodlr
                 % Here the truncation is made relatively to the norm of the
                 % off-diagonal blocks: we might want to do it relatively to
                 % the norm of the big matrix.
-                [tU21,S21,tV21] = lanczos_svd(@(v,trasp) toepmult_afun(...
-                    [ am(nl+1:min(nl+ml, length(am))) , zeros(1, ml - min(nl+ml, length(am)) + ml) ], am(nl+1:-1:2), ...
+                [tU21, S21, tV21] = lanczos_svd(@(v,trasp) toepmult_afun(...
+                    [ am(nl+1:min(nl+ml, length(am))), ...
+                    zeros(1, ml - min(nl+ml, length(am)) + ml) ], ...
+                    am(nl+1:-1:2), ...
                     ml, nl, v, trasp), ml, nl, tol);
-                [tU12,S12,tV12] = lanczos_svd(@(v,trasp) toepmult_afun(...
-                    ap(mu+1:-1:2), [ ap(mu+1:min(mu+nu, length(ap))), zeros(1, nu - min(mu+nu, length(ap)) + mu) ], ...
+                [tU12, S12, tV12] = lanczos_svd(@(v,trasp) toepmult_afun(...
+                    ap(mu+1:-1:2), [ ap(mu+1:min(mu+nu, length(ap))), ...
+                    zeros(1, nu - min(mu+nu, length(ap)) + mu) ], ...
                     mu, nu, v, trasp), mu, nu, tol);
                 
                 tU21 = tU21 * sqrt(S21);
@@ -395,7 +398,7 @@ classdef hodlr
         
         function [mu, nu, ml, nl] = find_max_offdiag_size(obj)
             if ~is_leafnode(obj)
-                [mu1, nu1, ml1, nl1] = find_max_offdiag_size(obj.A11);                
+                [mu1, nu1, ml1, nl1] = find_max_offdiag_size(obj.A11);
                 [mu2, nu2, ml2, nl2] = find_max_offdiag_size(obj.A22);
                 
                 mu = max([ size(obj.U12, 1), mu1, mu2 ]);
@@ -429,7 +432,7 @@ classdef hodlr
                 obj.A11 = initialize_toeplitz_h_matrix(obj.A11, am, ap, m1, tU12, tV12, tU21, tV21);
                 obj.A22 = initialize_toeplitz_h_matrix(obj.A22, am, ap, n-m1, tU12, tV12, tU21, tV21);
             end
-        end       
+        end
         
     end
     

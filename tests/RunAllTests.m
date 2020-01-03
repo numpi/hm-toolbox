@@ -6,6 +6,7 @@ hssoption('clear');
 
 hodlr_RunAllTests;
 hss_RunAllTests;
+hmatrix_RunAllTests;
 
 hodlroption('clear');
 hssoption('clear');

@@ -1,6 +1,6 @@
 function varargout = subsref(H, S)
 % Overloaded subsref function for HODLR matrices
- 
+
 switch S(1).type
     case '()'
         [m,n] = size(H);
@@ -17,7 +17,7 @@ switch S(1).type
         varargout = {purge_tree(hodlr_sub(H,mind,nind))};
     otherwise
         varargout = {builtin('subsref',H,S)};
-    end
+end
 end
 
 function H = hodlr_sub(H, mind, nind);
@@ -34,7 +34,7 @@ else
     H.A11 = hodlr_sub(H.A11, mind1, nind1);
     H.U12 = H.U12(mind1,:);
     H.V21 = H.V21(nind1,:);
-
+    
     [m2,n2] = size(H.A22);
     mind = mind - m1; nind = nind - n1;
     mind2 = intersect( 1:m2, mind );

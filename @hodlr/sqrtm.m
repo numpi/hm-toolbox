@@ -7,7 +7,7 @@ function X = sqrtm(H)
 converged = false;
 
 threshold = hodlroption('threshold') * norm(H);
-        
+
 X = H;
 Y = eye(size(H), 'like', H);
 
@@ -19,11 +19,11 @@ while ~converged && it < max_its
     
     Xnew = .5 * (X + inv(Y));
     Ynew = .5 * (Y + inv(X));
-
+    
     if norm(Xnew - X) < threshold
         converged = true;
     end
-
+    
     X = Xnew;
     Y = Ynew;
 end
@@ -31,6 +31,6 @@ end
 if it == max_its
     warning('Maximum number of iterations exceeded');
 end
-        
+
 end
 

@@ -4,7 +4,7 @@ function [S, ST] = ek_struct(A, cholesky)
 
 if issparse(A)
     if exist('cholesky', 'var') && cholesky
-        [R, g, pA] = chol(A);
+        [R, g, pA] = chol(A, 'vector');
         
         if (g ~= 0)
             % warning('Matrix is not posdef, resorting to LU');
@@ -12,25 +12,30 @@ if issparse(A)
             return;
         end
         
+        qA(pA) = 1:size(A,1);
+        
         S = struct(...
-            'solve', @(nu, mu, x) sparse_solve(nu, mu, R', R, pA', pA, x), ...
+            'solve', @(nu, mu, x) sparse_solve(nu, mu, R', R, pA, qA, x), ...
             'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
             'isreal', isreal(A), ...
             'nrm', normest(A, 1e-2));
         ST = S;
         
     else
-        [LA, UA, pA, qA] = lu(A);
+        [LA, UA, pA, qA] = lu(A, 'vector');
+        
+        iqA(qA) = 1:size(A,1);
+        ipA(pA) = 1:size(A,1);        
         
         S = struct(...
-            'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x), ...
+            'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, iqA, x), ...
             'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
             'isreal', isreal(A), ...
             'nrm', normest(A, 1e-2));
         
         if nargout >= 2
             ST = struct(...
-                'solve', @(nu, mu, x) sparse_solve(nu, mu, UA', LA', pA', qA', x), ...
+                'solve', @(nu, mu, x) sparse_solve(nu, mu, UA', LA', qA, ipA, x), ...
                 'multiply', @(rho, eta, x) rho * A' * x - eta * x, ...
                 'isreal', S.isreal, ...
                 'nrm', S.nrm);
@@ -97,10 +102,10 @@ else
         
     else
         % We use this syntax to be able to call sparse_solve even if this
-        % is the case of a generic matrix. 
+        % is the case of a generic matrix.
         [LA, UA, pA] = lu(A);
-        qA = 1; % This constructs an equivalent of the identity matrix 
-                % in practice, without the need to allocate it. 
+        qA = 1; % This constructs an equivalent of the identity matrix
+        % in practice, without the need to allocate it.
         
         S = struct(...
             'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x), ...

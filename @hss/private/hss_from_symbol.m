@@ -1,5 +1,5 @@
 function H = hss_from_symbol(am, ap, m, n, rowcluster, colcluster)
-%HSS_FROM_SYMBOL 
+%HSS_FROM_SYMBOL
 
 if ~exist('m', 'var')
     m = length(am);
@@ -30,22 +30,22 @@ end
 end
 
 function M = Aeval(am, ap, i, j)
-    if isscalar(i) && isscalar(j)
-        M = 0;
-        if i > j && i - j < length(am)
-            M = am(i - j + 1);
-        end
-        if j >= i && j - i < length(ap)
-            M = ap(j - i + 1);
-        end
-    else
-        M = zeros(length(i), length(j));
-        
-        for ii = 1 : length(i)
-            for jj = 1 : length(j)
-                M(ii,jj) = Aeval(am, ap, i(ii), j(jj));
-            end
+if isscalar(i) && isscalar(j)
+    M = 0;
+    if i > j && i - j < length(am)
+        M = am(i - j + 1);
+    end
+    if j >= i && j - i < length(ap)
+        M = ap(j - i + 1);
+    end
+else
+    M = zeros(length(i), length(j));
+    
+    for ii = 1 : length(i)
+        for jj = 1 : length(j)
+            M(ii,jj) = Aeval(am, ap, i(ii), j(jj));
         end
     end
+end
 end
 

@@ -1,15 +1,15 @@
 function x = toeplitz_solve(c, r, b)
-%TOEPLITZ_SOLVE Solve a Toeplitz linear system Tx = b. 
+%TOEPLITZ_SOLVE Solve a Toeplitz linear system Tx = b.
 %
 % X = TOEPLITZ_SOLVE(C, R, B) solves the linear system T * X = B using the
-%     algorithodlr presented in [1,2], implemented using the tools in 
-%     hm-toolbox. 
+%     algorithodlr presented in [1,2], implemented using the tools in
+%     hm-toolbox.
 %
-% [1] 1. J. Xia, Y. Xi, and M. Gu, A superfast structured solver for 
-%     Toeplitz linear systems via randomized sampling, 
+% [1] 1. J. Xia, Y. Xi, and M. Gu, A superfast structured solver for
+%     Toeplitz linear systems via randomized sampling,
 %     SIAM J. Matrix Anal. Appl., 33 (2012), pp. 837-858.
 %
-% [1] Y. Xi, J. Xia, S. Cauley, and V. Balakrishnan, Superfast and stable 
+% [1] Y. Xi, J. Xia, S. Cauley, and V. Balakrishnan, Superfast and stable
 %     structured solvers for Toeplitz least squares via randomized sampling
 %     SIAM J. Matrix Anal. Appl., 35 (2014), pp. 44-72.
 
@@ -26,8 +26,8 @@ Gh = ifft(G) * sqrt(n);
 Fh = ifft((d0.' * ones(1, 2)) .* H) * sqrt(n);
 
 C = hss('handle', @(v) toep_cauchy_matvec(c, r, d0, v), ...
-          @(v) toep_cauchy_matvec_trasp(c, r, d0, v), ...
-          @(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n);
+    @(v) toep_cauchy_matvec_trasp(c, r, d0, v), ...
+    @(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n);
 
 % C1 = (Gh * Fh') ./ (d1.' - dm1);
 
@@ -36,23 +36,23 @@ y = C \ z;
 x = d0' .* fft(y);
 
 if isreal(c) && isreal(r) && isreal(b)
-	x = real(x);
+    x = real(x);
 end
 
 end
 
 function z = toep_cauchy_matvec(c, r, omega, v)
-    n = size(v, 1);
-    v = omega' .* fft(v);
-    v = toepmult_fft(c, r, n, n, v);
-    z = ifft(v);
+n = size(v, 1);
+v = omega' .* fft(v);
+v = toepmult_fft(c, r, n, n, v);
+z = ifft(v);
 end
 
 function z = toep_cauchy_matvec_trasp(c, r, omega, v)
-    n = size(v, 1);
-    v = toepmult_fft(conj(r), conj(c), n, n, fft(v));
-    v = omega.' .* v;
-    z = ifft(v);
+n = size(v, 1);
+v = toepmult_fft(conj(r), conj(c), n, n, fft(v));
+v = omega.' .* v;
+z = ifft(v);
 end
 
 function u = toepmult_fft(am, ap, m, n, v)

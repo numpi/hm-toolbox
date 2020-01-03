@@ -38,3 +38,9 @@ jobs:
     - name: "Unit Tests / HSS / SVD compression / Frobenius norm"
       stage: unit tests
       script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hssoption('compression', 'svd'); hssoption('norm', 'fro'); hss_RunAllTests;"
+    - name: "Unit Tests / HMATRIX / QR compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hmatrixoption('compression', 'qr'); hmatrix_RunAllTests;"
+    - name: "Unit Tests / HMATRIX / SVD compression"
+      stage: unit tests
+      script: octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hmatrixoption('compression', 'svd'); hmatrix_RunAllTests;"
