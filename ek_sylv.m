@@ -4,11 +4,16 @@ function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
 %     Sylvester equation in the factored form XU * XV'. The integer K is
 %     the maximum number of iteration to perform, and the default tolerance
-%     is 1e-8.
+%     is 1e-8. The maximum number of steps K can be set to inf; in that
+%     case, the iteration is stopped only when the solution is accurate
+%     enough. 
 %
 % [XU, XV] = EK_SYLV(A, B, U, V, K, TOL, DEBUG) also returns the bases VA
 %     and VB, and the optional parameters TOL and DEBUG control the
 %     stopping criterion and the debugging during the iteration.
+%
+% The default stopping criterion is to continue until the residual is
+% smaller than TOL * norm(XU * XV'). 
 %
 % The tolerance TOL can also be specified as a function TOL(R, N) that
 % takes as input the residual norm and the norm of the solution (R and N,
