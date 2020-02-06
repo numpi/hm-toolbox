@@ -143,12 +143,14 @@ end
 switch nrmtype
     case 2
         s = diag(SS);
-        rk = sum( arrayfun(@(ss) tol(ss, s(1)), s) == 0);
+        rk = sum( arrayfun(@(ss) tol(ss, s(1) / max(nrmA, nrmB)), s) == 0);
     case 'fro'
         d = sort(diag(SS));
         s = cumsum(d);
-        rk = sum( arrayfun(@(ss) tol(ss, d(end)), s) == 0 );
+        rk = sum( arrayfun(@(ss) tol(ss, d(end) / max(nrmA, nrmB)), s) == 0 );
 end
+
+rk = length(SS);
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
