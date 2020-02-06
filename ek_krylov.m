@@ -130,7 +130,7 @@ V = [V, w];
 end
 
 %
-% Modified Gram-Schodlridt orthogonalization procedure.
+% Modified Gram-Schmidt orthogonalization procedure.
 %
 % Suggested improvements: work with block-size matrix vector products to
 % get BLAS3 speeds.
