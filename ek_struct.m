@@ -85,7 +85,8 @@ else
     % Cholesky first in the symmetric case, and otherwise resort to a
     % standard LU factorization
     if exist('cholesky', 'var') && cholesky
-        [R, g, pA] = chol(A);
+        [R, g] = chol(A);
+        pA = (1 : length(A));
         
         if (g ~= 0)
             % warning('Matrix is not posdef, resorting to LU');
@@ -103,9 +104,8 @@ else
     else
         % We use this syntax to be able to call sparse_solve even if this
         % is the case of a generic matrix.
-        [LA, UA, pA] = lu(A);
-        qA = 1; % This constructs an equivalent of the identity matrix
-        % in practice, without the need to allocate it.
+        [LA, UA, pA] = lu(A, 'vector');
+        qA = 1 : length(A); 
         
         S = struct(...
             'solve', @(nu, mu, x) sparse_solve(nu, mu, LA, UA, pA, qA, x), ...
@@ -120,8 +120,7 @@ else
                 'isreal', S.isreal, ...
                 'nrm', S.nrm);
         end
-    end
-    
+    end    
 end
 
 end
