@@ -20,7 +20,10 @@ xd = zeros(4, 0);
 yd = zeros(4, 0);
 xo = zeros(4, 0);
 yo = zeros(4, 0);
-[xd,yd, xo, yo] = spy_draw_block(H, 0, 0, hmatrixrank(H), xd, yd, xo, yo);
+xt = [];
+yt = [];
+rkt = [];
+[xd,yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, 0, 0, hmatrixrank(H), xd, yd, xo, yo, xt, yt, rkt);
 
 diag_color    = [ 0.1,  0.3,  0.95 ];
 offdiag_color = [ 0.95,  0.95,  1.0  ];
@@ -28,11 +31,16 @@ offdiag_color = [ 0.95,  0.95,  1.0  ];
 patch(xd, yd, diag_color);
 patch(xo, yo, offdiag_color);
 
+for j = 1 : length(xt)
+    text(xt(j), yt(j), sprintf('%d', rkt(j)), ...
+        'HorizontalAlignment', 'center', 'Interpreter', 'none');
+end
+
 hold off;
 
 end
 
-function [xd, yd, xo, yo] = spy_draw_block(H, xoffset, yoffset, rk, xd, yd, xo, yo)
+function [xd, yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt)
 
 
 mm = H.sz(1);
@@ -44,18 +52,21 @@ if is_leafnode(H)
         yd = [ yd, [ yoffset ; yoffset + mm ; yoffset + mm ; yoffset ] ];
     else
         thisrk = size(H.U, 2);
-        text(xoffset + nn / 2, yoffset + mm / 2, ...
-            sprintf('%d', thisrk), ...
-            'HorizontalAlignment', 'center', 'Interpreter', 'none');
+        %text(xoffset + nn / 2, yoffset + mm / 2, ...
+        %    sprintf('%d', thisrk), ...
+        %    'HorizontalAlignment', 'center', 'Interpreter', 'none');
+        xt = [ xt, xoffset + nn / 2 ];
+        yt = [ yt, yoffset + mm / 2 ];
+        rkt = [ rkt, thisrk ];
         xo = [ xo, [ xoffset ; xoffset ; xoffset + nn ; xoffset + nn ] ];
         yo = [ yo, [ yoffset ; yoffset + mm ; yoffset + mm ; yoffset ] ];
     end
 else
     mm = H.A11.sz(1);
     nn = H.A11.sz(2);
-    [xd,yd,xo,yo] = spy_draw_block(H.A11, xoffset, yoffset, rk, xd, yd, xo, yo);
-    [xd,yd,xo,yo] = spy_draw_block(H.A22, xoffset + nn, yoffset + mm, rk, xd, yd, xo, yo);
-    [xd,yd,xo,yo] = spy_draw_block(H.A12, xoffset + nn, yoffset, rk, xd, yd, xo, yo);
-    [xd,yd,xo,yo] = spy_draw_block(H.A21, xoffset, yoffset + mm, rk, xd, yd, xo, yo);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A11, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A22, xoffset + nn, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A12, xoffset + nn, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A21, xoffset, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt);
 end
 end
