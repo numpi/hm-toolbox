@@ -1,8 +1,11 @@
-function spy(H)
+function spy(H, levels)
 %SPY Inspect the rank structure of H.
 %
 % SPY(H) draw a plot displaying the low-rank structure in the off-diagonal
 %     blocks of H.
+%
+% SPY(H, LEVELS) shows the ranks of the off-diagonal blocks at depth
+% LEVELS. If not specified, LEVELS = 6. 
 
 m = size(H, 1);
 n = size(H, 2);
@@ -23,7 +26,12 @@ yo = zeros(4, 0);
 xt = [];
 yt = [];
 rkt = [];
-[xd,yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, 0, 0, hmatrixrank(H), xd, yd, xo, yo, xt, yt, rkt);
+
+if ~exist('levels', 'var')
+    levels = 6;
+end
+
+[xd,yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, 0, 0, hmatrixrank(H), xd, yd, xo, yo, xt, yt, rkt, levels);
 
 diag_color    = [ 0.1,  0.3,  0.95 ];
 offdiag_color = [ 0.95,  0.95,  1.0  ];
@@ -40,7 +48,7 @@ hold off;
 
 end
 
-function [xd, yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt)
+function [xd, yd, xo, yo, xt, yt, rkt] = spy_draw_block(H, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt, levels)
 
 
 mm = H.sz(1);
@@ -55,18 +63,20 @@ if is_leafnode(H)
         %text(xoffset + nn / 2, yoffset + mm / 2, ...
         %    sprintf('%d', thisrk), ...
         %    'HorizontalAlignment', 'center', 'Interpreter', 'none');
-        xt = [ xt, xoffset + nn / 2 ];
-        yt = [ yt, yoffset + mm / 2 ];
-        rkt = [ rkt, thisrk ];
+        if levels >= 0
+            xt = [ xt, xoffset + nn / 2 ];
+            yt = [ yt, yoffset + mm / 2 ];
+            rkt = [ rkt, thisrk ];
+        end
         xo = [ xo, [ xoffset ; xoffset ; xoffset + nn ; xoffset + nn ] ];
         yo = [ yo, [ yoffset ; yoffset + mm ; yoffset + mm ; yoffset ] ];
-    end
+      end
 else
     mm = H.A11.sz(1);
     nn = H.A11.sz(2);
-    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A11, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt);
-    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A22, xoffset + nn, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt);
-    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A12, xoffset + nn, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt);
-    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A21, xoffset, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A11, xoffset, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt, levels - 1);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A22, xoffset + nn, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt, levels -1 );
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A12, xoffset + nn, yoffset, rk, xd, yd, xo, yo, xt, yt, rkt, levels - 1);
+    [xd,yd,xo,yo,xt,yt,rkt] = spy_draw_block(H.A21, xoffset, yoffset + mm, rk, xd, yd, xo, yo, xt, yt, rkt, levels - 1);
 end
 end
