@@ -11,7 +11,7 @@ end
 function H = hmatrix_from_full_rec(H, A)
 if is_leafnode(H)
     if H.admissible
-        [H.U, H.V] = compress_matrix(A);
+        [H.U, H.V] = compress_matrix(A);        
     else
         H.F = full(A);
     end

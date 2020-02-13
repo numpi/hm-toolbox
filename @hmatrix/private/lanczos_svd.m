@@ -17,15 +17,12 @@ beta = [];
 
 it = 0;
 
-nrm = 0.0;
-nrm_converged = false;
-
 while res > tol
     it = it + 1;
     
     if it > min(m,n) / 2
         if m < n
-            A = Afun(eye(m), 'transp');
+            A = Afun(eye(m), 'transp')';
         else
             A = Afun(eye(n), 'notransp');
         end
@@ -59,7 +56,6 @@ while res > tol
     w = w - V * (V' * w);
     
     beta = [ beta, norm(w) ];
-    
     if beta(end) == 0
         break;
     end
@@ -68,15 +64,8 @@ while res > tol
     
     % Estimate the norm: if we have a good estimate, evaluate the
     % possibility of stopping the iteration.
-    if ~nrm_converged
-        nrm_est = norm(diag(alfa) + diag(beta(1:end-1), 1));
-        if (nrm_est - nrm) < tol * nrm
-            nrm_converged = true;
-        end
-        nrm = nrm_est;
-    else
-        res = max(abs([ alfa(end), beta(end) ])) / nrm;
-    end
+    nrm = norm(diag(alfa) + diag(beta(1:end-1), 1));
+    res = max(abs([ alfa(end), beta(end) ])) / nrm;
     
     % fprintf('Iteration %d, res = %e, nrm_conv = %d, nrm = %e\n', it, res, nrm_converged, nrm);
 end
