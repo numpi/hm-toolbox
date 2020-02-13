@@ -30,13 +30,13 @@ if is_leafnode(H)
     mm = size(H, 1);
     nn = size(H, 2);
     
-    xb = [xoffset, xoffset + nn, xoffset + nn, xoffset ];
-    yb = [yoffset, yoffset, yoffset + mm, yoffset + mm ];
     if ~H.admissible
-        fill(xb, yb, diag_color);
+        rectangle('Position', [ xoffset, yoffset, nn, mm ], 'FaceColor', diag_color);
     else
         thisrk = size(H.U, 2);
-        fill(xb, yb, offdiag_color);
+        rectangle('Position', [ xoffset, ...
+            yoffset, nn, mm ], 'FaceColor', offdiag_color);
+
         text(xoffset + nn / 2, yoffset + mm / 2, ...
             sprintf('%d', thisrk), ...
             'HorizontalAlignment', 'center');
@@ -46,9 +46,6 @@ else
     mm = size(H.A11, 1);
     nn = size(H.A11, 2);
     spy_draw_block(H.A22, xoffset + nn, yoffset + mm, rk);
-    
-    mm2 = size(H.A22, 1);
-    nn2 = size(H.A22, 2);
     spy_draw_block(H.A12, xoffset + nn, yoffset, rk);
     spy_draw_block(H.A21, xoffset, yoffset + mm, rk);
 end
