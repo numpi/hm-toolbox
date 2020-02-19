@@ -2,7 +2,11 @@ function H = hmatrix_repartition(H, maxrank)
 %REPARTITION_HMATRIX
 
 if is_leafnode(H)
-    H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2), maxrank);
+    if ~H.admissible
+    	H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2), maxrank);
+    else
+	H = hmatrix('adaptive', @(i, j) H.U(i, :) * H.V(j, :)', size(H, 1), size(H, 2), maxrank);
+    end
     %if ~H.admissible % In case of a dense block it tries to compress it in the low-rank format
     %    H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2), maxrank);
     %else % in case of a low-rank block it checks that the rank is not too high

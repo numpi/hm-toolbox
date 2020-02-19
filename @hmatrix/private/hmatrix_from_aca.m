@@ -14,6 +14,9 @@ if is_leafnode(H)
     progress_fcn(1, 1, 1, 'in progress');
     if H.admissible
         [H.U, H.V] = aca_or_fail(Afun, m, n, hmatrixoption('threshold'), []);
+	if isempty(H.U) || isempty(H.V)
+		error('Empty representation\n')
+	end
     else
         H.F = Afun((1:m).', (1:n));
     end    
