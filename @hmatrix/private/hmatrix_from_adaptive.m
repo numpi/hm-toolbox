@@ -26,7 +26,7 @@ end
 compression = 'svd';
 
 if isempty(maxrank)
-    maxrank = round(min(m,n) / 2);
+    maxrank = round(min(m,n) / 16);
 end
 
 H = hmatrix;
@@ -37,7 +37,7 @@ if (m <= bs && n <= bs) || min([m n]) == 1
         case 'svd'
             [U, S, V] = tsvd(Afun(1:m, 1:n), tol);
             U = U * S;
-            if size(U, 2) < min(maxrank, min(m, n) / 2)
+            if size(U, 2) < min(maxrank, min(m, n) / 16)
                 H.admissible = true;
                 H.U = U;
                 H.V = V;
@@ -74,7 +74,7 @@ else
                 case 'svd'
                     [U, S, V] = tsvd(Afun(1:m, 1:n), tol);
                     U = U * S;
-                    if size(U, 2) < min(maxrank, min(m, n) / 2)
+                    if size(U, 2) < min(maxrank, min(m, n) / 16)
                         H.admissible = true;
                         H.U = U;
                         H.V = V;
