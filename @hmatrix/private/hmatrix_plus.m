@@ -14,13 +14,21 @@ if is_leafnode(H1)
             H.V = [H1.V, H2.V];
             H.admissible = true;
         else
+	    if isempty(full(H2))
+		H.F = full(H1) + zeros(size(H2));
+	    else
             H.F = full(H1) + full(H2);
+	    end
         end
     else
         if H1.admissible
             H = hmatrix_rank_update(H2, H1.U, H1.V, []);
         else
+	    if isempty(full(H2))
+		H.F = full(H1) + zeros(size(H2));
+	    else
             H.F = full(H1) + full(H2);
+	    end
         end
     end
 elseif is_leafnode(H2)
