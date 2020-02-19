@@ -26,7 +26,7 @@ end
 compression = 'svd';
 
 if isempty(maxrank)
-    maxrank = min(m,n) / 10;
+    maxrank = round(min(m,n) / 2);
 end
 
 H = hmatrix;

@@ -26,7 +26,7 @@ if ~exist('debug', 'var')
 end
 
 if isempty(maxrank)
-    maxrank = round(min(m,n) / 10);
+    maxrank = round(min(m,n) / 2);
 end
 
 U = zeros(m, 0);

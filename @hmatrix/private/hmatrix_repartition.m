@@ -3,12 +3,13 @@ function H = hmatrix_repartition(H)
 
 if is_leafnode(H)
     if ~H.admissible
-        [U, S, V] = tsvd(H.F, hmatrixoption('threshold'));
-        if size(U, 2) < min(size(H.F) / 2)
-            H.admissible = true;
-            H.U = U * S;
-            H.V = V;
-        end
+        H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2));
+        %[U, S, V] = tsvd(H.F, hmatrixoption('threshold'));
+        %if size(U, 2) < min(size(H.F) / 2)
+        %    H.admissible = true;
+        %    H.U = U * S;
+        %    H.V = V;
+        %end
     end
 else
     H.A11 = hmatrix_repartition(H.A11);

@@ -13,7 +13,7 @@ function H = hmatrix_from_aca_rec(H, Afun, progress_fcn)
 if is_leafnode(H)
     progress_fcn(1, 1, 1, 'in progress');
     if H.admissible
-        [H.U, H.V] = aca(Afun, m, n, hmatrixoption('threshold'));
+        [H.U, H.V] = aca_or_fail(Afun, m, n, hmatrixoption('threshold'), []);
     else
         H.F = Afun((1:m).', (1:n));
     end    

@@ -58,8 +58,24 @@ elseif is_leafnode(A) && (is_lyapunov || is_leafnode(B))
     end
     X.admissible = false;
 elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
-    
+            
     m1 = A.A11.sz(1); n1 = A.A11.sz(2);
+    m2 = size(A) - m1; n2 = size(A, 2) - n1;
+    
+    if is_leafnode(C)       
+        % Create an @hmatrix representation of C according to the splitting
+        % of A and B, so we can perform the low-rank update approach
+        % recursively. 
+        CC = hmatrix; CC.sz = [ size(C, 1) , size(C, 2) ];
+        CC.admissible = false;
+                
+        CC.A11 = hmatrix; CC.A11.sz = [ m1 n1 ]; CC.A11.F = C.F(1:m1, 1:n1);
+        CC.A12 = hmatrix; CC.A12.sz = [ m1 n2 ]; CC.A12.F = C.F(1:m1, n1+1:end);
+        CC.A21 = hmatrix; CC.A21.sz = [ m2 n1 ]; CC.A21.F = C.F(m1+1:end, 1:n1);
+        CC.A22 = hmatrix; CC.A22.sz = [ m2 n2 ]; CC.A22.F = C.F(m1+1:end, n1+1:end);        
+        
+        C = CC;
+    end
     
     if is_lyapunov && ~is_sparse
         X.A11 = dac_lyap_blr(A.A11, C.A11);
