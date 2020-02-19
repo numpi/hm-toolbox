@@ -11,9 +11,6 @@ arithmetic uses the same partitioning (with nested bases), and is available thro
 
 Routines to compute matrix functions [1] and to solve matrix equations are included [1,2]. 
 
-Chebfun2 is required for the construction of HODLR / HSS matrices which sample 
-(piecewise) regular functions on a grid.
-
 # Installation instructions
 
 To install the toolbox download the latest revision from Github by running

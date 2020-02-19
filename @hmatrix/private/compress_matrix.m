@@ -4,7 +4,7 @@ function [U,V] = compress_matrix(A)
 threshold = hmatrixoption('threshold');
 compression = hmatrixoption('compression');
 
-if max(size(A)) < 256
+if max(size(A)) <= 128
     compression = 'svd';
 elseif issparse(A)
     compression = 'lanczos';
@@ -12,7 +12,7 @@ end
 
 switch compression
     case 'svd'
-        [U,S,V] = svd(full(A));
+        [U,S,V] = svd(full(A), 'econ');
         
         k = sum(abs(diag(S)) > S(1,1) * threshold);
         

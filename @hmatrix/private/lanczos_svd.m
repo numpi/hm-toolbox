@@ -17,6 +17,10 @@ beta = [];
 
 it = 0;
 
+oldnrm = 0.0;
+nrm = 0.0;
+nrm_converged = false;
+
 while res > tol
     it = it + 1;
     
@@ -64,7 +68,15 @@ while res > tol
     
     % Estimate the norm: if we have a good estimate, evaluate the
     % possibility of stopping the iteration.
-    nrm = norm(diag(alfa) + diag(beta(1:end-1), 1));
+    if ~nrm_converged
+        oldnrm = nrm;
+        nrm = norm(diag(alfa) + diag(beta(1:end-1), 1));
+        
+        if abs(nrm - oldnrm) < oldnrm * tol
+            nrm_converged = true;
+        end
+    end
+    
     res = max(abs([ alfa(end), beta(end) ])) / nrm;
     
     % fprintf('Iteration %d, res = %e, nrm_conv = %d, nrm = %e\n', it, res, nrm_converged, nrm);
