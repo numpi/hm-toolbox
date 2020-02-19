@@ -4,6 +4,7 @@ A = varargin{1};
 
 is_sparse = false;
 is_lyapunov   = false;
+debug = false;
 
 switch nargin
     case 2
@@ -36,16 +37,16 @@ if is_leafnode(C) && C.admissible
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA, issymmetric(sA));
-            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol);
+            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug);
         else
-            [X.U, X.V] = ek_sylv(sA, sB, C.U, C.V, inf, tol);
+            [X.U, X.V] = ek_sylv(sA, sB, C.U, C.V, inf, tol, debug);
         end
     else
         if is_lyapunov
             M = ek_struct(A);
-            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol);
+            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug);
         else
-            [X.U, X.V] = ek_sylv(A, B, C.U, C.V, inf, tol);
+            [X.U, X.V] = ek_sylv(A, B, C.U, C.V, inf, tol, debug);
         end
     end
     
@@ -118,16 +119,16 @@ elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA);
-            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol);        
+            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug);        
         else                    
-            [Xu, Xv] = ek_sylv(sA, sB, -U, V, inf, tol);
+            [Xu, Xv] = ek_sylv(sA, sB, -U, V, inf, tol, debug);
         end
     else
         if is_lyapunov
             M = ek_struct(A);
-            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol);
+            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug);
         else                    
-            [Xu, Xv] = ek_sylv(A, B, -U, V, inf, tol);
+            [Xu, Xv] = ek_sylv(A, B, -U, V, inf, tol, debug);
         end
     end
     

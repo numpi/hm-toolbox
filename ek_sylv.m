@@ -131,7 +131,8 @@ while max(sa-2*bsa, sb-2*bsb) < k
     
     % You might want to enable this for debugging purposes
     if debug
-        fprintf('%d Residue: %e\n', it, res / norm(Y));
+        fprintf('%d Residue: %e (space dim: %d)\n', it, res / norm(Y), ...
+            size(Y, 1));
     end
     
     if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol

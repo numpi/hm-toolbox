@@ -136,10 +136,10 @@ end
 % get BLAS3 speeds.
 %
 function [w, h] = mgs_orthogonalize(V, w)
-h = zeros(size(V, 2), size(w, 2));
-for j = 1 : size(V, 2)
-    h(j,:) = (V(:,j)' * w);
-    w = w - V(:,j) * (V(:,j)' * w);
-end
+    h = V' * w;
+    w = w - V * h;
+    h1 = V' * w;
+    h = h + h1;
+    w = w - V * h1;
 end
 
