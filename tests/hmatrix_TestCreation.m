@@ -92,7 +92,7 @@ H = hmatrix('handle', @(i,j) f(x(j), x(i)'), n, n);
 
 A = f( x, x' );
 
-CheckTestResult(norm(A*v - H*v), '<', norm(v) * sqrt(n) * hmatrixoption('threshold'), ...
+CheckTestResult(norm(A*v - H*v), '<', norm(A) * norm(v) * sqrt(n) * hmatrixoption('threshold'), ...
     'Generation of an hmatrix representation for A that samples f(x,y)');
 
 return
