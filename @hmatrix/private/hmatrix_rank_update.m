@@ -12,8 +12,7 @@ if is_leafnode(H)
     if H.admissible
         if exist('nrm', 'var')
             if isempty(nrm)
-                H.U = [H.U, U];
-                H.V = [H.V, V];
+                [H.U, H.V] = compress_factors([H.U, U], [H.V, V]);
             else
                 [H.U, H.V] = compress_factors([H.U, U], [H.V, V], nrm);
             end
