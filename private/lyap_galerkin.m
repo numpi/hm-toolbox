@@ -12,10 +12,15 @@ function [Y, res] = lyap_galerkin(varargin)
 %        Krylov-type method and that the action of A on the basis excluding
 %        the last BSA (resp. BSB) columns is contained in the full basis.
 
-if length(varargin) == 3
+if length(varargin) >= 3 && length(varargin) <= 4
     HA = varargin{1};
     C = varargin{2};
     bsa = varargin{3};
+    if nargin == 4
+	nrmtype = varargin{4};
+    else
+	nrmtype = 2;
+    end
     is_lyapunov = true;
 else
     HA = varargin{1};
@@ -23,6 +28,11 @@ else
     C = varargin{3};
     bsa = varargin{4};
     bsb = varargin{5};
+    if nargin == 6
+	nrmtype = varargin{6};
+    else
+	nrmtype = 2;
+    end
     is_lyapunov = false;
 end
 
@@ -44,11 +54,19 @@ end
 
 % Check the residual
 if ~is_lyapunov
-    res = max(norm(HA(end-bsa+1:end, :) * Y), ...
+    if nrmtype == 2
+    	res = max(norm(HA(end-bsa+1:end, :) * Y), ...
         norm(Y * HB(end-bsb+1 : end, :)'));
+    else
+	res = norm( [HA(end-bsa+1:end, :) * Y; ...
+        HB(end-bsb+1 : end, :) * Y'], 'fro');
+    end
 else
-    res = max(norm(HA(end-bsa+1:end, :) * Y), ...
-        norm(Y * HA(end-bsa+1 : end, :)'));
+    if nrmtype == 2
+    	res = norm(HA(end-bsa+1:end, :) * Y);
+    else
+	res = sqrt(2) * norm(HA(end-bsa+1:end, :) * Y, 'fro');
+    end
 end
 
 end

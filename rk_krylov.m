@@ -91,14 +91,14 @@ if abs(pole) > 1
     
     % Solve the shifted linear system
     % w = ( kh * A - hh * eye(n, 'like', A) ) \ (A * V * c);
-    w = correction( A.solve(kh, hh, A.multiply(1, 0, cqt(V * c))) );
+    w = A.solve(kh, hh, A.multiply(1, 0, V * c)) ;
 else
     kh = 1;
     hh = pole;
     
     % Solve the shifted linear system
     % w = ( kh * A - hh * eye(n, 'like', A) ) \ (V * c);
-    w = correction( A.solve(kh, hh, -A.multiply(0, 1, cqt(V * c))) );
+    w = A.solve(kh, hh, -A.multiply(0, 1, V * c)) ;
 end
 
 % We might need to add more rows to the basis

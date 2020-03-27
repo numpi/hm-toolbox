@@ -92,8 +92,15 @@ while max(sa-2*bsa, sb-2*bsb) < k
         
         [UU,SS,VV] = svd(Y);
         
-        % rk = sum(diag(SS) > SS(1,1) * tol / max(nrmA, nrmB));
-        rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
+	switch nrmtype
+    		case 2
+        	s = diag(SS);
+        	rk = sum( arrayfun(@(ss) tol(ss, s(1) / (nrmA + nrmB)), s) == 0);
+    		case 'fro'
+        	d = sort(diag(SS));
+        	s = sqrt(cumsum(d.^2));
+        	rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+	end
         
         Xu = UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
         Xv = VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
@@ -127,7 +134,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
     
     Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
     
-    [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb);
+    [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
     
     % You might want to enable this for debugging purposes
     if debug
@@ -149,11 +156,11 @@ end
 switch nrmtype
     case 2
         s = diag(SS);
-        rk = sum( arrayfun(@(ss) tol(ss, s(1) / max(nrmA, nrmB)), s) == 0);
+        rk = sum( arrayfun(@(ss) tol(ss, s(1) / (nrmA + nrmB)), s) == 0);
     case 'fro'
         d = sort(diag(SS));
-        s = cumsum(d);
-        rk = sum( arrayfun(@(ss) tol(ss, d(end) / max(nrmA, nrmB)), s) == 0 );
+        s = sqrt(cumsum(d.^2));
+        rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
 end
 
 rk = length(SS);

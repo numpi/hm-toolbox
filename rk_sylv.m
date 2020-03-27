@@ -1,4 +1,4 @@
-function [Xu, Xv, As, Bs] = rk_sylv(poles, A, B, u, v, k, tol, debug, nrm_type)
+function [Xu, Xv, VA, VB] = rk_sylv(poles, A, B, u, v, k, tol, debug, nrmtype)
 %RK_SYLV Approximate the solution of a Sylvester equation AX + XB' = U*V'.
 %
 % [XU,XV] = RK_SYLV(POLES, A, B, U, V, K) approximates the solution of the
@@ -23,8 +23,8 @@ if ~exist('tol', 'var')
     tol = 1e-8;
 end
 
-if ~exist('nrm_type', 'var')
-    nrm_type = 2;
+if ~exist('nrmtype', 'var')
+    nrmtype = 2;
 end
 
 if ~isstruct(A)
@@ -97,14 +97,14 @@ while max(sa-bsa, sb-bsb) < k
         
         Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
         
-        [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb);
+        [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
         
         % You might want to enable this for debugging purposes
         if debug
-            fprintf('%d Residue: %e\n', size(Y,1), res / norm(Y));
+            fprintf('%d Residue: %e\n', size(Y,1), res / norm(Y, nrmtype));
         end
         
-        if tol(res, norm(Y, nrm_type)) % res < norm(Y) * tol
+        if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
             break
         end
     end
@@ -117,7 +117,15 @@ end
 
 [UU,SS,VV] = svd(Y);
 
-rk = sum(arrayfun(@(s) tol(s, SS(1,1) / max(nrmA, nrmB)), diag(SS)) == false);
+switch nrmtype
+    case 2
+        s = diag(SS);
+        rk = sum( arrayfun(@(ss) tol(ss, s(1) / (nrmA + nrmB)), s) == 0);
+    case 'fro'
+        d = sort(diag(SS));
+        s = sqrt(cumsum(d.^2));
+        rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+end
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));

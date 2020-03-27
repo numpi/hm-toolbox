@@ -25,7 +25,7 @@ end
 
 compression = 'svd';
 
-if isempty(maxrank)
+if isempty(maxrank) || (maxrank > min(m, n) / 16)
     maxrank = round(min(m,n) / 16);
 end
 
@@ -121,7 +121,7 @@ function [U,S,V] = tsvd(A,tol)
 if min(size(A)) == 0
     U = zeros(size(A, 1), 0); S = []; V = zeros(size(A, 2), 0); return;
 end
-[U,S,V] = svd(A);
+[U,S,V] = svd(full(A));
 
 t = diag(S);
 % t = cumsum(t(end:-1:1));
