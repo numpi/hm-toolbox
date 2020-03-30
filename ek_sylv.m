@@ -30,10 +30,14 @@ end
 if ~exist('nrmtype', 'var')
     nrmtype = 2;
 end
-
+if size(u, 2) ~= size(v, 2)
+	error('EK_SYLV:: different number of columns in the factorization of the rhs');
+end
 if size(u, 2) == 0
     Xu = u;
     Xv = v;
+    VA = u;
+    VB = v;
     return;
 end
 
@@ -162,8 +166,6 @@ switch nrmtype
         s = sqrt(cumsum(d.^2));
         rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
 end
-
-rk = length(SS);
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));

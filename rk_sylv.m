@@ -26,7 +26,16 @@ end
 if ~exist('nrmtype', 'var')
     nrmtype = 2;
 end
-
+if size(u, 2) ~= size(v, 2)
+	error('RK_SYLV:: different number of columns in the factorization of the rhs');
+end
+if size(u, 2) == 0
+    Xu = u;
+    Xv = v;
+    VA = u;
+    VB = v;
+    return;
+end
 if ~isstruct(A)
     AA = rk_struct(A);
 else

@@ -9,7 +9,7 @@ switch S(1).type
         if ischar(mind), mind = 1:m; end
         if ischar(nind), nind = 1:n; end
         if ~issorted(mind) | ~issorted(nind),
-            error('Indices need to be sorted integers.');
+            error('Indices need to be sorted integers. Use get(A, I, J) if you need the submatrix in the dense format');
         end
         if min(mind)<1 | max(mind)>m | min(nind)<1 | max(nind)>n,
             error('Indices not in range.');

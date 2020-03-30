@@ -1,4 +1,4 @@
-function [Xu, VA, D, it] = ek_lyap(A, u, maxdim, tol, debug, varargin)
+function [Xu, VA, D, it] = ek_lyap(A, u, maxdim, tol, debug, nrmtype, varargin)
 %EK_LYAP Approximate the solution of a AX + XA' + u * u' = 0
 %
 % [XU, VA, D, it] = EK_LYAP(A, U, MAXDIM, TOL, DEBUG, 'kernel', K) solves
@@ -15,10 +15,18 @@ if ~exist('debug', 'var')
     debug = false;
 end
 
+if size(u, 2) == 0
+    Xu = u;
+    VA = u;
+    D = [];
+    it = 0;
+    return;
+end
 p = inputParser;
 
-addOptional(p, 'nrmtype', 2, ...
-    @(x) (isnumeric(x) && x == 2) || strcmp(x, 'fro'));
+if ~exist('nrmtype', 'var')
+    nrmtype = 2;
+end
 
 addParameter(p, 'kernel', 1);
 

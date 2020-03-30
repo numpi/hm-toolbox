@@ -2,7 +2,6 @@ function d = det(H)
 %DET Determinant of a HODLR matrix.
 %
 % D = DET(H) returns the determinant of H obtained by an LU factorization.
-
 if size(H, 1) ~= size(H, 1)
     error('det(H): Matrix H is not square');
 end
