@@ -112,6 +112,27 @@ else
             H.F = [ H.A11.F , H.A12.F ; H.A21.F , H.A22.F ];
             H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
         end
+        
+        if ~is_leafnode(H) && (H.A11.admissible && H.A12.admissible && H.A21.admissible && H.A22.admissible)
+            % if we have 4 children of low-rank let's try to merge them
+            % first we compute the low-rank representation of the 4 blocks together
+            [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22);
+
+            if size(U, 2) < min([size(H) / 2, maxrank]) % if the rank is not too high...
+                mem = sum(H.sz) * size(U, 2);
+                mem11 = sum(H.A11.sz) * size(H.A11.U, 2);
+                mem12 = sum(H.A12.sz) * size(H.A12.U, 2);
+                mem21 = sum(H.A21.sz) * size(H.A21.U, 2);
+                mem22 = sum(H.A22.sz) * size(H.A22.U, 2);
+
+                if mem <= 2 * (mem11 + mem12 + mem21 + mem22) % ...and we do not lose too much in memory, then we merge them
+                    H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
+                    H.U = U;
+                    H.V = V;
+                    H.admissible = true;
+                end
+            end
+        end
     end            
 end
 
@@ -133,4 +154,9 @@ U = U(:,1:r);
 V = V(:,1:r);
 S = S(1:r,1:r);
 
+end
+
+function [U, V] = merge_low_rank(A11, A12, A21, A22)
+[U, V] = compress_factors(blkdiag([ A11.U, A12.U ], [ A21.U, A22.U ]), ...
+    [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ]);
 end
