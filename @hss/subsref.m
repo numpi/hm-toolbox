@@ -29,6 +29,7 @@ if H.leafnode
     H.D = H.D(mind,nind);
     H.U = H.U(mind,:);
     H.V = H.V(nind,:);
+    H.ml = []; H.nl = []; H.mr = []; H.nr = []; 
 else
     [m1,n1] = size(H.A11);
     mind1 = intersect( 1:m1, mind );
