@@ -1,4 +1,4 @@
-function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
+function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype, autosplit, bs)
 %EK_SYLV Approximate the solution of a Sylvester equation AX + XB + U*V' = 0.
 %
 % [XU,XV] = EK_SYLV(A, B, U, V, K) approximates the solution of the
@@ -18,6 +18,10 @@ function [Xu, Xv, VA, VB] = ek_sylv(A, B, u, v, k, tol, debug, nrmtype)
 % The tolerance TOL can also be specified as a function TOL(R, N) that
 % takes as input the residual norm and the norm of the solution (R and N,
 % respectively), and returns true if the solution can be accepted.
+
+if ~exist('autosplit', 'var')
+    autosplit = false;
+end
 
 if ~exist('debug', 'var')
     debug = false;
@@ -64,19 +68,90 @@ end
 nrmA = AA.nrm;
 nrmB = BB.nrm;
 
-% Dimension of the space
-sa = size(u, 2);
-sb = size(v, 2);
-
-bsa = sa;
-bsb = sb;
-
 % tol can be function tol(r, n) that is given the residual and the norm, or
 % a scalar. In the latter case, we turn it into a function
 if isfloat(tol)
     tol_eps = tol;
     tol = @(r, n) r < tol_eps * n;
 end
+
+if autosplit
+    n = size(u, 1);
+    
+    % Compute SVD of the RHS
+    [qu, ru] = qr(u, 0);
+    [qv, rv] = qr(v, 0);
+    
+    [uu, ss, vv] = svd(ru * rv');
+    
+    uu = qu * uu;
+    vv = qv * vv;
+    
+    Xu = zeros(n, 0);
+    Xv = zeros(n, 0);
+    
+    if ~exist('bs', 'var')
+        p = polyfit(1:length(ss), log(diag(ss)).', 1);
+        rho = exp(-p(1));        
+        bs = max(2, round(28 / rho));
+    end
+    
+    %semilogy(diag(ss))
+    %pause
+  
+    % disp(bs)
+    
+    % bs = 16;
+    
+    for j = 1 : bs : size(ss, 2)
+        % Build the RHS
+        sz = min(bs, size(ss,2)-j+1);
+        u1 = uu(:, j:j+sz-1) * ss(j:j+sz-1, j:j+sz-1);
+        v1 = vv(:, j:j+sz-1);
+        
+        % Solve the equation with the j-th rhs
+        [~, r1] = qr(Xu, 0); 
+        [~, r2] = qr(Xv, 0); 
+        nrmX = norm(r1 * r2', nrmtype);
+        
+        [xu, xv] = ek_sylv(AA, BB, u1, v1, k, ...
+            @(r, n) tol(r, (n + nrmX)), ...
+            debug, nrmtype, false);
+        Xu = [ Xu, xu ];
+        Xv = [ Xv, xv ];
+    end
+    
+    [qu, ru] = qr(Xu, 0);
+    [qv, rv] = qr(Xv, 0);
+    
+    [uu, SS, vv] = svd(ru * rv');
+    
+    switch nrmtype
+        case 2
+            s = diag(SS);
+            rk = sum( arrayfun(@(ss) tol(ss, s(1) / (nrmA + nrmB)), s) == 0);
+        case 'fro'
+            d = sort(diag(SS));
+            s = sqrt(cumsum(d.^2));
+            rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+    end
+    
+    uu = qu * uu(:, 1:rk);
+    vv = qv * vv(:, 1:rk);
+    
+    Xu = uu * SS(1:rk, 1:rk);
+    Xv = vv;
+        size(Xu, 2)
+    
+    return;
+end
+
+% Dimension of the space
+sa = size(u, 2);
+sb = size(v, 2);
+
+bsa = sa;
+bsb = sb;
 
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k

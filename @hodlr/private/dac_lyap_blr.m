@@ -6,6 +6,9 @@ is_sparse = false;
 is_lyapunov   = false;
 debug = false;
 
+nrmtype = 2;
+autosplit = false;
+
 switch nargin
     case 2
         C = varargin{2};
@@ -37,33 +40,36 @@ if is_leafnode(C) && C.admissible
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA, issymmetric(sA));
-            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug);
+            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug, nrmtype, autosplit);
         else
-            [X.U, X.V] = ek_sylv(sA, sB, C.U, C.V, inf, tol, debug);
+            [X.U, X.V] = ek_sylv(sA, sB, C.U, C.V, inf, tol, debug, nrmtype, autosplit);
         end
     else
         if is_lyapunov
             M = ek_struct(A);
-            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug);
+            [X.U, X.V] = ek_sylv(M, M, C.U, C.V, inf, tol, debug, nrmtype, autosplit);
         else
-            [X.U, X.V] = ek_sylv(A, B, C.U, C.V, inf, tol, debug);
+            [X.U, X.V] = ek_sylv(A, B, C.U, C.V, inf, tol, debug, nrmtype, autosplit);
         end
     end
     
     X.admissible = true;
-elseif is_leafnode(A) && (is_lyapunov || is_leafnode(B))
+elseif (is_leafnode(A) && (is_lyapunov || is_leafnode(B))) || (any(size(C) <= 512) && is_leafnode(C))
     if is_lyapunov
-        X.F = lyap(A.F, full(C));
+        X.F = lyap(full(A), full(C));
     else
-        X.F = lyap(A.F, B.F, full(C));
+        X.F = lyap(full(A), full(B), full(C));
     end
     X.admissible = false;
 elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
             
     m1 = A.A11.sz(1); n1 = A.A11.sz(2);
-    m2 = size(A) - m1; n2 = size(A, 2) - n1;
+    m2 = size(A, 1) - m1; n2 = size(A, 2) - n1;
     
-    if is_leafnode(C)       
+    repacking_needed = false;
+    
+    if is_leafnode(C)
+        repacking_needed = true;
         % Create an @hmatrix representation of C according to the splitting
         % of A and B, so we can perform the low-rank update approach
         % recursively. 
@@ -119,20 +125,25 @@ elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA);
-            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug);        
+            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug, nrmtype, autosplit);        
         else                    
-            [Xu, Xv] = ek_sylv(sA, sB, -U, V, inf, tol, debug);
+            [Xu, Xv] = ek_sylv(sA, sB, -U, V, inf, tol, debug, nrmtype, autosplit);
         end
     else
         if is_lyapunov
             M = ek_struct(A);
-            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug);
+            [Xu, Xv] = ek_sylv(M, M, -U, V, inf, tol, debug, nrmtype, autosplit);
         else                    
-            [Xu, Xv] = ek_sylv(A, B, -U, V, inf, tol, debug);
+            [Xu, Xv] = ek_sylv(A, B, -U, V, inf, tol, debug, nrmtype, autosplit);
         end
     end
     
     X = rank_update(X, Xu, Xv);
+    
+    if repacking_needed
+        X.F = [ X.A11.F , X.A12.F ; X.A21.F, X.A22.F ];
+        X.A11 = []; X.A12 = []; X.A21 = []; X.A22 = [];
+    end
 else
     error('Non-conformal partitioning in A and B');        
 end

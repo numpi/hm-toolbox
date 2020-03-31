@@ -56,8 +56,6 @@ else
                 H.U = U;
                 H.V = V;
                 H.admissible = true;
-                %else    % only for debug
-                %	fprintf('No gain in memory, merging avoided : %d, [%d, %d ; %d, %d]\n', size(U, 2), size(H.A11.U, 2), size(H.A12.U, 2), size(H.A21.U, 2), size(H.A22.U, 2));
             end
         end
     end
