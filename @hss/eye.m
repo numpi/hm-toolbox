@@ -1,10 +1,10 @@
 function I = eye(varargin)
 %EYE Create an HSS identity
 
-if isa(varargin{1}, 'hss')
-    [rowcluster, colcluster] = cluster(varargin{1});
-    
-    I = hss('eye', size(varargin{1}, 1), 'cluster', rowcluster, colcluster);
+if isa(varargin{3}, 'hss')
+    [rowcluster, colcluster] = cluster(varargin{3});
+    I = hss('eye', size(varargin{3}, 1), 'cluster', rowcluster, colcluster);
+
 else
     sz = varargin{1};
     

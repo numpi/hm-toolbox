@@ -14,7 +14,6 @@ else
     if length(partitionn) ~= length(partitionm)
         error('Row and column partitioning must have the same number of elements');
     end
-    
     H = build_hss_tree_partition_rec(m, n, partitionm, partitionn);
 end
 
