@@ -1,10 +1,11 @@
 function X = hss_remove_leaf_level(X)
 %
 
+
 if X.leafnode == 1
     error('Cannot remove a level on a single level HSS');
 else
-    if X.A11.leafnode == 1
+    if X.A11.leafnode == 1 && X.A22.leafnode == 1
         was_topnode = (X.topnode == 1);
         X.topnode = 1;
         
@@ -22,8 +23,12 @@ else
         X.A11 = []; X.A22 = [];
         X.ml = []; X.nl = []; X.mr = []; X.nr = [];
     else
-        X.A11 = hss_remove_leaf_level(X.A11);
-        X.A22 = hss_remove_leaf_level(X.A22);
+	if X.A11.leafnode == 0
+        	X.A11 = hss_remove_leaf_level(X.A11);
+	end
+	if X.A22.leafnode == 0
+        	X.A22 = hss_remove_leaf_level(X.A22);
+	end
     end
 end
 

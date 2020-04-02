@@ -21,8 +21,7 @@ end
 function g = bottom_up(A, v)
 g = struct();
 
-if (A.leafnode == 0)   % not a leaf
-    
+if (A.leafnode == 0)   % not a leaf    
     g.gl = bottom_up(A.A11, v(1:A.nl,:));
     g.gr = bottom_up(A.A22, v(A.nl+1:end,:));
     if A.topnode == 0    % not root

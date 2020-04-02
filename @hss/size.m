@@ -12,13 +12,17 @@ if nargout == 2
     return;
 end
 
-if ~isempty(H.ml)
+if H.leafnode ~= isempty(H.ml) || H.leafnode ~= isempty(H.nl)
+    % keyboard;
+end
+
+if ~H.leafnode
     m = H.ml + H.mr;
 else
     m = size(H.D, 1);
 end
 
-if ~isempty(H.nl)
+if ~H.leafnode
     n = H.nl + H.nr;
 else
     n = size(H.D, 2);

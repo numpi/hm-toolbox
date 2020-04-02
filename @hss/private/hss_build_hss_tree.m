@@ -14,6 +14,7 @@ else
     if length(partitionn) ~= length(partitionm)
         error('Row and column partitioning must have the same number of elements');
     end
+    
     H = build_hss_tree_partition_rec(m, n, partitionm, partitionn);
 end
 
@@ -75,15 +76,19 @@ if lp > 1
     H.mr = m - H.ml;
     H.nr = n - H.nl;
     
-    if H.ml == 0 || H.mr == 0 || H.nl == 0 || H.nr == 0
+    if (H.ml > 0 && H.nl > 0) && (H.mr > 0 && H.nr > 0)
+        H.leafnode = 0;
+        H.A11 = build_hss_tree_partition_rec(H.ml, H.nl, partitionm(1:lp/2), partitionn(1:lp/2));
+        H.A22 = build_hss_tree_partition_rec(H.mr, H.nr, partitionm(lp/2+1:end) - H.ml, partitionn(lp/2+1:end) - H.nl);
+    elseif (H.ml > 0 && H.nl > 0) && (H.mr == 0 || H.nr == 0)
+        H = build_hss_tree_partition_rec(H.ml, H.nl, partitionm(1:lp/2), partitionn(1:lp/2));
+    elseif (H.ml == 0 || H.nl == 0) && (H.mr > 0 && H.nr > 0)        
+        H = build_hss_tree_partition_rec(H.mr, H.nr, partitionm(lp/2+1:end) - H.ml, partitionn(lp/2+1:end) - H.nl);
+    else
         H.D = zeros(m, n);
         H.U = zeros(m, 0);
         H.V = zeros(n, 0);
         H.leafnode = 1;
-    else
-        H.leafnode = 0;
-        H.A11 = build_hss_tree_partition_rec(H.ml, H.nl, partitionm(1:lp/2), partitionn(1:lp/2));
-        H.A22 = build_hss_tree_partition_rec(H.mr, H.nr, partitionm(lp/2+1:end) - H.ml, partitionn(lp/2+1:end) - H.nl);
     end
 else
     H.D = zeros(m, n);

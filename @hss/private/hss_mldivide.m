@@ -27,7 +27,6 @@ QB = hss_remove_leaf_level(QB);
 % Project L on the columns as well
 L = hss_project(L, cind, 'col');
 L = hss_remove_leaf_level(L);
-
 Y1 = hss_mldivide(L, QB);
 
 Y1 = hss_unpack(Y0, Y1, ind, cind);
@@ -35,6 +34,7 @@ Y1 = hss_unpack(Y0, Y1, ind, cind);
 Y = hss_sum(Y0, Y1, false);
 
 X = hss_compress(applyQ(Y, Z, false), hssoption('threshold'));
+
 end
 
 function [A, Q, Z, ind, cind] = hss_mldivide_rec(A, Q, Z, ind, cind)
@@ -168,7 +168,27 @@ end
 end
 
 function [Y1, ind, cind] = hss_unpack(Y0, Y1, ind, cind)
-if Y1.leafnode == 1
+if Y1.leafnode == 1 && Y0.leafnode == 1 
+	ind1 = ind{1};
+        lcind1 = cind{1};
+        cind = { cind{2:end} };
+        ind = { ind{2:end} };
+        temp = zeros(size(Y0));
+        temp(lcind1, :) = Y1.D; Y1.D = temp;
+	if size(Y0, 1) > size(Y1.U, 1)
+		temp = zeros(size(Y0, 1), size(Y1.U, 2));
+		temp(lcind1, :) = Y1.U; 
+		Y1.U = temp;
+	end	
+	%if size(Y0, 2) > size(Y1.V, 1)
+	%	temp = zeros(size(Y0, 2), size(Y1.V, 2));
+	%	temp(lcind1, :) = Y1.V; 
+	%	Y1.V = temp;
+	%end
+	return
+end
+
+if Y1.leafnode == 1 
     Y1.leafnode = 0;
     Y1.A11 = hss();
     Y1.A22 = hss();
@@ -179,6 +199,8 @@ if Y1.leafnode == 1
     
     lcind1 = cind{1};
     lcind2 = cind{2};
+    ind1 = ind{1};
+    ind2 = ind{2};
     
     cind = { cind{3:end} };
     ind = { ind{3:end} };
@@ -188,8 +210,8 @@ if Y1.leafnode == 1
     Y1.A22.D(lcind2, :) = Y1.D(length(lcind1)+1:end, size(Y0.A11,2)+1:end);
     
     if Y1.topnode == 1
-        Y1.U = zeros(size(Y1, 1), 0);
-        Y1.V = zeros(size(Y1, 2), 0);
+        Y1.U = zeros(length(lcind1) + length(lcind2), 0);
+        Y1.V = zeros(size(Y0, 2), 0);
     end
     
     % A12 block
@@ -216,7 +238,6 @@ if Y1.leafnode == 1
 else
     [Y1.A11, ind, cind] = hss_unpack(Y0.A11, Y1.A11, ind, cind);
     [Y1.A22, ind, cind] = hss_unpack(Y0.A22, Y1.A22, ind, cind);
-    
     [Y1.ml, Y1.nl] = size(Y1.A11);
     [Y1.mr, Y1.nr] = size(Y1.A22);
 end
