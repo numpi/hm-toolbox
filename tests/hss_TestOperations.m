@@ -211,5 +211,21 @@ X = inv(H);
 CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (hnrm(X)*hnrm(H) + hnrm(B)) * tol, ...
     'Inversion (hss rank 12)');
 
+% Inversion with non-standard clustering
+c = [ 21  42  42  42  42  42  42  42  59  76  93 111 128 145 162 180 ];
+n = c(end);
+H = hss(rand(n), 'cluster', c);
+X = inv(H);
+CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (hnrm(X)*hnrm(H) + hnrm(B)) * tol, ...
+    'Inversion (non-standard cluster)');
+
+% Random cluster
+c = cumsum(randi(32, 1, 16));
+n = c(end);
+H = hss(rand(n), 'cluster', c);
+X = inv(H);
+CheckTestResult(norm(H*X - eye(n, 'like', H)), '<', (hnrm(X)*hnrm(H) + hnrm(B)) * tol, ...
+    'Inversion (non-standard random cluster)');
+
 
 end
