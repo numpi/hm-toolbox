@@ -1,4 +1,4 @@
-function y = lu_solve(nu, mu, L, U,x)
+function y = lu_solve(nu, mu, L, U, x)
 
 if nu > mu
     y = nu\(U\(L\x));
