@@ -7,7 +7,7 @@ is_lyapunov   = false;
 debug = false;
 
 nrmtype = 2;
-autosplit = false;
+autosplit = true;
 
 switch nargin
     case 2
