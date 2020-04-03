@@ -141,7 +141,6 @@ if autosplit
     
     Xu = uu * SS(1:rk, 1:rk);
     Xv = vv;
-        size(Xu, 2)
     
     return;
 end
