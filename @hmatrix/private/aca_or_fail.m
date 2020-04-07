@@ -1,4 +1,4 @@
-function [U, V] = aca_or_fail(Afun, m, n, tol, maxrank)
+function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm)
 %
 % Construct a low-rank representation of C = Afun([1:m], [1:n])
 % by means of adaptive cross approximation with partial pivoting (heuristic)
@@ -34,7 +34,6 @@ V = zeros(n, 0);
 k = 1;
 ind = 1;
 taken_row = [];
-nrm = 0;
 sample_size = 50;
 
 m_min = 128;
@@ -83,7 +82,7 @@ while k < min(m,n)
         fprintf('Iteration: %d Pivot at (%d,%d): %e\n', k, ind, new_ind, b(new_ind))
     end
     
-    if abs(b(new_ind)) <= nrm * tol
+    if exist('nrm', 'var') && abs(b(new_ind)) <= nrm * tol
     	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), sample_size));
         rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
         [mx, ind] = max(max(abs(rows), [], 2));
@@ -108,9 +107,15 @@ while k < min(m,n)
         ind = tind;
     end
 
-    if k == 1
+    % Here the norm estimated using the first vectors obtained, unless a
+    % norm to use as threshold has been given by the user; this is
+    % particularly useful when approximating a block of a larger matrix,
+    % and truncation is desired with respect to the norm of the entire
+    % matrix.
+    if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
         nrm = norm(a) * norm(b);
     end
+    
     k = k + 1;
     tnrm = norm(a) * norm(b);
     nrm = max(nrm, tnrm);
@@ -127,8 +132,11 @@ while k < min(m,n)
     taken_row = [taken_row, ind];
 
     if k >= maxrank || k >= min(m, n) / 2
+        [~, ru] = qr(U, 0); [~, rv] = qr(V, 0); 
+        nrm = norm(ru * rv');
+        
         U = [];
-        V = [];
+        V = [];        
         return;
     end
 end

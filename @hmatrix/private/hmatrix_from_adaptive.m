@@ -1,4 +1,4 @@
-function [H] = hmatrix_from_adaptive(Afun, m, n, maxrank, support)
+function [H] = hmatrix_from_adaptive(Afun, m, n, maxrank, support, nrm)
 %HMATRIX_FROM_ADAPTIVE Construct an hmatrix of a function sampling
 %
 % Inputs:
@@ -15,6 +15,14 @@ function [H] = hmatrix_from_adaptive(Afun, m, n, maxrank, support)
 %      0, 1, or 2 in these cases, respectively. Default implementation
 %      returns 1. 
 %  
+
+% The variable norm can be used to track the norm used to perform relative
+% truncation, and is an estimate of the norm of the entire matrix. At the
+% first call, is set to zero and then estimated by the first call to
+% aca_or_fail.
+if ~exist('nrm', 'var')
+    nrm = 0;
+end
 
 tol = hmatrixoption('threshold');
 bs = hmatrixoption('block-size');
@@ -43,7 +51,7 @@ if (m <= bs && n <= bs) || min([m n]) == 1
                 H.V = V;
             end
         case 'aca'
-            [U, V] = aca_or_fail(Afun, m, n, tol, maxrank);
+            [U, V] = aca_or_fail(Afun, m, n, tol, maxrank, nrm);
             if size(U, 1) ~= 0
                 H.admissible = true;
                 H.U = U; H.V = V;
@@ -60,16 +68,17 @@ else
             H.admissible = true;
             H.U = zeros(m, 0); H.V = zeros(n, 0);
         case 1
-            compression_method = 'svd';
+            compression_method = 'aca';
             
             switch compression_method
                 case 'aca'            
-                    [U, V] = aca_or_fail(Afun, m, n, tol, maxrank);
+                    [U, V, newnrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm);
                     if size(U, 1) ~= 0
                         H.admissible = true;
                         H.U = U; H.V = V;
                     else
                         H.admissible = false;
+                        nrm = max(nrm, newnrm);
                     end
                 case 'svd'
                     [U, S, V] = tsvd(Afun(1:m, 1:n), tol);
@@ -94,16 +103,16 @@ else
         n1 = ceil(n / 2);
         
         H.A11 = hmatrix_from_adaptive(@(i,j) Afun(i, j), m1, n1, ...
-            maxrank, support);
+            maxrank, support, nrm);
         H.A12 = hmatrix_from_adaptive(@(i,j) Afun(i, j + n1), m1, ...
             n - n1, maxrank, ...
-            @(i1, j1, i2, j2) support(i1, j1 + n1, i2, j2 + n1));
+            @(i1, j1, i2, j2) support(i1, j1 + n1, i2, j2 + n1), nrm);
         H.A21 = hmatrix_from_adaptive(@(i,j) Afun(i + m1, j), ...
             m - m1, n1, maxrank, ...
-            @(i1, j1, i2, j2) support(i1 + m1, j1, i2 + m1, j2));
+            @(i1, j1, i2, j2) support(i1 + m1, j1, i2 + m1, j2), nrm);
         H.A22 = hmatrix_from_adaptive(@(i,j) Afun(m1 + i, n1 + j), ...
             m - m1, n - n1, maxrank, ...
-            @(i1, j1, i2, j2) support(i1 + m1, j1 + n1, i2 + m1, j2 + n1));
+            @(i1, j1, i2, j2) support(i1 + m1, j1 + n1, i2 + m1, j2 + n1), nrm);
         
         % Check if the blocks here are all full --- if they are, then we
         % can merge them and avoid having a deep tree for no gain.
