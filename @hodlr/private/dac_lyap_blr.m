@@ -4,12 +4,28 @@ A = varargin{1};
 
 is_sparse = false;
 is_lyapunov   = false;
-debug = false;
 
-nrmtype = 2;
-autosplit = true;
+% Find the first string parameter, if any
+firstchar = nargin + 1;
+for j = 1 : nargin
+    if ischar(varargin{j})
+        firstchar = j;
+        break;
+    end
+end
 
-switch nargin
+p = inputParser;
+addParameter(p, 'autosplit', false);
+addParameter(p, 'nrmtype', 2);
+addParameter(p, 'debug', false);
+
+parse(p, varargin{firstchar : nargin});
+
+autosplit = p.Results.autosplit;
+nrmtype   = p.Results.nrmtype;
+debug     = p.Results.debug;
+
+switch firstchar - 1
     case 2
         C = varargin{2};
         is_lyapunov = true;

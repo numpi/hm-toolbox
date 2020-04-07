@@ -17,6 +17,8 @@ function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm)
 %
 % -----------------------------------------------------------------------------
 
+require_norm_output = ~exist('nrm', 'var');
+
 if ~exist('comp', 'var')
     comp = 0;
 end
@@ -34,6 +36,7 @@ V = zeros(n, 0);
 k = 1;
 ind = 1;
 taken_row = [];
+
 sample_size = 50;
 
 m_min = 128;
@@ -132,8 +135,10 @@ while k < min(m,n)
     taken_row = [taken_row, ind];
 
     if k >= maxrank || k >= min(m, n) / 2
-        [~, ru] = qr(U, 0); [~, rv] = qr(V, 0); 
-        nrm = norm(ru * rv');
+        if require_norm_output
+            [~, ru] = qr(U, 0); [~, rv] = qr(V, 0);
+            nrm = norm(ru * rv');
+        end
         
         U = [];
         V = [];        

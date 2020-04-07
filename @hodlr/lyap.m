@@ -44,15 +44,17 @@ else
     is_lyapunov = false;
 end
 
-addParameter(p, 'debug', false, @islogical);
-addParameter(p, 'expm',  'pade', @ischar);
-addParameter(p, 'method', 'd&c', @ischar);
-addParameter(p, 'parallel', false, @islogical);
-
 if isa(C, 'hmatrix')
     X = dac_lyap_blr(varargin{:});
     return;
 end
+
+
+addParameter(p, 'debug', false, @islogical);
+addParameter(p, 'expm',  'pade', @ischar);
+addParameter(p, 'method', 'd&c', @ischar);
+addParameter(p, 'parallel', false, @islogical);
+addParameter(p, 'autosplit', false, @islogical);
 
 for first_keyword = 1 : length(varargin)
     if ischar(varargin{first_keyword})

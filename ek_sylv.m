@@ -90,7 +90,11 @@ if autosplit
     Xu = zeros(n, 0);
     Xv = zeros(n, 0);
     
-    if ~exist('bs', 'var')
+    if length(ss) < 2 && ~exist('bs', 'var')
+        bs = 1;
+    end
+    
+    if ~exist('bs', 'var') && length(ss) >= 2
         p = polyfit(1:length(ss), log(diag(ss)).', 1);
         rho = exp(-p(1));        
         bs = max(2, round(28 / rho));
