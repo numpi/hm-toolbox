@@ -23,7 +23,7 @@ if ~exist('support', 'var')
     support = @(i1, j1, i2, j2) 1;
 end
 
-compression = 'svd';
+compression = 'aca';
 
 if isempty(maxrank) || (maxrank > min(m, n) / 16)
     maxrank = round(min(m,n) / 16);
@@ -60,7 +60,7 @@ else
             H.admissible = true;
             H.U = zeros(m, 0); H.V = zeros(n, 0);
         case 1
-            compression_method = 'aca';
+            compression_method = 'svd';
             
             switch compression_method
                 case 'aca'            

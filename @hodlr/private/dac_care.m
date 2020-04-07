@@ -24,15 +24,13 @@ X = hodlr();
 X.sz = [n n];
 
 if  ~isempty(A.F) || ~isempty(C.F)
-	if eigs(C.F, 1, 'smallestreal') >=0
-		if ~exist('icare', 'file')
-			X.F = care(A.F, B, C.F);
-		else
-			tic;X.F = icare(A.F, B, C.F);toc
-		end
+	if ~exist('icare', 'file')
+		X.F = care(A.F, B, C.F);
 	else
-		X.F = small_care_solve(A.F, B, C.F, 1e-12, 50); 
+		X.F = small_care_solve(A.F, B, C.F, 1e-12, 50);
+		%X.F = icare(A.F, B, C.F);
 	end
+
 	if debug
         	fprintf('Base case: Dimension = %d, Residue = %e\n', size(A, 1), norm(A' * X + X * A - X * B * B' * X + C )/norm(X));
     	end

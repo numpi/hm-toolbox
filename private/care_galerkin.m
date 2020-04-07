@@ -34,15 +34,13 @@ HA1 = HA(1 : end - bsa, :);
 % Compute the solution of the CARE equation (word of warning: please
 % check the sign of C in the implementation of SylvKrylov).
 rhs = C(1:end-bsa,1:end-bsa); 
-if false && ishermitian(rhs) && eigs(rhs, 1, 'smallestreal') >= 0
-	if ~exist('icare', 'file')
-		Y = care(HA1, HB, rhs);
-	else
-		Y = icare(HA1, HB, rhs);
-	end
+if ~exist('icare', 'file')
+	Y = care(HA1, HB, rhs);
 else
-	Y = small_solve_ME(HA1', HB, rhs, [], [], 1e-12, 50); 
+	Y = small_care_solve(HA1, HB, rhs, 1e-12, 50);
+	%Y = icare(HA1, HB, rhs);
 end
+
 
 if isempty(Y)
 	error('CARE_GALERKIN:: There is no finite stabilizing solution for the projected CARE')

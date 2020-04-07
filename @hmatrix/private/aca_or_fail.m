@@ -33,15 +33,48 @@ U = zeros(m, 0);
 V = zeros(n, 0);
 k = 1;
 ind = 1;
+taken_row = [];
+nrm = 0;
+sample_size = 50;
 
-% Select the first pivot
-first_indices = randsample([1:m], 10);
-rows = Afun(first_indices, 1:n);
+m_min = 128;
+n_min = 128;
+if  false && m > m_min && n > n_min
+	% first try with full pivoting on a subsample
+	isub = round(linspace(1, m, m_min));
+	jsub = round(linspace(1, n, n_min));
+	[~, ~, I, J] = aca_full_pivoting(Afun(isub', jsub), m_min, n_min, tol);
+	if length(I) >= maxrank
+        	U = [];
+        	V = [];
+        	return;
+	else
+		I = isub(I);
+		J = jsub(J);
+		U = Afun(1:m, I) / Afun(I, J);
+		V = Afun(J, 1:n)'; 
+		[~, RU] = qr(U, 0); 
+    		[~, RV] = qr(V, 0);
+		nrm = norm(RU * RV');
+		taken_row = I;
+		k = k + size(U, 2);
+		% Then, continue with partial pivoting
+		%[~, ind] = max(abs(U([1:I(end) - 1, I(end) + 1:m], end)));
+    		%if ind >= I(end)
+        	%	ind = ind + 1;
+    		%else
+        	%	ind = ind;
+    		%end
+    	end
+end
 
+% Select the first pivot with a random sampling
+first_indices = randsample(setdiff(1:m, taken_row), sample_size);
+rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
 [~, ind] = max(max(abs(rows), [], 2));
 ind = first_indices(ind);
-taken_row = ind;
-nrm = 0;
+taken_row = [taken_row, ind];
+
 while k < min(m,n)
 
     b = Afun(ind, 1:n) - U(ind, :) * V';
@@ -51,13 +84,13 @@ while k < min(m,n)
     end
     
     if abs(b(new_ind)) <= nrm * tol
-    	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), 10));
+    	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), sample_size));
         rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
         [mx, ind] = max(max(abs(rows), [], 2));
         if mx <= tol * nrm
         	return;
         else
-    		ind = first_indices(ind);    
+    	    ind = first_indices(ind);    
             b = Afun(ind, 1:n) - U(ind, :) * V';
             [~, new_ind] = max(abs(b));
     	end
@@ -82,7 +115,7 @@ while k < min(m,n)
     tnrm = norm(a) * norm(b);
     nrm = max(nrm, tnrm);
     if  tnrm < tol * nrm && k < min(m,n) - 1 % If the heuristic criterion detect convergence we still perform a sample on a few rows in the residual
-	first_indices = randsample(setdiff([1:m], taken_row), min(m - length(taken_row), 10));
+	first_indices = randsample(setdiff([1:m], taken_row), min(m - length(taken_row), sample_size));
 	rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
 	[mx, ind] = max(max(abs(rows), [], 2));
 	if mx < tol * nrm
