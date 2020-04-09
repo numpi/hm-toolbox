@@ -1,7 +1,7 @@
 function [Xu, VA, D, it, res] = ek_care(A, B, u, maxdim, tol, debug, nrmtype, varargin)
 %EK_CARE Approximate the solution of the continuous-time algebraic Riccati equation (CARE):
 %
-% 	 AX + XA' - XBB'X + uu' = 0
+% 	 A'X + XA - XBB'X + uu' = 0
 %
 % [XU, VA, D, it] = EK_CARE(A, B, C, MAXDIM, TOL, DEBUG, 'kernel', K) solves
 %
@@ -80,12 +80,12 @@ while sa - 2*bsa < maxdim
         
 	if ishermitian(K) && eigs(K, 1, 'smallestreal') >= 0 % care and icare work only for positive definite rhs 
 		if ~exist('icare', 'file')
-        		Y = care(A, B, u * K * u');
+        		Y = care(A', B, u * K * u');
 		else
-			Y = icare(A, B, u * K * u');
+			Y = icare(A', B, u * K * u');
 		end
 	else 
-		Y = small_solve_ME(A', B * B', u * K * u', [], [], 1e-12, 50); 
+		Y = small_care_solve(A', B, u * K * u', hodlroption('threshold'), 50);
 	end
         
         [QQ, DD] = eig(.5 * (Y + Y'));

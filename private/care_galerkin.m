@@ -2,7 +2,7 @@ function [Y, res] = care_galerkin(varargin)
 %LYAP_GALERKIN Solve the reduced CARE and check the residual.
 %
 % Y = CARE_GALERKIN(HA, HB, C, bsa, nrmtype) solves the (projected) CARE
-%        HA1 * Y + Y * HA1' - Y * HB * HB' * Y + C1 = 0, where HA1 is obtained shrinking
+%        HA1' * Y + Y * HA1 - Y * HB * HB' * Y + C1 = 0, where HA1 is obtained shrinking
 %        HA by BSA columns and rows, 
 %        columns and rows, and C1 is obtained cutting C accordingly.
 %
@@ -35,10 +35,10 @@ HA1 = HA(1 : end - bsa, :);
 % check the sign of C in the implementation of SylvKrylov).
 rhs = C(1:end-bsa,1:end-bsa); 
 if ~exist('icare', 'file')
-	Y = care(HA1, HB, rhs);
+	Y = care(HA1', HB, rhs);
 else
-	Y = small_care_solve(HA1, HB, rhs, 1e-12, 50);
-	%Y = icare(HA1, HB, rhs);
+	Y = small_care_solve(HA1', HB, rhs, hodlroption('threshold'), 50);
+	%Y = icare(HA1', HB, rhs);
 end
 
 

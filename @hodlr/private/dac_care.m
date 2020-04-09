@@ -27,7 +27,7 @@ if  ~isempty(A.F) || ~isempty(C.F)
 	if ~exist('icare', 'file')
 		X.F = care(A.F, B, C.F);
 	else
-		X.F = small_care_solve(A.F, B, C.F, 1e-12, 50);
+		X.F = small_care_solve(A.F, B, C.F, hodlroption('threshold'), 50);
 		%X.F = icare(A.F, B, C.F);
 	end
 
