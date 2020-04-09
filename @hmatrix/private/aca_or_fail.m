@@ -71,7 +71,7 @@ if  false && m > m_min && n > n_min
 end
 
 % Select the first pivot with a random sampling
-first_indices = randsample(setdiff(1:m, taken_row), sample_size);
+first_indices = randsample(setdiff(1:m, taken_row), min(m, sample_size));
 rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
 [~, ind] = max(max(abs(rows), [], 2));
 ind = first_indices(ind);
@@ -86,7 +86,7 @@ while k < min(m,n)
     end
     
     if exist('nrm', 'var') && abs(b(new_ind)) <= nrm * tol
-    	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), sample_size));
+    	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), min(m - length(taken_row), sample_size)));
         rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
         [mx, ind] = max(max(abs(rows), [], 2));
         if mx <= tol * nrm
