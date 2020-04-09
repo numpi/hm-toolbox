@@ -10,15 +10,15 @@ end
 if ~exist('maxit', 'var')
 	maxit = 30;
 end
+
 X = X0;
-err = 1;
-k = 0;
-nC = norm(C);
+err = 1; err_old = 1;
+k = 1;
 RX = C + X0 * A + A' * X0 - X0 * B * X0;
 RX = .5 * (RX + RX');
 
 linesearch = true;
-while err > tol && k < maxit
+while err > tol && k < maxit && err_old >= err 
     H = lyap(A' - X * B, RX); 
     if linesearch
     	V = H*B*H;
@@ -32,12 +32,16 @@ while err > tol && k < maxit
     X = X + tk *H;
     RX = C + X * A + A' * X - X * B * X;
     RX = .5 * (RX + RX');
-    err = norm(RX) / norm(X);
+    err = norm(RX, 'fro') / norm(X, 'fro');
+    if mod(k, 2) == 1
+	err_old = err;
+    end
     k = k + 1;
 end
 
 if k == maxit
     fprintf('NEWTON_CARE::Warning: reached the maximum number of iterations: %d\n', maxit)
+pause
 end
 
 
