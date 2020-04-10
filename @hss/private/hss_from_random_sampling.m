@@ -189,7 +189,7 @@ else
         Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
         
         if B.topnode == 0
-            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
+            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
             
             Q = Q(:,1:rk);
             
@@ -201,7 +201,7 @@ else
             Jcol = Jcol(Jcolloc);
             U = [ B.Rl ; B.Rr ];
             
-            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol * size(R, 2));
+            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
             
             Q = Q(:,1:rk);
             
@@ -242,11 +242,11 @@ use_qr = false;
 
 if use_qr
     [Q, R, ~] = qr(S, 0);
-    rk = sum(abs(diag(R)) > nrm * tol * sqrt(size(S, 2)));
+    rk = sum(abs(diag(R)) > nrm * tol);
     Q = Q(:,1:rk);
 else
     [Q, S, ~] = svd(S);
-    rk = sum(diag(S) > nrm * tol * size(S, 2));
+    rk = sum(diag(S) > nrm * tol);
     Q = Q(:,1:rk);
 end
 end
