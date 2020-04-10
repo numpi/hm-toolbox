@@ -41,14 +41,15 @@ end
     B1 = B1 - W;
     %err = min(norm(B0),norm(B2));
     G = -AH \ A0;
-    err = (A2 * G + A1) * G + A0;
-    err = norm(err, nrmtype); 
+    %err = (A2 * G + A1) * G + A0;
+    %err = norm(err, nrmtype); 
+    err = min(norm(B0, 'fro'), norm(B2, 'fro'));
     if debug
 	fprintf('CR iteration: %d, residue: %e\n', k, err)
     end
     k = k + 1;
 end
- 
+
 if nargout == 2
 	F = -AT \ A2;
 end

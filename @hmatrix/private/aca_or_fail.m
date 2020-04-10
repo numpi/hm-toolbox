@@ -97,18 +97,24 @@ while k < min(m,n)
             [~, new_ind] = max(abs(b));
     	end
     end
-    
-    a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
-    a = a/b(new_ind);
-    U = [U, a];
-    V = [V, b'];
-    [~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
-    if tind >= ind
-        ind = tind + 1;
-    else
+    if b(new_ind) ~= 0
+    	a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
+    	a = a/b(new_ind);
+    	U = [U, a];
+    	V = [V, b'];
+    	[~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
+    	if tind >= ind
+        	ind = tind + 1;
+    	else
 
-        ind = tind;
-    end
+        	ind = tind;
+    	end
+     else
+	if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
+		nrm = 0;
+	end
+	return
+     end
 
     % Here the norm estimated using the first vectors obtained, unless a
     % norm to use as threshold has been given by the user; this is
