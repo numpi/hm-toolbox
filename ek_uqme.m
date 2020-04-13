@@ -42,32 +42,34 @@ zB = [tB, -tB];
 
 %-----------Create the structure for (X0 + A^-1 B) and X0'---------------------------
 if ~isstruct(A) 
-	if exist('sA', 'var')
-		error('SPARSE CASE TO BE DONE')  % TODO
+	if  isa(X0, 'hodlr') 
+		AA = ek_uqme_struct(A, zA, A * X0 + B);
+	elseif  isa(X0, 'hss')
+		error('HSS CASE TO BE DONE')  % TODO
 	else
-		if  isa(X0, 'hodlr') 
-			AA = ek_uqme_struct(A, zA, A * X0 + B);
-		elseif  isa(X0, 'hss')
-			error('HSS CASE TO BE DONE')  % TODO
-		else
-			error('Unstructured CASE TO BE DONE')  % TODO
-		end
-  	end
+		AA = X0 + A \ B; % Unstructured case
+	end
 else
     	AA = A;
+		nrmA = norm(AA);
 end
-nrmA = AA.nrm;
+if ~exist('nrmA', 'var')
+	nrmA = AA.nrm;
+end
 
 if ~isstruct(X0)
     if(isa(X0,'hodlr') || isa(X0,'hss')) % TODO Check whether it is fine for hss
 		BB = ek_uqme_struct(X0', zB);
     else
-		error('Unstructured CASE TO BE DONE')  % TODO
+		BB = X0'; % Unstructured case
+		nrmB = norm(BB);
     end
 else
     BB = X0; % Note that in this case the struct which refers to X0' has to be passed
 end
-nrmB = BB.nrm;
+if ~exist('nrmB', 'var')
+	nrmB = BB.nrm;
+end
 
 %---------------------------------------------------------------------------------------
 
