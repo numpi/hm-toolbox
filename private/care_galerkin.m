@@ -37,8 +37,13 @@ rhs = C(1:end-bsa,1:end-bsa);
 if ~exist('icare', 'file')
 	Y = care(HA1', HB, rhs);
 else
-	Y = small_care_solve(HA1', HB, rhs, hodlroption('threshold'), 50);
+	%Y = small_care_solve(HA1', HB, rhs, hodlroption('threshold'), 50);
+	[Y, converged] = newton_care(HA1', HB * HB', rhs, zeros(size(HA1)), hodlroption('threshold'), 50);
 	%Y = icare(HA1', HB, rhs);
+	if false && ~converged
+		res = inf;
+		return
+	end
 end
 
 

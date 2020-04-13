@@ -156,7 +156,7 @@ end
 
 [~,ii] = sort(diag(abs(DD))); ii = ii(end:-1:end-rk+1);
 
-Xu = VA(:,1:size(QQ,1)) * QQ(:,ii) * sqrt(abs(DD(ii,ii)));
+Xu = VA(:, 1:size(QQ, 1)) * QQ(:, ii) * sqrt(abs(DD(ii, ii)));
 D = diag(sign(diag(DD(ii, ii))));
 
 end

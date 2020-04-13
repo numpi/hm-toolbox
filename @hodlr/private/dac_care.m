@@ -19,9 +19,9 @@ end
 if ~exist('spA','var') 
     spA = [];
 end
-n = size(A, 1);
+[n, m] = size(A);
 X = hodlr();
-X.sz = [n n];
+X.sz = [n m];
 
 if  ~isempty(A.F) || ~isempty(C.F)
 	if ~exist('icare', 'file')
@@ -32,7 +32,7 @@ if  ~isempty(A.F) || ~isempty(C.F)
 	end
 
 	if debug
-        	fprintf('Base case: Dimension = %d, Residue = %e\n', size(A, 1), norm(A' * X + X * A - X * B * B' * X + C )/norm(X));
+        	fprintf('Base case: Dimension = %d, Residual = %e\n', size(A, 1), norm(A' * X + X * A - X * B * B' * X + C )/norm(X));
     	end
 else
 	nn = size(A.A11, 1);
@@ -73,7 +73,7 @@ else
 		else
 			ATstruct = ek_struct(A' + hodlr('low-rank', XB, B)); % Build the structure exploiting the HODLR structure
 		end
-		[dXU, ~, dUZ,~, rkres] = ek_care(ATstruct, B, u, 300, tol, debug, nrmtype, 'kernel', D); % Solve the CARE with low-rank rhs
+		[dXU, ~, dUZ,~, rkres] = ek_care(ATstruct, B, u, min(1000, n), tol, debug, nrmtype, 'kernel', D); % Solve the CARE with low-rank rhs
     	else
         	dXU = []; dUZ = [];
     	end
@@ -81,11 +81,11 @@ else
         	if debug
             		dX = hodlr('low-rank', dXU * dUZ, dXU); F = hodlr('low-rank', B, B);
             		Ac = A - F * X; Q = u * D * u';
-            		fprintf('Correction eq: Dimension = %d, Rank of the sol. = %d, Residue = %e\n', size(A, 1), size(dXU, 2), norm(Ac' * dX + dX * Ac - dX * F * dX + Q) / norm(dX))
+            		fprintf('Correction eq: Dimension = %d, Rank of the sol. = %d, Residual = %e\n', size(A, 1), size(dXU, 2), norm(Ac' * dX + dX * Ac - dX * F * dX + Q) / norm(dX))
         	end
 		X = X + hodlr('low-rank', dXU * dUZ, dXU);
 		if debug 
-        		fprintf('Complete equation: Dimension = %d, HODLR rank sol. = %d, Residue = %e\n', size(A, 1), hodlrrank(X), norm(A' * X + X * A - X * F * X + C, 1e-2) / norm(X));
+        		fprintf('Complete equation: Dimension = %d, HODLR rank sol. = %d, Residual = %e\n', size(A, 1), hodlrrank(X), norm(A' * X + X * A - X * F * X + C, 1e-2) / norm(X));
     		end
     	end
 end

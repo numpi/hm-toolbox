@@ -1,4 +1,4 @@
-function X = newton_care(A, B, C, X0, tol, maxit)
+function [X, converged] = newton_care(A, B, C, X0, tol, maxit, debug)
 % X = NEWTON_CARE(A,B,C,X0) solves the CARE C + XA + A'X - XBX = 0
 % by means of Newton's method with linesearch
 %    A, B, C: matrix coefficients
@@ -10,13 +10,16 @@ end
 if ~exist('maxit', 'var')
 	maxit = 30;
 end
-
+if ~exist('debug', 'var')
+	debug = false;
+end
 X = X0;
 err = 1; err_old = 1;
 k = 1;
 RX = C + X0 * A + A' * X0 - X0 * B * X0;
 RX = .5 * (RX + RX');
 
+converged = true;
 linesearch = true;
 while err > tol && k < maxit && err_old >= err 
     H = lyap(A' - X * B, RX); 
@@ -39,9 +42,10 @@ while err > tol && k < maxit && err_old >= err
     k = k + 1;
 end
 
-if k == maxit
-    fprintf('NEWTON_CARE::Warning: reached the maximum number of iterations: %d\n', maxit)
-pause
+if k == maxit && debug
+    fprintf('NEWTON_CARE::Warning: reached the maximum number of iterations: %d, Res = %e\n', maxit, err)
 end
-
+if err > 1e-10
+	converged = false;
+end
 

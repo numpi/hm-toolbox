@@ -26,6 +26,7 @@ B0 = A0; B1 = A1; B2 = A2;
 % CR step
 err = 1;
 k = 0;
+
 while err > tol && k < maxit
     F0 = B0 / B1;
     F2 = B2 / B1;
@@ -49,7 +50,6 @@ end
     end
     k = k + 1;
 end
-
 if nargout == 2
 	F = -AT \ A2;
 end
