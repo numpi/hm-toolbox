@@ -1,5 +1,5 @@
-function [G,F] = hodlr_cr(A2, A1, A0, tol, debug, nrmtype, maxit)
-% [G,F]=hodlr_cr(A0,A1,A2) solves the UQMEs A0 + A1 X + A2 X^2 = 0 and 
+function [G,F] = hss_cr(A2, A1, A0, tol, debug, nrmtype, maxit)
+% [G,F] = HSS_CR(A0,A1,A2) solves the UQMEs A0 + A1 X + A2 X^2 = 0 and 
 % A2 + A1 Y + A0 Y^2 = 0 by means of cyclic reduction
 % A0, A1, A2: matrix coefficients of the UQMEs
 % G: solution of the UQME A0 + A1 X + A2 X^2 = 0
@@ -56,5 +56,5 @@ if nargout == 2
 end
 
 if k == maxit
-    disp('HODLR_CR:: Warning: reached the maximum number of iterations')
+    disp('HSS_CR:: Warning: reached the maximum number of iterations')
 end

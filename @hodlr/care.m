@@ -22,6 +22,6 @@ if ~exist('spA', 'var')
 	spA = [];
 end
 	
-X = dac_care(A, B, C, spA, tol, debug, nrmtype);
+X = hodlr_dac_care(A, B, C, spA, tol, debug, nrmtype);
 end
 

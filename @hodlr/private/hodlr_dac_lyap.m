@@ -1,5 +1,5 @@
-function X = dac_lyap(A,B,C)
-% LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0
+function X = hodlr_dac_lyap(A,B,C)
+% HODLR_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0
 %          where all the matrices are represented in the HODLR format
 X = A;
 n = size(A,1);
@@ -14,8 +14,8 @@ if n <= 256
     return
 end
 
-X.A11 = dac_lyap(A.A11, B.A11, C.A11); % Recursive solution on the diagonal blocks
-X.A22 = dac_lyap(A.A22, B.A22, C.A22);
+X.A11 = hodlr_dac_lyap(A.A11, B.A11, C.A11); % Recursive solution on the diagonal blocks
+X.A22 = hodlr_dac_lyap(A.A22, B.A22, C.A22);
 X.U21 = zeros(size(A.U21,1),0);
 X.U12 = zeros(size(A.U12,1),0);
 X.V21 = zeros(size(A.V21,1),0);

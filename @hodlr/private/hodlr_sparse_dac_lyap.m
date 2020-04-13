@@ -1,7 +1,6 @@
-function X = sparse_dac_lyap(A, B, C, sA, sB)
-% LYAP_DAQ Divide and conquer method for solving A X + X B + C = 0
-%          where all the matrices are represented in the HODLR format
-%k = 3;
+function X = hodlr_sparse_dac_lyap(A, B, C, sA, sB)
+% HODLR_SPARSE_DAC_LYAP Divide and conquer method for solving A X + X B + C = 0
+%          where  matrices are available in the HODLR and in the sparse format
 X = A;
 n = size(A,1);
 debug = 0;
@@ -16,8 +15,8 @@ if n <= 256
     return
 end
 
-X.A11 = sparse_dac_lyap(A.A11, B.A11, C.A11, sA(1:n/2,1:n/2),sB(1:n/2,1:n/2)); % Recursive solution on the diagonal blocks
-X.A22 = sparse_dac_lyap(A.A22, B.A22, C.A22, sA(n/2+1:end,n/2+1:end),sB(n/2+1:end,n/2+1:end));
+X.A11 = hodlr_sparse_dac_lyap(A.A11, B.A11, C.A11, sA(1:n/2,1:n/2),sB(1:n/2,1:n/2)); % Recursive solution on the diagonal blocks
+X.A22 = hodlr_sparse_dac_lyap(A.A22, B.A22, C.A22, sA(n/2+1:end,n/2+1:end),sB(n/2+1:end,n/2+1:end));
 X.U21 = zeros(size(A.U21,1),0);
 X.U12 = zeros(size(A.U12,1),0);
 X.V21 = zeros(size(A.V21,1),0);
@@ -49,8 +48,8 @@ if size(u1,2) > 0 && size(u2,2) > 0
     tol = hodlroption('threshold');
     [ Xu, Xv ] = ek_sylv(sA, sB, u, v, inf, tol);
     if debug
-        XX=hodlr('low-rank',Xu,Xv);
-        norm(A*XX+XX*B+hodlr('low-rank',u,v),'fro')/norm(XX,'fro')/norm(A,'fro')/sqrt(size(XX,1))
+        XX = hodlr('low-rank', Xu, Xv);
+        norm(A * XX + XX * B+ hodlr('low-rank', u, v), 'fro') / norm(XX, 'fro') / norm(A, 'fro') / sqrt(size(XX, 1))
     end
     X = hodlr_rank_update(X, Xu, Xv);
 end

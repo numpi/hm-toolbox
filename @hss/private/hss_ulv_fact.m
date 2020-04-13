@@ -60,14 +60,14 @@ if A.leafnode == 1  % LEAF
     A.D = Q' * A.D;
     % Triangularize part of diagonal block
     [Q, L] = qr(A.D(1:end-k,:)');
-    F.L = [F.L, L(1:end-k,:)' ];
+    F.L = [F.L, {L(1:end-k,:)'} ];
     % Update transformations on the right
     V = Q' * A.V;
     ort = [ort, Q];
     ort_ind = [ort_ind, cur_ind];
     % Reduce the rows in the system
     D = A.D(end-k+1:end, :) * Q;
-    F.L = [F.L, D(:, 1:end-k)];
+    F.L = [F.L, {D(:, 1:end-k)}];
     
     % Reduce the columns of the diagonal block
     D = D(:,end-k+1:end);
@@ -78,14 +78,14 @@ else    % NOT A LEAF
     [F,  Dr, Ur, Vr, indr, cindr, ort, ort_ind] = hss_ulv_fact_rec(F, A.A22, ort, ort_ind, cur_ind(A.nl+1:end));  % recursive call on right child
     
     % Reduce the columns in the system
-    
-    F.L = [F.L, Ul , A.B12 * Vr(indr,:)'];
-    F.L = [F.L, Ur , A.B21 * Vl(indl,:)'];
+    F.L = [F.L, {Ul} , {A.B12 * Vr(indr,:)'}];
+    F.L = [F.L, {Ur} , {A.B21 * Vl(indl,:)'}];
+
     % Merge nodes
     D = [Dl, Ul * A.B12 * Vr(cindr, :)'; Ur * A.B21 * Vl(cindl, :)', Dr];
     
     if A.topnode == 1 % If we are in the root we solve the remaining dense sytem and we apply right transformations
-        F.L = [F.L, D];
+        F.L = [F.L, {D}];
         U = []; V = [];
         % Apply all the transformations on the right
         for j = length(ort):-1:1
@@ -113,7 +113,7 @@ else    % NOT A LEAF
     [Q, L] = qr(D(1:end-k,:)');
     
     % Retrieve part of the variables
-    F.L = [F.L, L(1:end-k,:)'];
+    F.L = [F.L, {L(1:end-k,:)'}];
     
     
     % Update transformations on the right
@@ -138,7 +138,7 @@ else    % NOT A LEAF
     cind = [cindl, A.nl + cindr]; % Complementary of ind;
     % Reduce the rows in the system
     D = D(end-k+1:end, :) * Q;
-    F.L = [F.L, D(:, 1:end-k)];
+    F.L = [F.L, {D(:, 1:end-k)}];
     
     % Reduce the columns of the diagonal block
     D = D(:,end-k+1:end);

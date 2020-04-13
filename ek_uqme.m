@@ -42,10 +42,11 @@ zB = [tB, -tB];
 
 %-----------Create the structure for (X0 + A^-1 B) and X0'---------------------------
 if ~isstruct(A) 
-	if  isa(X0, 'hodlr') 
+	if  isa(X0, 'hodlr') || isa(X0, 'hss')
 		AA = ek_uqme_struct(A, zA, A * X0 + B);
-	elseif  isa(X0, 'hss')
-		error('HSS CASE TO BE DONE')  % TODO
+	%elseif  isa(X0, 'hss')
+	%	AA = X0 + A \ B; nrmA = norm(AA);
+		%error('HSS CASE TO BE DONE')  % TODO
 	else
 		AA = X0 + A \ B; % Unstructured case
 	end
@@ -58,8 +59,10 @@ if ~exist('nrmA', 'var')
 end
 
 if ~isstruct(X0)
-    if(isa(X0,'hodlr') || isa(X0,'hss')) % TODO Check whether it is fine for hss
+    if(isa(X0,'hodlr') || isa(X0,'hss')) 
 		BB = ek_uqme_struct(X0', zB);
+		%BB = X0'; 
+		%nrmB = norm(BB);
     else
 		BB = X0'; % Unstructured case
 		nrmB = norm(BB);
@@ -200,38 +203,79 @@ function S = ek_uqme_struct(A, poles, AXB)
 % Build a struct for building rational Krylov subspaces for the correction equation of UQMEs.
 %
 if exist('AXB', 'var')
-	[LA, UA] = lu(A);
+	if isa(A, 'hodlr')
+		[LA, UA] = lu(A);
+	elseif isa(A, 'hss')
+		ulvA = ulv(A);
+	end
 	if poles(1) ~= inf
-		[LA1, UA1]  = lu(AXB -  poles(1) * A);
+		if isa(A, 'hodlr')
+			[LA1, UA1]  = lu(AXB -  poles(1) * A);
+		elseif isa(A, 'hss')
+			ulvA1  = ulv(AXB -  poles(1) * A);
+		end
 	else
 		LA1 = 0; UA1 = 0;
 	end
 	if poles(2) ~= inf
-		[LAm1,UAm1] = lu(AXB -  poles(2) * A);
+		if isa(AXB, 'hodlr')
+			[LAm1,UAm1] = lu(AXB -  poles(2) * A);
+		elseif isa(AXB, 'hss')
+			ulvAm1  = ulv(AXB -  poles(2) * A);
+		end
 	else
 		LA1 = 0; UA1 = 0;
 	end
-	S = struct(...
-        	 'solve', @(nu, mu, x) aux(A, x, mu, nu, LA1, UA1, LAm1, UAm1, LA, UA, poles), ...
-        	 'multiply', @(rho, eta, x) rho * AXB * x - eta * A * x, ...
-        	 'isreal', isreal(AXB), ...
-        	 'nrm', normest(AXB, 1e-2));
+	if isa(AXB, 'hodlr')
+		S = struct(...
+        		 'solve', @(nu, mu, x) aux(A, x, mu, nu, LA1, UA1, LAm1, UAm1, LA, UA, poles), ...
+        		 'multiply', @(rho, eta, x) rho * AXB * x - eta * A * x, ...
+        		 'isreal', isreal(AXB), ...
+        		 'nrm', normest(AXB, 1e-2));
+	elseif isa(AXB, 'hss')
+		S = struct(...
+        		 'solve', @(nu, mu, x) aux(A, x, mu, nu, ulvA1, [], ulvAm1, [], ulvA, [], poles), ...
+        		 'multiply', @(rho, eta, x) rho * AXB * x - eta * A * x, ...
+        		 'isreal', isreal(AXB), ...
+        		 'nrm', normest(AXB, 1e-2));
+	end
 else
 	if poles(1) ~= inf
-		[LA1, UA1]  = lu(A - poles(1) * eye(size(A), 'like', A));
+		if isa(A, 'hodlr')
+			[LA1, UA1]  = lu(A - poles(1) * eye(size(A), 'like', A));
+		elseif isa(A, 'hss')
+			ULV1 = ulv(A - poles(1) * eye(size(A), 'like', A));
+		else
+			error('Unsupported structure')
+		end
 	else
 		LA1 = 0; UA1 = 0; poles(1) = poles(2) + 3;
 	end
 	if poles(2) ~= inf
-		[LAm1, UAm1] = lu(A - poles(2) * eye(size(A), 'like', A));
+		if isa(A, 'hodlr')
+			[LAm1, UAm1] = lu(A - poles(2) * eye(size(A), 'like', A));
+		elseif isa(A, 'hss')
+			ULVm1 = ulv(A - poles(2) * eye(size(A), 'like', A));
+		else
+			error('Unsupported structure')
+		end
 	else
 		LAm1 = 0; UAm1 = 0; poles(2) = poles(1) + 3;
 	end
-	S = struct(...
-            	'solve', @(nu, mu, x) aux2(A, x, mu, nu, LA1, UA1, LAm1, UAm1, poles), ...
-            	'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
-            	'isreal', isreal(A), ...
-            	'nrm', normest(A, 1e-2));
+	if isa(A, 'hodlr')
+		S = struct(...
+            		'solve', @(nu, mu, x) aux2(A, x, mu, nu, LA1, UA1, LAm1, UAm1, poles), ...
+            		'multiply', @(rho, eta, x) rho * A * x - eta * x, ...
+            		'isreal', isreal(A), ...
+            		'nrm', normest(A, 1e-2));
+	elseif isa(A, 'hss')
+		    S = struct(...
+        		... % 'solve', @(nu, mu, x) (nu * A - mu * eye(size(A), 'like', A)) \ x, ...
+        		'solve', @(nu, mu, x) aux2(A, x, mu, nu, ULV1, [], ULVm1, [], poles),...
+        		'multiply', @(rho, eta, x) rho * (A * x) - eta * x, ...
+        		'isreal', isreal(A), ...
+        		'nrm', normest(A, 1e-2));
+	end
 end
 end
 %----------------------------------------------------------------------
@@ -239,15 +283,26 @@ end
 
 function y = aux(A, x, mu, nu, LA1, UA1, LAm1, UAm1, LA, UA, poles)  
 if nu == 0
-	y = -lu_solve(1.0, 0.0, LA, UA, x) / mu;
-	return
+	if isa(A, 'hodlr')
+		y = -lu_solve(1.0, 0.0, LA, UA, x) / mu;
+		return
+	elseif isa(A, 'hss')
+		y = -ulv_solve(LA, x) / mu;
+		return
+	end
 end
 if mu == poles(1)
-	y = lu_solve(1.0, 0, LA1, UA1, x);
+	if isa(A, 'hodlr')
+		y = lu_solve(1.0, 0, LA1, UA1, x);
+	elseif isa(A, 'hss')
+		y = ulv_solve(LA1, x);
+	end
 elseif mu == poles(2)
-	y = lu_solve(1.0, 0, LAm1, UAm1, x);
-else
-	y = lu_solve(0, 1.0, LAm1, UAm1, x);
+	if isa(A, 'hodlr')
+		y = lu_solve(1.0, 0, LAm1, UAm1, x);
+	elseif isa(A, 'hss')
+		y = ulv_solve(LAm1, x);		
+	end
 end
 end
 %----------------------------------------------------------------------
@@ -259,9 +314,17 @@ if nu == 0
 	return
 end
 if nu == 1/poles(1)
-	y = lu_solve(1.0, 0, LA1, UA1, x) * poles(1);
+	if isa(A, 'hodlr')
+		y = lu_solve(1.0, 0, LA1, UA1, x) * poles(1);
+	elseif isa(A, 'hss')
+		y = ulv_solve(LA1, x) * poles(1);
+	end
 elseif nu == 1/poles(2)
-	y = lu_solve(1.0, 0, LAm1, UAm1, x) * poles(2);
+	if isa(A, 'hodlr')
+		y = lu_solve(1.0, 0, LAm1, UAm1, x) * poles(2);
+	elseif isa(A, 'hss')
+		y = ulv_solve(LAm1, x) * poles(2);
+	end
 else
 	y = (nu * A - mu * eye(size(A), 'like', A))\x;
 end

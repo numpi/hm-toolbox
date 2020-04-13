@@ -1,4 +1,4 @@
-function X = dac_care(A, B, C, spA, tol, debug, nrmtype)
+function X = hodlr_dac_care(A, B, C, spA, tol, debug, nrmtype)
 % solve the CARE A'X + X A - X B B' X + C = 0 with a divide and conquer method
 %
 %  Assumptions:
@@ -38,11 +38,11 @@ else
 	nn = size(A.A11, 1);
 	% Solve the block diagonal equation via recursion
 	if issparse(spA)
-        	X = blkdiag( dac_care(A.A11, B(1:nn, :), C.A11, spA(1:nn, 1:nn),tol, debug, nrmtype),...
-                     dac_care(A.A22, B(nn + 1:end, :), C.A22, spA(nn + 1:end, nn + 1:end), tol, debug, nrmtype) );
+        	X = blkdiag( hodlr_dac_care(A.A11, B(1:nn, :), C.A11, spA(1:nn, 1:nn),tol, debug, nrmtype),...
+                     hodlr_dac_care(A.A22, B(nn + 1:end, :), C.A22, spA(nn + 1:end, nn + 1:end), tol, debug, nrmtype) );
 	else
-		X = blkdiag( dac_care(A.A11, B(1:nn, :), C.A11, [],tol, debug, nrmtype),...
-                     dac_care(A.A22, B(nn + 1:end, :), C.A22, [], tol, debug, nrmtype) );
+		X = blkdiag( hodlr_dac_care(A.A11, B(1:nn, :), C.A11, [],tol, debug, nrmtype),...
+                     hodlr_dac_care(A.A22, B(nn + 1:end, :), C.A22, [], tol, debug, nrmtype) );
 	end
 
         % Build low-rank representation of the correction equation

@@ -75,11 +75,11 @@ if ( is_lyapunov && length(varargin) >= 3 && issparse(varargin{3})  )|| ...
     
     if is_lyapunov
         nrmA = 1 / norm(A);
-        X = sparse_dac_lyap(A * nrmA, A' * nrmA, C * nrmA, ...
+        X = hodlr_sparse_dac_lyap(A * nrmA, A' * nrmA, C * nrmA, ...
             varargin{3} * nrmA, varargin{3}' * nrmA);
     else
         nrm = 1 / max(norm(A), norm(B));
-        X = sparse_dac_lyap(A * nrm, B * nrm, C * nrm, ...
+        X = hodlr_sparse_dac_lyap(A * nrm, B * nrm, C * nrm, ...
             varargin{4} * nrm, varargin{5} * nrm);
     end
     
@@ -89,10 +89,10 @@ end
 if strcmp(method, 'd&c')
     if is_lyapunov
         nrmA = 1 / norm(A);
-        X = dac_lyap(A * nrmA, A' * nrmA, C * nrmA);
+        X = hodlr_dac_lyap(A * nrmA, A' * nrmA, C * nrmA);
     else
         nrm = 1 ./ max(norm(A), norm(B));
-        X = dac_lyap(A * nrm, B * nrm, C * nrm);
+        X = hodlr_dac_lyap(A * nrm, B * nrm, C * nrm);
     end
     
     X = compress_hodlr(X);
