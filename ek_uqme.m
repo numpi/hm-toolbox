@@ -43,10 +43,8 @@ zB = [tB, -tB];
 %-----------Create the structure for (X0 + A^-1 B) and X0'---------------------------
 if ~isstruct(A) 
 	if  isa(X0, 'hodlr') || isa(X0, 'hss')
-		AA = ek_uqme_struct(A, zA, A * X0 + B);
-	%elseif  isa(X0, 'hss')
-	%	AA = X0 + A \ B; nrmA = norm(AA);
-		%error('HSS CASE TO BE DONE')  % TODO
+		%AA = ek_uqme_struct(A, zA, A * X0 + B);
+		AA = ek_uqme_struct(X0 + A\B, zB); % Both structures work; this is one is faster, the former might be more accurate if A is nearly singular
 	else
 		AA = X0 + A \ B; % Unstructured case
 	end
