@@ -25,7 +25,7 @@ else
             mem21 = sum(H.A21.sz) * size(H.A21.U, 2);
             mem22 = sum(H.A22.sz) * size(H.A22.U, 2);
             
-            if mem <= 2 * (mem11 + mem12 + mem21 + mem22) % ...and we do not lose too much in memory, then we merge them
+            if mem <= 1.75 * (mem11 + mem12 + mem21 + mem22) % ...and we do not lose too much in memory, then we merge them
                 H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
                 H.U = U;
                 H.V = V;
