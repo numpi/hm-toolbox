@@ -8,7 +8,11 @@ if hmatrixoption('norm') == 2
         @(x) H' * x + V * (U' * x), size(H, 2), 1e-3);
     H = hmatrix_rank_update(H, U, V, nrm);
 else
+    % Precomputing the Frobenius norm of H + UV' would help in this
+    % process, as we could directly truncate relative to the norm of the
+    % result.
     H = hmatrix_rank_update(H, U, V);
+    H = hmatrix_compress(H);
 end
 
 end
