@@ -21,7 +21,7 @@ else
     U.A12 = L.A11 \ H.A12;
     L.A21 = H.A21 / U.A11;
     % [L.A22, U.A22] = lu(H.A22 - L.A21 * U.A12);
-    [L.A22, U.A22] = lu(compress_hmatrix(hmatrix_minus(H.A22, L.A21 * U.A12), []));
+    [L.A22, U.A22] = lu(hmatrix_compress(hmatrix_minus(H.A22, L.A21 * U.A12), []));
     
     % Since these matrices are lower and upper triangular we can set some
     % blocks to be empty, and in particular admissible.

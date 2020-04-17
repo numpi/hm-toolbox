@@ -1,11 +1,6 @@
-function H = hmatrix_hadamard_mul(H1, H2, compress)
-if ~exist('compress', 'var')
-    compress = true;
-end
-H = hmatrix_hadamard_mul_ric(H1, H2);
-if compress
-	    H = compress_hmatrix(H);
-end
+function H = hmatrix_hadamard_mul(H1, H2)
+    H = hmatrix_hadamard_mul_ric(H1, H2);
+    H = hmatrix_compress(H);
 end
 
 function H = hmatrix_hadamard_mul_ric(H1, H2)

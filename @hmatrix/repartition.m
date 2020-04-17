@@ -5,6 +5,7 @@ if ~exist('maxrank', 'var')
 end
 
 H = hmatrix_repartition(H, maxrank);
+H = hmatrix_compress(H);
 
 end
 

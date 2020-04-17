@@ -158,6 +158,11 @@ bsb = sb;
 
 it=1;
 while max(sa-2*bsa, sb-2*bsb) < k
+    
+    if it > 30
+        keyboard
+    end
+    
     if exist('VA', 'var') && ( ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
             ( size(VB, 2) + 2 * bsb >= size(VB, 1) ) )
         
