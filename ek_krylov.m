@@ -95,6 +95,12 @@ K(1:end-bs, end-bs+1:end) = h;
 H(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 
 [w, r] = qr(w, 0);
+
+% Reorthogonalize
+hh = V' * w;
+w = w - V * hh; % A*v = V*h + (w + V*hh)*r
+K(1:end-bs, end-bs+1:end) = K(1:end-bs, end-bs+1:end) + hh * r;
+
 K(end-bs+1:end, end-bs+1:end) = r;
 
 V = [V, w];
@@ -124,16 +130,19 @@ H(1:end-bs, end-bs+1:end) = h;
 K(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 
 [w, r] = qr(w, 0);
+
+% Reorthogonalize
+hh = V' * w;
+w = w - V * hh;
+H(1:end-bs, end-bs+1:end) = H(1:end-bs, end-bs+1:end) + hh * r;
+
 H(end-bs+1:end, end-bs+1:end) = r;
 
 V = [V, w];
 end
 
 %
-% Modified Gram-Schmidt orthogonalization procedure.
-%
-% Suggested improvements: work with block-size matrix vector products to
-% get BLAS3 speeds.
+% Gram-Schmidt orthogonalization procedure.
 %
 function [w, h] = mgs_orthogonalize(V, w)
     h = V' * w;

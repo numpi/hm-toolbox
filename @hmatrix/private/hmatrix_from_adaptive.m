@@ -31,9 +31,9 @@ if ~exist('support', 'var')
     support = @(i1, j1, i2, j2) 1;
 end
 
-compression = 'aca';
+compression = 'svd';
 
-if isempty(maxrank) || (maxrank > min(m, n) / 16)
+if isempty(maxrank) || maxrank > round(min(m,n) / 16)
     maxrank = round(min(m,n) / 16);
 end
 
@@ -45,7 +45,7 @@ if (m <= bs && n <= bs) || min([m n]) == 1
         case 'svd'
             [U, S, V] = tsvd(Afun(1:m, 1:n), tol);
             U = U * S;
-            if size(U, 2) < min(maxrank, min(m, n) / 16)
+            if size(U, 2) < maxrank
                 H.admissible = true;
                 H.U = U;
                 H.V = V;

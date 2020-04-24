@@ -5,7 +5,9 @@ if is_leafnode(H)
     if ~H.admissible
     	H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2), maxrank);
     else
-        H = hmatrix('adaptive', @(i, j) H.U(i, :) * H.V(j, :)', size(H, 1), size(H, 2), maxrank);
+        if size(H.U, 2) > min(maxrank, min(size(H.U, 1), size(H.V,1)) / 16)
+            H = hmatrix('adaptive', @(i, j) H.U(i, :) * H.V(j, :)', size(H, 1), size(H, 2), maxrank);
+        end
     end
 else
     % Recursive call on the children
@@ -14,7 +16,13 @@ else
     H.A21 = hmatrix_repartition(H.A21, maxrank);
     H.A22 = hmatrix_repartition(H.A22, maxrank);
     
-    if H.A11.admissible && H.A12.admissible && H.A21.admissible && H.A22.admissible % if we have 4 children of low-rank let's try to merge them
+    % Check if the blocks here are all full --- if they are, then we
+    % can merge them and avoid having a deep tree for no gain.
+    if ~isempty(H.A11.F) && ~isempty(H.A12.F) && ...
+            ~isempty(H.A21.F) && ~isempty(H.A22.F)
+        H.F = [ H.A11.F , H.A12.F ; H.A21.F , H.A22.F ];
+        H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
+    elseif H.A11.admissible && H.A12.admissible && H.A21.admissible && H.A22.admissible % if we have 4 children of low-rank let's try to merge them
         % first we compute the low-rank representation of the 4 blocks together
         [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22);
         

@@ -16,4 +16,3 @@ fprintf('  - All the tests have been completed successfully.\n');
 fprintf('  - The options have been reset to their default values.\n');
 
 end
-

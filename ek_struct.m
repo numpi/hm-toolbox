@@ -123,5 +123,16 @@ else
     end    
 end
 
+try
+    % Not all datatypes implement issymmetric at the moment
+    S.issymmetric = issymmetric(A);
+catch
+    S.issymmetric = false;
+end
+
+if nargout > 1
+    ST.issymmetric = S.issymmetric;
+end
+
 end
 

@@ -60,7 +60,7 @@ else
                 hmatrix_threshold = max(eps, value);
             end
         case 'norm'
-            if value ~= 2 && ~strcmp(value, 'fro')
+            if (isscalar(value) && value ~= 2) && ~strcmp(value, 'fro')
                 error('Unsupported norm specified');
             else
                 hmatrix_norm = value;

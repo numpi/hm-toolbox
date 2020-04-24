@@ -157,6 +157,9 @@ bsa = sa;
 bsb = sb;
 
 it=1;
+
+residuals = [];
+
 while max(sa-2*bsa, sb-2*bsb) < k
     
     if exist('VA', 'var') && ( ( size(VA, 2) + 2 * bsa >= size(VA, 1) ) || ...
@@ -206,28 +209,58 @@ while max(sa-2*bsa, sb-2*bsb) < k
     sa = size(VA, 2);
     sb = size(VB, 2);
     
-    % Compute the solution and residual of the projected Lyapunov equation
-    As = HA / KA(1:end-bsa,:);
-    Bs = HB / KB(1:end-bsb,:);
-    Cs = zeros(size(As, 1), size(Bs, 1));
-    
-    if ~exist('Cprojected', 'var')
-        Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
+    % We only compute the solution and residual of the projected Lyapunov 
+    % equation in the first three iterations, and then use the fact that
+    % the convergence is expected to be linear to estimate the number of
+    % iterations requires to converge. This saves some Lyapunov dense
+    % solutions, which are relatively expensive.
+    if it <= 3 || ~exist('tol_eps', 'var')
+        check_residual = true;
+    else
+        if it == 4
+            pp = polyfit(1:3, log(residuals(1:3)), 1);
+            r1 = residuals(1) / norm(Y, nrmtype);
+            needed_iterations = ceil(...
+                (log(tol_eps) - log(r1)) / pp(1)) + 1;
+            needed_iterations = min(20, needed_iterations);
+        end
+        check_residual = it >= needed_iterations;
     end
     
-    Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
-    
-    [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
-    
-    % You might want to enable this for debugging purposes
-    if debug
-        fprintf('%d Residue: %e (space dim: %d)\n', it, res / norm(Y), ...
-            size(Y, 1));
+    if check_residual
+        As = HA / KA(1:end-bsa,:);
+        Bs = HB / KB(1:end-bsb,:);
+        Cs = zeros(size(As, 1), size(Bs, 1));
+
+        if AA.issymmetric
+            As = block_symmetrize(As, bsa);
+        end
+
+        if BB.issymmetric
+            Bs = block_symmetrize(Bs, bsb);
+        end
+
+        if ~exist('Cprojected', 'var')
+            Cprojected = ( VA(:,1:size(u,2))' * u ) * ( v' * VB(:,1:size(v,2)) );
+        end
+
+        Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
+
+        [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
+
+        residuals(it) = res;
+
+        % You might want to enable this for debugging purposes
+        if debug
+            fprintf('%d Residue: %e (space dim: %d)\n', it, res / norm(Y), ...
+                size(Y, 1));
+        end
+
+        if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
+            break
+        end
     end
     
-    if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
-        break
-    end
     it=it+1;
 end
 
@@ -251,3 +284,9 @@ Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
 
 end
 
+function A = block_symmetrize(B, bs)
+    A = B(1:end-bs, :);
+    A = .5 * (A + A');
+    A = triu(tril(A, 3*bs),-3*bs);
+    A = [ A ; B(end-bs+1:end,:) ];
+end
