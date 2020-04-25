@@ -287,6 +287,8 @@ end
 function A = block_symmetrize(B, bs)
     A = B(1:end-bs, :);
     A = .5 * (A + A');
-    A = triu(tril(A, 3*bs),-3*bs);
+    if 3*bs > size(A, 1)
+        A = triu(tril(A, 3*bs),-3*bs);
+    end
     A = [ A ; B(end-bs+1:end,:) ];
 end
