@@ -4,7 +4,7 @@ m = size(U, 1);
 n = size(V, 1);
 
 if isempty(H)
-    H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
+	H = hmatrix; H.admissible = true; H.sz = [m n];
 end
 
 H = hmatrix_low_rank_ric(H, U, V);

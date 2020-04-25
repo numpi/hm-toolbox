@@ -214,7 +214,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
     % the convergence is expected to be linear to estimate the number of
     % iterations requires to converge. This saves some Lyapunov dense
     % solutions, which are relatively expensive.
-    if it <= 3 || ~exist('tol_eps', 'var')
+    if  it <= 3 || ~exist('tol_eps', 'var')
         check_residual = true;
     else
         if it == 4
@@ -231,7 +231,6 @@ while max(sa-2*bsa, sb-2*bsb) < k
         As = HA / KA(1:end-bsa,:);
         Bs = HB / KB(1:end-bsb,:);
         Cs = zeros(size(As, 1), size(Bs, 1));
-
         if AA.issymmetric
             As = block_symmetrize(As, bsa);
         end

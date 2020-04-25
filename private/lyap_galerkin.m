@@ -39,13 +39,11 @@ end
 % Consider the projected matrices at the previous step, which is needed to
 % check the Galerkin condition
 HA1 = HA(1 : end - bsa, :);
-
 if ~is_lyapunov
     HB1 = HB(1 : end - bsb, :);
 end
 
-% Compute the solution of the Lyapunov equation (word of warning: please
-% check the sign of C in the implementation of SylvKrylov).
+% Compute the solution of the Lyapunov equation.
 if ~is_lyapunov
     Y = lyap(HA1, HB1', C(1:end-bsa,1:end-bsb));
 else
