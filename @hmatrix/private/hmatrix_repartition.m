@@ -1,20 +1,34 @@
-function H = hmatrix_repartition(H, maxrank)
+function H = hmatrix_repartition(H, maxrank, nrm)
 %REPARTITION_HMATRIX
+
+if ~exist('nrm', 'var')
+    nrm = [];
+end
 
 if is_leafnode(H)
     if ~H.admissible
-    	H = hmatrix('adaptive', H.F, size(H.F, 1), size(H.F, 2), maxrank);
+        if ~isempty(nrm)
+            H = hmatrix_from_adaptive(H.F, size(H.F,1), size(H.F,2), maxrank, @(i,j) 1, nrm);
+        else
+            H = hmatrix_from_adaptive(H.F, size(H.F,1), size(H.F,2), maxrank);
+        end
     else
         if size(H.U, 2) > min(maxrank, min(size(H.U, 1), size(H.V,1)) / 16)
-            H = hmatrix('adaptive', @(i, j) H.U(i, :) * H.V(j, :)', size(H, 1), size(H, 2), maxrank);
+            if ~isempty(nrm)                
+                H = hmatrix_from_adaptive(@(i, j) H.U(i, :) * H.V(j, :)', ...
+                        size(H.U,1), size(H.V,1), maxrank, @(i,j) 1, nrm);
+            else
+                H = hmatrix_from_adaptive(@(i, j) H.U(i, :) * H.V(j, :)', ...
+                        size(H.U,1), size(H.V,1), maxrank);
+            end
         end
     end
 else
     % Recursive call on the children
-    H.A11 = hmatrix_repartition(H.A11, maxrank);
-    H.A12 = hmatrix_repartition(H.A12, maxrank);
-    H.A21 = hmatrix_repartition(H.A21, maxrank);
-    H.A22 = hmatrix_repartition(H.A22, maxrank);
+    H.A11 = hmatrix_repartition(H.A11, maxrank, nrm);
+    H.A12 = hmatrix_repartition(H.A12, maxrank, nrm);
+    H.A21 = hmatrix_repartition(H.A21, maxrank, nrm);
+    H.A22 = hmatrix_repartition(H.A22, maxrank, nrm);
     
     % Check if the blocks here are all full --- if they are, then we
     % can merge them and avoid having a deep tree for no gain.
@@ -45,7 +59,7 @@ end
 
 end
 
-function [U, V] = merge_low_rank(A11, A12, A21, A22)
+function [U, V] = merge_low_rank(A11, A12, A21, A22, nrm)
 [U, V] = compress_factors(blkdiag([ A11.U, A12.U ], [ A21.U, A22.U ]), ...
     [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ]);
 end

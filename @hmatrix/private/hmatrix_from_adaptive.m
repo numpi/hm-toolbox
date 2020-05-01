@@ -43,7 +43,7 @@ H.sz = [m n];
 if (m <= bs && n <= bs) || min([m n]) == 1
     switch compression
         case 'svd'
-            [U, S, V] = tsvd(Afun(1:m, 1:n), tol);
+            [U, S, V] = tsvd(Afun(1:m, 1:n), tol, nrm);
             U = U * S;
             if size(U, 2) < maxrank
                 H.admissible = true;
@@ -125,7 +125,7 @@ else
         if ~is_leafnode(H) && (H.A11.admissible && H.A12.admissible && H.A21.admissible && H.A22.admissible)
             % if we have 4 children of low-rank let's try to merge them
             % first we compute the low-rank representation of the 4 blocks together
-            [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22);
+            [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22, nrm);
 
             if size(U, 2) < min([size(H) / 2, maxrank]) % if the rank is not too high...
                 mem = sum(H.sz) * size(U, 2);
@@ -147,7 +147,7 @@ end
 
 end
 
-function [U,S,V] = tsvd(A,tol)
+function [U,S,V] = tsvd(A,tol,nrm)
 if min(size(A)) == 0
     U = zeros(size(A, 1), 0); S = []; V = zeros(size(A, 2), 0); return;
 end
@@ -156,7 +156,11 @@ end
 t = diag(S);
 % t = cumsum(t(end:-1:1));
 
-r = sum(t > tol);
+if nrm == 0
+    nrm = t(1);
+end
+
+r = sum(t > tol * nrm);
 
 % r = sum(cumsum(diag(S(end:-1:1,end:-1:1))) > tol);
 U = U(:,1:r);
@@ -165,7 +169,7 @@ S = S(1:r,1:r);
 
 end
 
-function [U, V] = merge_low_rank(A11, A12, A21, A22)
+function [U, V] = merge_low_rank(A11, A12, A21, A22, nrm)
 [U, V] = compress_factors(blkdiag([ A11.U, A12.U ], [ A21.U, A22.U ]), ...
-    [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ]);
+    [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ], nrm);
 end
