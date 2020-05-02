@@ -8,15 +8,15 @@ end
 if is_leafnode(H)
     if ~H.admissible
         if ~isempty(nrm)
-            H = hmatrix_from_adaptive(H.F, size(H.F,1), size(H.F,2), maxrank, @(i,j) 1, nrm);
+            H = hmatrix_from_adaptive(H.F, size(H.F,1), size(H.F,2), maxrank, @(i1,i2,j1,j2) 1, nrm);
         else
             H = hmatrix_from_adaptive(H.F, size(H.F,1), size(H.F,2), maxrank);
         end
     else
-        if size(H.U, 2) > min(maxrank, min(size(H.U, 1), size(H.V,1)) / 16)
+        if size(H.U, 2) > min(maxrank, min(size(H.U, 1), size(H.V,1)) * hmatrixoption('rank-ratio'))
             if ~isempty(nrm)                
                 H = hmatrix_from_adaptive(@(i, j) H.U(i, :) * H.V(j, :)', ...
-                        size(H.U,1), size(H.V,1), maxrank, @(i,j) 1, nrm);
+                        size(H.U,1), size(H.V,1), maxrank, @(i1,i2,j1,j2) 1, nrm);
             else
                 H = hmatrix_from_adaptive(@(i, j) H.U(i, :) * H.V(j, :)', ...
                         size(H.U,1), size(H.V,1), maxrank);
@@ -38,21 +38,20 @@ else
         H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
     elseif H.A11.admissible && H.A12.admissible && H.A21.admissible && H.A22.admissible % if we have 4 children of low-rank let's try to merge them
         % first we compute the low-rank representation of the 4 blocks together
-        [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22);
+        [U, V] = merge_low_rank(H.A11, H.A12, H.A21, H.A22, nrm);
         
-        if size(U, 2) < min([size(H) / 2, maxrank]) % if the rank is not too high...
-            mem = sum(H.sz) * size(U, 2);
-            mem11 = sum(H.A11.sz) * size(H.A11.U, 2);
-            mem12 = sum(H.A12.sz) * size(H.A12.U, 2);
-            mem21 = sum(H.A21.sz) * size(H.A21.U, 2);
-            mem22 = sum(H.A22.sz) * size(H.A22.U, 2);
-            
-            if mem <= 1.75 * (mem11 + mem12 + mem21 + mem22) % ...and we do not lose too much in memory, then we merge them
-                H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
-                H.U = U;
-                H.V = V;
-                H.admissible = true;
-            end
+        maximum_acceptable_rank = max([ ...
+            size(H.A11.U, 2), size(H.A12.U,2), ...
+            size(H.A21.U,2), size(H.A22.U, 2) ]) * 2;
+        
+        maximum_acceptable_rank = min([ maximum_acceptable_rank, ...
+            size(H) * hmatrixoption('rank-ratio'), maxrank ]);
+        
+        if size(U, 2) < maximum_acceptable_rank % if the rank is not too high...            
+            H.A11 = []; H.A12 = []; H.A21 = []; H.A22 = [];
+            H.U = U;
+            H.V = V;
+            H.admissible = true;
         end
     end
 end
@@ -60,7 +59,7 @@ end
 end
 
 function [U, V] = merge_low_rank(A11, A12, A21, A22, nrm)
-[U, V] = compress_factors(blkdiag([ A11.U, A12.U ], [ A21.U, A22.U ]), ...
-    [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ]);
+    [U, V] = compress_factors(blkdiag([ A11.U, A12.U ], [ A21.U, A22.U ]), ...
+        [ blkdiag(A11.V, A12.V), blkdiag(A21.V, A22.V) ], nrm);
 end
 
