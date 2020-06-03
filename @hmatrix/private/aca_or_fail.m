@@ -41,11 +41,15 @@ sample_size = 50;
 
 m_min = 128;
 n_min = 128;
-if  false && m > m_min && n > n_min
+
+if m > m_min && n > n_min
 	% first try with full pivoting on a subsample
-	isub = round(linspace(1, m, m_min));
-	jsub = round(linspace(1, n, n_min));
-	[~, ~, I, J] = aca_full_pivoting(Afun(isub', jsub), m_min, n_min, tol);
+    chebm = -cos((0:m_min-1)./(m_min-1)*pi);
+    chebn = -cos((0:n_min-1)./(n_min-1)*pi);
+	isub = unique(round(1 + (chebm + 1) ./ 2 * (m-1)));
+	jsub = unique(round(1 + (chebn + 1) ./ 2 * (n-1)));
+    
+	[U, V, I, J] = aca_full_pivoting(Afun(isub', jsub), length(isub), length(jsub), tol);
 	if length(I) >= maxrank
         	U = [];
         	V = [];
@@ -53,10 +57,13 @@ if  false && m > m_min && n > n_min
 	else
 		I = isub(I);
 		J = jsub(J);
-		U = Afun(1:m, I) / Afun(I, J);
-		V = Afun(J, 1:n)'; 
+        
+        [UU,SS,VV] = svd(Afun(I,J));
+        ISS = diag(1 ./ sqrt(diag(SS)));        
+		U = Afun(1:m, I) * UU * ISS;
+		V = Afun(J, 1:n)' * VV * ISS;
 		[~, RU] = qr(U, 0); 
-    		[~, RV] = qr(V, 0);
+    	[~, RV] = qr(V, 0);
 		nrm = norm(RU * RV');
 		taken_row = I;
 		k = k + size(U, 2);
