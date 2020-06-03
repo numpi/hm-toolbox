@@ -12,6 +12,17 @@ global hmatrix_threshold
 global hmatrix_compression
 global hmatrix_norm
 
+% Private options -- not exposed to users
+
+% This option sets the maximum allowed rank for low-rank blocks with
+% respect the dimension: for a block of size (m,n) the maximum allowed rank
+% is hmatrixoption('rank-ratio') * min(m,n)
+global hmatrix_rank_ratio
+
+if isempty(hmatrix_rank_ratio)
+    hmatrix_rank_ratio = 0.5;
+end
+
 if isempty(hmatrix_block_size)
     hmatrix_block_size = 256;
 end
@@ -42,6 +53,8 @@ if ~exist('value', 'var')
             opt = hmatrix_compression;
         case 'norm'
             opt = hmatrix_norm;
+        case 'rank-ratio'
+            opt = hmatrix_rank_ratio;
         otherwise
             error('Unsupported option specified');
     end

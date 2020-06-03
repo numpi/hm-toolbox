@@ -98,7 +98,7 @@ else    % NOT A LEAF
     V = [Vl * A.Wl; Vr * A.Wr];
     U = [Ul * A.Rl; Ur * A.Rr];
     k = size(U,2);
-    if k == size(U,1) % full rank, no compression needed
+    if k >= size(U,1) % full rank, no compression needed
         ind = [indl, A.nl + indr];
         cind = [cindl, A.nl + cindr];
         return
