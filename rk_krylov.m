@@ -130,17 +130,7 @@ end
 function c = continuation_vector(K, H, pole, bs)
 % Find the list of poles we had
 
-sz = size(H, 1) / bs;
-j = sz;
-
-while j > 1 && min( abs(eig(H((j-1)*bs+1:j*bs,(j-2)*bs+1:(j-1)*bs), ...
-                            K((j-1)*bs+1:j*bs,(j-2)*bs+1:(j-1)*bs)) ...
-                            - pole ) ) < 1e-12
-    j = j - 1;
-end
-
-c = zeros(sz, 1); c(j) = 1;
-
+c = ones(size(H, 1) / bs, 1);
 end
 
 function p = poles_pencil(K, H, bs)
@@ -160,14 +150,9 @@ end
 % get BLAS3 speeds.
 %
 function [w, h] = mgs_orthogonalize(V, w)
-    h = zeros(size(V, 2), size(w, 2));
-    for j = 1 : size(V, 2)
-        h(j,:) = (V(:,j)' * w);
-        w = w - V(:,j) * h(j,:);
-    end
-    for j = 1 : size(V, 2)
-        hj = (V(:,j)' * w);
-        w = w - V(:,j) * hj;
-        h(j,:) = h(j,:) + hj;
-    end
+h = zeros(size(V, 2), size(w, 2));
+for j = 1 : size(V, 2)
+    h(j,:) = (V(:,j)' * w);
+    w = w - V(:,j) * (V(:,j)' * w);
+end
 end
