@@ -31,91 +31,60 @@ if isempty(maxrank)
     maxrank = round(min(m,n) / 2);
 end
 
+has_norm = exist('nrm', 'var');
+
 U = zeros(m, 0);
 V = zeros(n, 0);
 k = 1;
-ind = 1;
 taken_row = [];
 
-sample_size = 50;
-
-m_min = 128;
-n_min = 128;
-if  false && m > m_min && n > n_min
-	% first try with full pivoting on a subsample
-	isub = round(linspace(1, m, m_min));
-	jsub = round(linspace(1, n, n_min));
-	[~, ~, I, J] = aca_full_pivoting(Afun(isub', jsub), m_min, n_min, tol);
-	if length(I) >= maxrank
-        	U = [];
-        	V = [];
-        	return;
-	else
-		I = isub(I);
-		J = jsub(J);
-		U = Afun(1:m, I) / Afun(I, J);
-		V = Afun(J, 1:n)'; 
-		[~, RU] = qr(U, 0); 
-    		[~, RV] = qr(V, 0);
-		nrm = norm(RU * RV');
-		taken_row = I;
-		k = k + size(U, 2);
-		% Then, continue with partial pivoting
-		%[~, ind] = max(abs(U([1:I(end) - 1, I(end) + 1:m], end)));
-    		%if ind >= I(end)
-        	%	ind = ind + 1;
-    		%else
-        	%	ind = ind;
-    		%end
-    	end
-end
+sample_size = ceil(sqrt(n));
 
 % Select the first pivot with a random sampling
-first_indices = randsample(setdiff(1:m, taken_row), min(m, sample_size));
-rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
-[~, ind] = max(max(abs(rows), [], 2));
-ind = first_indices(ind);
-taken_row = [taken_row, ind];
+[ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
 
 while k < min(m,n)
-
-    b = Afun(ind, 1:n) - U(ind, :) * V';
-    [~, new_ind] = max(abs(b));
+        
     if debug
-        fprintf('Iteration: %d Pivot at (%d,%d): %e\n', k, ind, new_ind, b(new_ind))
+        fprintf('Iteration: %d Pivot at (%d,%d): %e\n', ...
+                k, ind, new_ind, b(new_ind))
     end
     
     if exist('nrm', 'var') && abs(b(new_ind)) <= nrm * tol
-    	first_indices = randsample(setdiff(1:m, taken_row), min(m - length(taken_row), min(m - length(taken_row), sample_size)));
-        rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
-        [mx, ind] = max(max(abs(rows), [], 2));
-        if mx <= tol * nrm
-        	return;
-        else
-    	    ind = first_indices(ind);    
-            b = Afun(ind, 1:n) - U(ind, :) * V';
-            [~, new_ind] = max(abs(b));
-    	end
+        % Check before exiting
+        [ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
+        
+        if can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
+            return;
+        end
     end
+    
     if b(new_ind) ~= 0
-    	a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
-    	a = a/b(new_ind);
-    	U = [U, a];
-    	V = [V, b'];
-    	[~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
-    	if tind >= ind
-        	ind = tind + 1;
-    	else
-
-        	ind = tind;
-    	end
-     else
-	if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
-		nrm = 0;
-	end
-	return
-     end
-
+        a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
+        a = a/b(new_ind);
+        
+        U = [U, a];
+        V = [V, b'];
+        
+        taken_row = [ taken_row, ind ];
+        
+        [~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
+        if tind >= ind
+            ind = tind + 1;
+        else
+            ind = tind;
+        end
+        
+        b = Afun(ind, 1:n) - U(ind, :) * V';
+        [~, new_ind] = max(abs(b));
+    else
+        if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
+            nrm = 0;
+        end
+        
+        return
+    end
+    
     % Here the norm estimated using the first vectors obtained, unless a
     % norm to use as threshold has been given by the user; this is
     % particularly useful when approximating a block of a larger matrix,
@@ -126,20 +95,21 @@ while k < min(m,n)
     end
     
     k = k + 1;
+    
+    % Update norm estimate, unless explicitly given
     tnrm = norm(a) * norm(b);
-    nrm = max(nrm, tnrm);
+    if ~has_norm
+        nrm = max(nrm, tnrm);
+    end        
+    
     if  tnrm < tol * nrm && k < min(m,n) - 1 % If the heuristic criterion detect convergence we still perform a sample on a few rows in the residual
-	first_indices = randsample(setdiff([1:m], taken_row), min(m - length(taken_row), sample_size));
-	rows = Afun(first_indices, 1:n) - U(first_indices, :) * V';
-	[mx, ind] = max(max(abs(rows), [], 2));
-	if mx < tol * nrm
-        	break
-	else
-		ind = first_indices(ind);
-	end
+        [ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
+        
+        if can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
+            break;
+        end
     end
-    taken_row = [taken_row, ind];
-
+    
     if k >= maxrank || k >= min(m, n) / 2
         if require_norm_output
             [~, ru] = qr(U, 0); [~, rv] = qr(V, 0);
@@ -147,10 +117,11 @@ while k < min(m,n)
         end
         
         U = [];
-        V = [];        
+        V = [];
         return;
     end
 end
+
 if comp
     [QU, RU] = qr(U, 0); % Re-compression
     [QV, RV] = qr(V, 0);
@@ -158,4 +129,31 @@ if comp
     rk = sum(diag(S) > tol * S(1,1));
     U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
     V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
+end
+
+end
+
+function [ind, new_ind, row] = find_pivot(Afun, U, V, taken_row, m, n, ns)
+    kk = 5;
+    rowind = [ 1 : kk, ...
+        randsample(setdiff(kk+1:m-kk, taken_row), ns - 2 * kk), ...
+        m-kk+1 : m ];
+    colind = [ 1 : kk, randsample(1:n, ns-2*kk), n-kk+1:n ];
+
+    B = Afun(rowind', colind) - U(rowind, :) * V(colind, :)';
+
+    [~, idx] = max(abs(B(:)));
+    [r, ~] = ind2sub(size(B), idx);
+
+    ind = rowind(r);
+
+    row = Afun(ind, 1:n) - U(ind, :) * V';
+    [~, new_ind] = max(abs(row));
+end
+
+function b = can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
+    row = Afun(ind, 1:n) - U(ind, :) * V';
+    col = Afun(1:m, new_ind) - U * V(new_ind, :)';
+    
+    b = norm(row) * norm(col) / abs(row(new_ind)) < tol * nrm;
 end
