@@ -21,10 +21,18 @@ if is_leafnode(H)
             H.V = V;
         else
             [H.U, H.V] = aca_or_fail(Afun, m, n, hmatrixoption('threshold'), []);
+            
+            if size(H.U, 1) == 0 
+                warning('ACA failed on a low-rank block -- trying truncated SVD');                
+                [U, S, V] = tsvd(Afun(1:m, 1:n), hmatrixoption('threshold'));
+                U = U * S;
+                H.admissible = true;
+                H.U = U;
+                H.V = V;
+            end
+            
         end
-        if size(H.U, 1) == 0 
-            error('Empty representation')
-        end
+
     else
         H.F = Afun((1:m).', (1:n));
     end    
