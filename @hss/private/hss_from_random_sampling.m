@@ -39,7 +39,7 @@ if isOctave
         struct('issym', true, 'tol', 1e-2));
 else
     nrm = svds(@(x,t) normest_afun(Afun, Afunt, x, t), ...
-        [n n], 1, 'largest', ...
+        [m n], 1, 'largest', ...
         struct('tol', 1e-2)); nrm = nrm(1);
 end
 
@@ -48,7 +48,7 @@ while failed
     [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
         hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
         Ocol, Orow, 0, 0, tol, nrm, a);
-    
+
     if failed
         % fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);
         Ocol = [ Ocol, randn(n, bs) ];
