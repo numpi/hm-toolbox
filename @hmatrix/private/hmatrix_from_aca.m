@@ -4,11 +4,13 @@ if isempty(H)
     H = hmatrix_build_default_tree(m, n, hmatrixoption('block-size'));
 end
 
-H = hmatrix_from_aca_rec(H, Afun, progress_fcn);
+[~, ~, nrm] = aca_or_fail(Afun, m, n, eps, 10);
+
+H = hmatrix_from_aca_rec(H, Afun, progress_fcn, nrm);
 
 end
 
-function H = hmatrix_from_aca_rec(H, Afun, progress_fcn)
+function H = hmatrix_from_aca_rec(H, Afun, progress_fcn, nrm)
 [m, n] = size(H);
 if is_leafnode(H)
     progress_fcn(1, 1, 1, 'in progress');
@@ -20,7 +22,7 @@ if is_leafnode(H)
             H.U = U;
             H.V = V;
         else
-            [H.U, H.V] = aca_or_fail(Afun, m, n, hmatrixoption('threshold'), []);
+            [H.U, H.V] = aca_or_fail(Afun, m, n, hmatrixoption('threshold'), [], nrm);
             
             if size(H.U, 1) == 0 
                 warning('ACA failed on a low-rank block -- trying truncated SVD');                
@@ -40,10 +42,10 @@ if is_leafnode(H)
 else
     [m1, n1] = size(H.A11);
     
-    H.A11 = hmatrix_from_aca_rec(H.A11, Afun, @(l,i,j,s) progress_fcn(l+1,i,j,s));
-    H.A12 = hmatrix_from_aca_rec(H.A12, @(i, j) Afun(i, j + n1), @(l,i,j,s) progress_fcn(l+1,i,j+1,s));
-    H.A21 = hmatrix_from_aca_rec(H.A21, @(i, j) Afun(i + m1, j), @(l,i,j,s) progress_fcn(l+1,i+1,j,s));
-    H.A22 = hmatrix_from_aca_rec(H.A22, @(i, j) Afun(i + m1, j + n1), @(l,i,j,s) progress_fcn(l+1,i+1,j+1,s));
+    H.A11 = hmatrix_from_aca_rec(H.A11, Afun, @(l,i,j,s) progress_fcn(l+1,i,j,s), nrm);
+    H.A12 = hmatrix_from_aca_rec(H.A12, @(i, j) Afun(i, j + n1), @(l,i,j,s) progress_fcn(l+1,i,j+1,s), nrm);
+    H.A21 = hmatrix_from_aca_rec(H.A21, @(i, j) Afun(i + m1, j), @(l,i,j,s) progress_fcn(l+1,i+1,j,s), nrm);
+    H.A22 = hmatrix_from_aca_rec(H.A22, @(i, j) Afun(i + m1, j + n1), @(l,i,j,s) progress_fcn(l+1,i+1,j+1,s), nrm);
 end
 end
 
