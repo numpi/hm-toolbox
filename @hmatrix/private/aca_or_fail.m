@@ -1,4 +1,4 @@
-function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm)
+function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm, debug)
 %
 % Construct a low-rank representation of C = Afun([1:m], [1:n])
 % by means of adaptive cross approximation with partial pivoting (heuristic)
@@ -58,10 +58,24 @@ while k < min(m,n)
             return;
         end
     end
+   
+    
     
     if b(new_ind) ~= 0
+
+        
         a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
         a = a/b(new_ind);
+        
+            
+    % Here the norm estimated using the first vectors obtained, unless a
+    % norm to use as threshold has been given by the user; this is
+    % particularly useful when approximating a block of a larger matrix,
+    % and truncation is desired with respect to the norm of the entire
+    % matrix.
+    if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
+        nrm = norm(a) * norm(b);
+    end
         
         U = [U, a];
         V = [V, b'];
@@ -84,15 +98,7 @@ while k < min(m,n)
         
         return
     end
-    
-    % Here the norm estimated using the first vectors obtained, unless a
-    % norm to use as threshold has been given by the user; this is
-    % particularly useful when approximating a block of a larger matrix,
-    % and truncation is desired with respect to the norm of the entire
-    % matrix.
-    if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
-        nrm = norm(a) * norm(b);
-    end
+
     
     k = k + 1;
     
