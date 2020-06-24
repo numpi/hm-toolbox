@@ -76,7 +76,11 @@ while k < min(m,n)
     if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
         nrm = norm(a) * norm(b);
     end
-        
+        % Update norm estimate, unless explicitly given
+    tnrm = norm(a) * norm(b);
+    if ~has_norm
+        nrm = max(nrm, tnrm);
+    end     
         U = [U, a];
         V = [V, b'];
         
@@ -94,20 +98,13 @@ while k < min(m,n)
     else
         if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
             nrm = 0;
-        end
-        
+        end    
         return
     end
 
     
     k = k + 1;
-    
-    % Update norm estimate, unless explicitly given
-    tnrm = norm(a) * norm(b);
-    if ~has_norm
-        nrm = max(nrm, tnrm);
-    end        
-    
+        
     if  tnrm < tol * nrm && k < min(m,n) - 1 % If the heuristic criterion detect convergence we still perform a sample on a few rows in the residual
         [ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
         

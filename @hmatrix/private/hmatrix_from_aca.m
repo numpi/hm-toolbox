@@ -5,7 +5,9 @@ if isempty(H)
 end
 
 [~, ~, nrm] = aca_or_fail(Afun, m, n, eps, 10);
-
+if nrm == 0
+	keyboard                
+end
 H = hmatrix_from_aca_rec(H, Afun, progress_fcn, nrm);
 
 end
@@ -26,7 +28,6 @@ if is_leafnode(H)
             
             if size(H.U, 1) == 0 
                 warning('ACA failed on a low-rank block -- trying truncated SVD');
-				keyboard                
                 [U, S, V] = tsvd(Afun(1:m, 1:n), hmatrixoption('threshold'));
                 U = U * S;
                 H.admissible = true;
