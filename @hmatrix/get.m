@@ -7,7 +7,7 @@ end
 
 function M = hmatrix_sub(H, mind, nind)
 
-if is_leafnode(H)
+if isempty(H.A11)
     if H.admissible
         M = H.U(mind, :) * H.V(nind, :)';
     else
@@ -16,20 +16,22 @@ if is_leafnode(H)
 else
     m1 = H.A11.sz(1);
     n1 = H.A11.sz(2);
-    mind1 = my_intersect(m1, mind);
-    nind1 = my_intersect(n1, nind);
     
-    mind = mind - m1; nind = nind - n1;
-    mind2 = my_intersect(H.A22.sz(1), mind);
-    nind2 = my_intersect(H.A22.sz(2), nind);
+    [mind1, mind2] = my_intersect(m1, mind);
+    [nind1, nind2] = my_intersect(n1, nind);
     
-    M = [ hmatrix_sub(H.A11, mind1, nind1) , hmatrix_sub(H.A12, mind1, nind2) ; ...
-          hmatrix_sub(H.A21, mind2, nind1) , hmatrix_sub(H.A22, mind2, nind2) ];
+    M11 = hmatrix_sub(H.A11, mind1, nind1);
+    M12 = hmatrix_sub(H.A12, mind1, nind2);
+    M21 = hmatrix_sub(H.A21, mind2, nind1);
+    M22 = hmatrix_sub(H.A22, mind2, nind2);
+    
+    M = [ M11 , M12  ; M21, M22 ];
 end
 
 end
 
-function s = my_intersect(m, mind)
-    s = mind(mind <= m);
-    s = s(s > 0);
+function [mind1, mind2] = my_intersect(m, mind)
+    s = mind <= m;
+    mind1 = mind(s == 1);
+    mind2 = mind(s == 0) - m;
 end

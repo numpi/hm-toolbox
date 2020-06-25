@@ -8,7 +8,8 @@ function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm, debug)
 % Afun   matrix or function handle returning entries of the matrix
 % m, n	 rows and cols of the matrix to compress
 % tol    stopping criterion for the Adaptive Cross Approximation
-% comp   re-compression at the end (optional), default =0
+% comp   re-compression at the end (optional), default = 0
+% norm   estimate of the norm of the matrix, if empty or not given the estimate is computed on the fly
 % debug  enables some debugging prints (optional), default = 0
 %
 % ----------------------Output-------------------------------------------------
@@ -17,11 +18,7 @@ function [U, V, nrm] = aca_or_fail(Afun, m, n, tol, maxrank, nrm, debug)
 %
 % -----------------------------------------------------------------------------
 
-require_norm_output = ~exist('nrm', 'var');
-
-if ~exist('comp', 'var')
-    comp = 0;
-end
+require_norm_output = (nargout > 2);
 
 if ~exist('debug', 'var')
     debug = 0;
@@ -31,7 +28,7 @@ if isempty(maxrank)
     maxrank = round(min(m,n) / 2);
 end
 
-has_norm = exist('nrm', 'var');
+has_norm = exist('nrm', 'var') && ~isempty(nrm);
 
 U = zeros(m, 0);
 V = zeros(n, 0);
@@ -41,7 +38,7 @@ taken_row = [];
 sample_size = ceil(sqrt(n));
 
 % Select the first pivot with a random sampling
-[ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
+[ind, new_ind, b, a] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
 
 while k < min(m,n)
         
@@ -50,68 +47,64 @@ while k < min(m,n)
                 k, ind, new_ind, b(new_ind))
     end
     
-    if exist('nrm', 'var') && abs(b(new_ind)) <= nrm * tol
+    if has_norm && abs(b(new_ind)) * sqrt(n) <= nrm * tol
+
         % Check before exiting
-        [ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
+        [ind, new_ind, b, a] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
         
-        if can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
+        if can_stop(new_ind, tol, nrm, b, a)
             return;
+ 		end
+	else
+		if k > 1
+			a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
         end
     end
-   
-    
-    
+
+
+        
     if b(new_ind) ~= 0
+       
+        % a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
+        a = a / b(new_ind);
 
-        
-        a = Afun((1:m)', new_ind) - U * V(new_ind, :)';
-        a = a/b(new_ind);
-        
-            
-    % Here the norm estimated using the first vectors obtained, unless a
-    % norm to use as threshold has been given by the user; this is
-    % particularly useful when approximating a block of a larger matrix,
-    % and truncation is desired with respect to the norm of the entire
-    % matrix.
-    if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
-        nrm = norm(a) * norm(b);
+		% Update norm estimate, unless explicitly given
+		tnrm = norm(a) * norm(b);
+		if ~has_norm
+			nrm = tnrm;
+			has_norm = true;
+		else
+		    nrm = max(nrm, tnrm);
+		end     
+	    U = [U, a];
+	    V = [V, b'];
+	    
+	    taken_row = [ taken_row, ind ];
+	    
+	    [~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
+	    if tind >= ind
+	        ind = tind + 1;
+	    else
+	        ind = tind;
+	    end
+	    
+	    b = Afun(ind, 1:n) - U(ind, :) * V';
+	    [~, new_ind] = max(abs(b));
+	else
+	    if ~has_norm
+		   % Check before exiting
+		   [ind, new_ind, b, a] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
+		    
+		   if abs(b(new_ind)) == 0
+	        	nrm = 0;
+				return;
+			end
+	    else
+			return;
+		end
     end
-        % Update norm estimate, unless explicitly given
-    tnrm = norm(a) * norm(b);
-    if ~has_norm
-        nrm = max(nrm, tnrm);
-    end     
-        U = [U, a];
-        V = [V, b'];
-        
-        taken_row = [ taken_row, ind ];
-        
-        [~, tind] = max(abs(a([1:ind - 1, ind + 1:m])));
-        if tind >= ind
-            ind = tind + 1;
-        else
-            ind = tind;
-        end
-        
-        b = Afun(ind, 1:n) - U(ind, :) * V';
-        [~, new_ind] = max(abs(b));
-    else
-        if k == 1 && ( ~exist('nrm', 'var') || nrm == 0.0 )
-            nrm = 0;
-        end    
-        return
-    end
-
     
     k = k + 1;
-        
-    if  tnrm < tol * nrm && k < min(m,n) - 1 % If the heuristic criterion detect convergence we still perform a sample on a few rows in the residual
-        [ind, new_ind, b] = find_pivot(Afun, U, V, taken_row, m, n, sample_size);
-        
-        if can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
-            break;
-        end
-    end
     
     if k >= maxrank || k >= min(m, n) / 2
         if require_norm_output
@@ -125,38 +118,43 @@ while k < min(m,n)
     end
 end
 
-if comp
-    [QU, RU] = qr(U, 0); % Re-compression
-    [QV, RV] = qr(V, 0);
-    [U, S, V] = svd(RU * RV', 'econ');
-    rk = sum(diag(S) > tol * S(1,1));
-    U = QU * U(:,1:rk) * sqrt(S(1:rk,1:rk));
-    V = QV * V(:,1:rk) * sqrt(S(1:rk,1:rk));
 end
 
-end
-
-function [ind, new_ind, row] = find_pivot(Afun, U, V, taken_row, m, n, ns)
+function [ind, new_ind, row, col] = find_pivot(Afun, U, V, taken_row, m, n, ns)
     kk = 5;
     rowind = [ 1 : kk, ...
         randsample(setdiff(kk+1:m-kk, taken_row), ns - 2 * kk), ...
         m-kk+1 : m ];
     colind = [ 1 : kk, randsample(1:n, ns-2*kk), n-kk+1:n ];
 
+	rowind = sort(rowind);
+	colind = sort(colind);
+
     B = Afun(rowind', colind) - U(rowind, :) * V(colind, :)';
 
     [~, idx] = max(abs(B(:)));
-    [r, ~] = ind2sub(size(B), idx);
+    [r, c] = ind2sub(size(B), idx);
 
-    ind = rowind(r);
+    indr = rowind(r);
+	indc = colind(c);
 
-    row = Afun(ind, 1:n) - U(ind, :) * V';
-    [~, new_ind] = max(abs(row));
+    row = Afun(indr, 1:n) - U(indr, :) * V';
+    col = Afun(1:m, indc) - U * V(indc, :)';
+    [mr, new_indr] = max(abs(row));
+	[mc, new_indc] = max(abs(col));
+	if mr >= mc
+		ind = indr;
+		new_ind = new_indr;
+        col = Afun(1:m, new_ind) - U * V(new_ind, :)';
+	else
+		ind = new_indc;
+		row = Afun(ind, 1:n) - U(ind, :) * V';
+    	% [~, new_ind] = max(abs(row));
+        new_ind = indc;
+        % col = Afun(1:m, ind) - U * V(ind, :)';
+	end
 end
 
-function b = can_stop(Afun, U, V, m, n, ind, new_ind, tol, nrm)
-    row = Afun(ind, 1:n) - U(ind, :) * V';
-    col = Afun(1:m, new_ind) - U * V(new_ind, :)';
-    
+function b = can_stop(new_ind, tol, nrm, row, col)
     b = norm(row) * norm(col) / abs(row(new_ind)) < tol * nrm;
 end

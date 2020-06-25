@@ -21,7 +21,7 @@ function [H] = hmatrix_from_adaptive(Afun, m, n, maxrank, support, nrm)
 % first call, is set to zero and then estimated by the first call to
 % aca_or_fail.
 if ~exist('nrm', 'var')
-    nrm = 0;
+    nrm = [];
 end
 
 tol = hmatrixoption('threshold');
@@ -156,7 +156,7 @@ end
 t = diag(S);
 % t = cumsum(t(end:-1:1));
 
-if nrm == 0
+if isempty(nrm)
     nrm = t(1);
 end
 
