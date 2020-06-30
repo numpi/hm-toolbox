@@ -5,9 +5,7 @@ if isempty(H)
 end
 
 [~, ~, nrm] = aca_or_fail(Afun, m, n, eps, 10);
-if nrm == 0
-	keyboard                
-end
+
 H = hmatrix_from_aca_rec(H, Afun, progress_fcn, nrm);
 
 end

@@ -52,7 +52,7 @@ X.sz = C.sz;
 
 tol = hmatrixoption('threshold');
 
-if is_leafnode(C) && C.admissible && max(size(C)) > 512
+if is_leafnode(C) && C.admissible
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA);
@@ -70,13 +70,17 @@ if is_leafnode(C) && C.admissible && max(size(C)) > 512
     end
     
     X.admissible = true;
-elseif (is_leafnode(A) && (is_lyapunov || is_leafnode(B))) || (any(size(C) <= 512) && is_leafnode(C))
+elseif (is_leafnode(A) && (is_lyapunov || is_leafnode(B))) || any(size(C) <= 512)
     if is_lyapunov
         X.F = lyap(full(A), full(C));
     else
         X.F = lyap(full(A), full(B), full(C));
     end
-    X.admissible = false;
+    
+    % Unpack the solution with the same structure that it previously had,
+    % if it was not dense because we matched any(size(C)) <= 512
+    X = hmatrix('handle', X.F, size(C, 1), size(C, 2), 'cluster', C);
+    
 elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
             
     m1 = A.A11.sz(1); n1 = A.A11.sz(2);
