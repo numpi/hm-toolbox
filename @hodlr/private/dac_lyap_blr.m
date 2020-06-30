@@ -52,7 +52,7 @@ X.sz = C.sz;
 
 tol = hmatrixoption('threshold');
 
-if is_leafnode(C) && C.admissible
+if is_leafnode(C) && C.admissible && max(size(C)) > 512
     if is_sparse
         if is_lyapunov
             M = ek_struct(sA);
