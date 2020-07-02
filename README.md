@@ -43,4 +43,4 @@ the ACA code that is used inside the HODLR handle constructor).
 
 1. Massei, S., Palitta, D., & Robol, L. (2018). Solving Rank-Structured Sylvester and Lyapunov Equations. SIAM Journal on Matrix Analysis and Applications, 39(4), 1564-1590.
 2. Kressner, D., Massei, S., & Robol, L. (2019). Low-rank updates and a divide-and-conquer method for linear matrix equations. SIAM Journal on Scientific Computing 41 (2), A848-A876.
-3. Kressner, D., Massei, S., & Robol, L. (2019). hm-toolbox: Matlab software for HODLR and HSS matrices, arXiv preprint arXiv:1909.07909.
+3. Massei, S., Robol, L., & Kressner, D. (2020). hm-toolbox: MATLAB Software for HODLR and HSS Matrices. SIAM Journal on Scientific Computing, 42(2), C43-C68.
