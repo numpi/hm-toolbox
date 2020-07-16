@@ -144,6 +144,10 @@ classdef hmatrix
                         obj = hmatrix_from_full(H, varargin{2});
                     case 'low-rank'
                         obj = hmatrix_from_low_rank(H, varargin{2}, varargin{3});
+                    case 'zeros'
+                        obj = hmatrix('low-rank', zeros(varargin{2}, 0), zeros(varargin{3}, 0));
+                    case 'ones'
+                        obj = hmatrix('low-rank', ones(varargin{2}, 1), ones(varargin{3}, 1));
                     otherwise
                         error('Unsupported constructor');
                 end
