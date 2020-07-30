@@ -12,7 +12,7 @@ end
 
 if A.admissible  % A is a low-rank leaf node
 	V = B * A.V;
-	y = trace(U' * V);
+	y = trace(A.U' * V);
 elseif B.admissible % B is a low-rank leaf node
 	U = A' * B.U;
 	y = trace(B.V' * U);
