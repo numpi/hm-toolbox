@@ -61,7 +61,21 @@ end
 
 % Construct the rest of the structure
 % fprintf('HSS_FROM_RANDOM_SAMPLING :: Recovering the rest of the structure\n');
-B = hss_from_random_sampling_rec2(B, Aeval, Scol, Srow, Ocol, Orow, 0, 0, tol, nrm, a);
+failed = true;
+while failed    
+    [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
+        hss_from_random_sampling_rec2(B, Aeval, Scol, Srow, ...
+            Ocol, Orow, 0, 0, tol, nrm, a);
+        
+    if failed
+        % fprintf('HSS_FROM_RANDOM_SAMPLING :: Enlarging sampling space to %d\n', k + bs);
+        Ocol = [ Ocol, randn(n, bs) ];
+        Scol = [ Scol, Afun(Ocol(:, end-bs+1:end))  ];
+        Orow = [ Orow, randn(m, bs) ];
+        Srow = [ Srow, Afunt(Orow(:,end-bs+1:end)) ];
+        k = k + bs;
+    end
+end
 
 % Remove any temporary data that we might have stored in the leafnodes B12
 % anb B21 -- these are not part of the final HSS data structure.
@@ -86,7 +100,7 @@ if B.leafnode == 1
     end
     
     % Compute span of the columns, but only if the old one was not ok
-    if isempty(B.B12)
+    if isempty(B.B12) || true
         Scol = Scol - B.D * Ocol;
         
         [Q, ~] = colspan(Scol(:, 1:end - a), ...
@@ -111,7 +125,7 @@ if B.leafnode == 1
     end
     
     % Compute span of the rows
-    if isempty(B.B21)
+    if isempty(B.B21) || true
         Srow = Srow - B.D' * Orow;
         [Q, ~] = colspan(Srow(:,1:end-a), ...
             sqrt(size(Srow, 2)) * eps, nrm);
@@ -154,8 +168,10 @@ else
 end
 end
 
-function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V] = ...
+function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V, failed] = ...
     hss_from_random_sampling_rec2(B, Aeval, Scol, Srow, Ocol, Orow, row, col, tol, nrm, a)
+
+    failed = false;
 
     if B.leafnode == 1
         % Recover the information from the previous pass
@@ -169,16 +185,30 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V] = ...
         Srow = Srow(Jrow, :) - B.D(:, Jrow)' * Orow;
         Jrow = col + Jrow;
     else
-        [B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1] = ...
+        [B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1] = ...
             hss_from_random_sampling_rec2(B.A11, Aeval, ...
             Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), ...
             Orow(1:B.ml, :), row, col, tol, nrm, a);
+        
+        if failed1
+            failed = true;
+            Scol = []; Srow = []; Ocol = []; Orow = [];
+            Jcol = []; Jrow = []; U = []; V = [];
+            return;
+        end
 
-        [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2] = ...
+        [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2, failed2] = ...
             hss_from_random_sampling_rec2(B.A22, Aeval, ...
             Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), ...
             Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), ...
             row + B.ml, col + B.nl, tol, nrm, a);
+        
+        if failed2
+            failed = true;
+            Scol = []; Srow = []; Ocol = []; Orow = [];
+            Jcol = []; Jrow = []; U = []; V = [];
+            return;
+        end
 
         Ocol2 = V2' * Ocol2;
         Ocol1 = V1' * Ocol1;
@@ -188,7 +218,6 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V] = ...
         Jcol = [Jcol1, Jcol2]; Jrow = [Jrow1, Jrow2];
         Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
 
-
         B.B12 = Aeval(Jcol1, Jrow2);
         B.B21 = Aeval(Jcol2, Jrow1);
 
@@ -196,28 +225,66 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V] = ...
         Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
 
         if B.topnode == 0
-            Q = colspan(Scol, sqrt(size(Scol, 2)) * eps, nrm);
+            % If B.U is non empty we can recover Jcolloc from the previous
+            % run, which was successful. The basis is not recomputed.
+            if isempty(B.U)
+                Q = colspan(Scol(:, 1:end-a), sqrt(size(Scol, 2)) * eps, nrm);
 
-            [Xcol, Jcolloc] = interpolative(Q', tol);
+                Scol2 = Scol(:, end-a+1:end);
+                Scol2 = Scol2 - Q * (Q' * Scol2);
 
-            B.Rl = Xcol(:, 1:size(Scol1, 1))';
-            B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
+                %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice
+                km = 1;
+
+                if norm(Scol2) * km > nrm * tol
+                    failed = true;
+                    Scol = []; Srow = []; Ocol = []; Orow = [];
+                    Jcol = []; Jrow = []; U = []; V = [];
+                    return;
+                end
+
+                [Xcol, Jcolloc] = interpolative(Q', tol);
+                B.U = Jcolloc;
+
+                B.Rl = Xcol(:, 1:size(Scol1, 1))';
+                B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
+            else
+                Jcolloc = B.U;
+            end
+            
             Scol = Scol(Jcolloc, :);
             Jcol = Jcol(Jcolloc);
             U = [ B.Rl ; B.Rr ];
+            
+            % If B.V is non empty we can recover Jrowloc from the previous
+            % run, which was successful. The basis is not recomputed.
+            if isempty(B.V)
+                Q = colspan(Srow(:, 1:end-a), sqrt(size(Srow, 2)) * eps, nrm);
 
-            Q = colspan(Srow, sqrt(size(Srow, 2)) * eps, nrm);
+                Srow2 = Srow(:, end-a+1:end);
+                Srow2 = Srow2 - Q * (Q' * Srow2);
 
-            [Xrow, Jrowloc] = interpolative(Q', tol);
+                %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice
+                km = 1;
 
-            B.Wl = Xrow(:, 1:size(Srow1, 1))';
-            B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
+                if norm(Srow2) * km > nrm * tol
+                    failed = true;
+                    Scol = []; Srow = []; Ocol = []; Orow = [];
+                    Jcol = []; Jrow = []; U = []; V = [];
+                    return;
+                end
+
+                [Xrow, Jrowloc] = interpolative(Q', tol);
+                B.V = Jrowloc;
+                B.Wl = Xrow(:, 1:size(Srow1, 1))';
+                B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
+            else
+                Jrowloc = B.V;
+            end
+            
             Srow = Srow(Jrowloc, :);
             Jrow = Jrow(Jrowloc);
             V = [ B.Wl ; B.Wr ];
-
-            B.U.Jcolloc = Jcolloc;
-            B.V = Jrowloc;
         else
             Scol = []; Srow = []; Ocol = []; Orow = [];
             Jcol = []; Jrow = []; U = []; V = [];
