@@ -78,7 +78,8 @@ while res > tol
         res = max(abs([ alfa(end), beta(end) ])) / nrm;
     end
     
-    % fprintf('Iteration %d, res = %e, nrm_conv = %d, nrm = %e\n', it, res, nrm_converged, nrm);
+    %fprintf('Iteration %d, res = %e, nrm_conv = %d, nrm = %e, nrm2 = %e\n', it, res, nrm_converged, nrm, norm(diag(alfa) + diag(beta(1:end-1),-1)));
+    % keyboard
 end
 
 if length(alfa) == length(beta)

@@ -32,7 +32,8 @@ Scol = Afun(Ocol);
 Orow = randn(m, k + a);
 Srow = Afunt(Orow);
 
-bs = 5;
+% Increase on the block size when the required accuracy is not reached
+bs = 12;
 
 if isOctave
     nrm = eigs(@(x, t) real(Afunt(Afun(x))), n, 1, 'lm', ...
@@ -45,8 +46,7 @@ end
 
 while failed
     % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
-    [B, ~, ~, ~, ~, ~, ~, ~, ~, failed] = ...
-        hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
+    [B, failed] = hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
         Ocol, Orow, 0, 0, tol, nrm, a);
 
     if failed
@@ -59,21 +59,18 @@ while failed
     end
 end
 
+% Construct the rest of the structure
+% fprintf('HSS_FROM_RANDOM_SAMPLING :: Recovering the rest of the structure\n');
+B = hss_from_random_sampling_rec2(B, Aeval, Scol, Srow, Ocol, Orow, 0, 0, tol, nrm, a);
+
 % Remove any temporary data that we might have stored in the leafnodes B12
 % anb B21 -- these are not part of the final HSS data structure.
 B = clean_structure(B);
 
-% [ hssrank(B), k ]
-% B = hss_proper(B);
-% B = hss_compress(B, tol);
-% hssrank(B)
-
 end
 
-function [B, Scol, Srow, Ocol, Orow, Jcol, ...
-    Jrow, U, V, failed] = ...
-    hss_from_random_sampling_rec(B, Aeval, Scol, Srow, ...
-    Ocol, Orow, row, col, tol, nrm, a)
+function [B, failed] = hss_from_random_sampling_rec(B, Aeval, Scol, ...
+    Srow, Ocol, Orow, row, col, tol, nrm, a)
 
 if B.leafnode == 1
     failed = false;
@@ -103,22 +100,14 @@ if B.leafnode == 1
         
         if norm(Scol2) * km > nrm * tol
             failed = true;
-            Jcol = []; Jrow = []; U = []; V = [];
+            B.B12 = [];
             return;
         end
         
         [Xcol, Jcol] = interpolative(Q', tol);
-        B.U = Xcol';
-        Scol = Scol(Jcol, :);
         
-        U = Xcol';
+        B.U = Xcol';
         B.B12 = Jcol;
-        Jcol = row + Jcol;
-    else
-        U = B.U;
-        Jcol = B.B12;
-        Scol = Scol(Jcol, :) - B.D(Jcol, :) * Ocol;
-        Jcol = row + Jcol;
     end
     
     % Compute span of the rows
@@ -135,106 +124,105 @@ if B.leafnode == 1
         
         if norm(Srow2) * km > nrm * tol
             failed = true;
-            Jcol = []; Jrow = []; U = []; V = [];
+            B.B21 = [];
             return;
         end
         
         [Xrow, Jrow] = interpolative(Q', tol);
         
-        B.V = Xrow';
-        Srow = Srow(Jrow, :);
-        
-        V = Xrow';
-        
+        B.V = Xrow';        
         B.B21 = Jrow;
-        
-        Jrow = col + Jrow;
-    else
-        V = B.V;
-        Jrow = B.B21;
-        Srow = Srow(Jrow, :) - B.D(:, Jrow)' * Orow;
-        Jrow = col + Jrow;
     end
 else
-    [B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1, failed1]  = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), row, col, tol, nrm, a);
+    [B.A11, failed1] = hss_from_random_sampling_rec(B.A11, Aeval, Scol(1:B.ml, :), ...
+        Srow(1:B.nl, :), Ocol(1:B.nl, :), Orow(1:B.ml, :), ...
+        row, col, tol, nrm, a);
     
     if ~failed1
-        [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2, failed2]  = hss_from_random_sampling_rec(B.A22, Aeval, Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), row + B.ml, col + B.nl, tol, nrm, a);
+        [B.A22, failed2] = hss_from_random_sampling_rec(B.A22, Aeval, ...
+            Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), ...
+            Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), ...
+            row + B.ml, col + B.nl, tol, nrm, a);
     end
     
     if (failed1 || failed2)
         failed = true;
-        
-        Scol = []; Srow = []; Ocol = []; Orow = [];
-        Jcol = []; Jrow = []; U = []; V = [];
-        
         return;
     else
         failed = false;
     end
-    
-    Ocol2 = V2' * Ocol2;
-    Ocol1 = V1' * Ocol1;
-    Orow2 = U2' * Orow2;
-    Orow1 = U1' * Orow1;
-    
-    Jcol = [Jcol1, Jcol2]; Jrow = [Jrow1, Jrow2];
-    Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
-    
-    if isempty(B.B12)
+end
+end
+
+function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V] = ...
+    hss_from_random_sampling_rec2(B, Aeval, Scol, Srow, Ocol, Orow, row, col, tol, nrm, a)
+
+    if B.leafnode == 1
+        % Recover the information from the previous pass
+        U = B.U;
+        Jcol = B.B12;
+        Scol = Scol(Jcol, :) - B.D(Jcol, :) * Ocol;
+        Jcol = row + Jcol;
+
+        V = B.V;
+        Jrow = B.B21;
+        Srow = Srow(Jrow, :) - B.D(:, Jrow)' * Orow;
+        Jrow = col + Jrow;
+    else
+        [B.A11, Scol1, Srow1, Ocol1, Orow1, Jcol1, Jrow1, U1, V1] = ...
+            hss_from_random_sampling_rec2(B.A11, Aeval, ...
+            Scol(1:B.ml, :), Srow(1:B.nl, :), Ocol(1:B.nl, :), ...
+            Orow(1:B.ml, :), row, col, tol, nrm, a);
+
+        [B.A22, Scol2, Srow2, Ocol2, Orow2, Jcol2, Jrow2, U2, V2] = ...
+            hss_from_random_sampling_rec2(B.A22, Aeval, ...
+            Scol(B.ml + 1:end, :), Srow(B.nl + 1:end,:), ...
+            Ocol(B.nl + 1:end, :), Orow(B.ml + 1:end, :), ...
+            row + B.ml, col + B.nl, tol, nrm, a);
+
+        Ocol2 = V2' * Ocol2;
+        Ocol1 = V1' * Ocol1;
+        Orow2 = U2' * Orow2;
+        Orow1 = U1' * Orow1;
+
+        Jcol = [Jcol1, Jcol2]; Jrow = [Jrow1, Jrow2];
+        Ocol = [Ocol1; Ocol2]; Orow = [Orow1; Orow2];
+
+
         B.B12 = Aeval(Jcol1, Jrow2);
         B.B21 = Aeval(Jcol2, Jrow1);
-        
+
         Scol = [Scol1 - B.B12  * Ocol2;  Scol2 - B.B21  * Ocol1 ];
         Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
-        
+
         if B.topnode == 0
-            [Q, R, ~] = qr(Scol, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
-            
-            Q = Q(:,1:rk);
-            
+            Q = colspan(Scol, sqrt(size(Scol, 2)) * eps, nrm);
+
             [Xcol, Jcolloc] = interpolative(Q', tol);
-            
+
             B.Rl = Xcol(:, 1:size(Scol1, 1))';
             B.Rr = Xcol(:, size(Scol1, 1)+1:end)';
             Scol = Scol(Jcolloc, :);
             Jcol = Jcol(Jcolloc);
             U = [ B.Rl ; B.Rr ];
-            
-            [Q, R, ~] = qr(Srow, 0); rk = sum(abs(diag(R)) > abs(R(1,1)) * tol);
-            
-            Q = Q(:,1:rk);
-            
+
+            Q = colspan(Srow, sqrt(size(Srow, 2)) * eps, nrm);
+
             [Xrow, Jrowloc] = interpolative(Q', tol);
-            
+
             B.Wl = Xrow(:, 1:size(Srow1, 1))';
             B.Wr = Xrow(:, size(Srow1, 1)+1:end)';
             Srow = Srow(Jrowloc, :);
             Jrow = Jrow(Jrowloc);
             V = [ B.Wl ; B.Wr ];
-            
-            B.U = Jcolloc;
+
+            B.U.Jcolloc = Jcolloc;
             B.V = Jrowloc;
         else
             Scol = []; Srow = []; Ocol = []; Orow = [];
             Jcol = []; Jrow = []; U = []; V = [];
         end
-    else
-        Jcolloc = B.U;
-        Jrowloc = B.V;
-        
-        Scol = [Scol1 - B.B12  * Ocol2;  Scol2 - B.B21  * Ocol1 ];
-        Srow = [Srow1 - B.B21' * Orow2;  Srow2 - B.B12' * Orow1 ];
-        
-        U = [ B.Rl ; B.Rr ];
-        V = [ B.Wl ; B.Wr ];
-        
-        Scol = Scol(Jcolloc, :);
-        Jcol = Jcol(Jcolloc);
-        Srow = Srow(Jrowloc, :);
-        Jrow = Jrow(Jrowloc);
     end
-end
 end
 
 function [Q, rk] = colspan(S, tol, nrm)
@@ -268,6 +256,7 @@ if B.leafnode
     B.B12 = [];
     B.B21 = [];
 else
+    B.U = []; B.V = [];
     B.A11 = clean_structure(B.A11);
     B.A22 = clean_structure(B.A22);
 end

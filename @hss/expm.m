@@ -41,7 +41,7 @@ A = A * (1 / 2^h);
 
 if strcmp(method,'taylor')
     maxit = N;
-    eT = hss('diagonal', ones(n,1));
+    eT = hss('diagonal', ones(n,1), 'cluster', cluster(A));
     
     tempT = eT;
     for i=1:maxit
@@ -51,8 +51,8 @@ if strcmp(method,'taylor')
 elseif strcmp(method,'pade')
     
     c = 1 / 2;
-    eTn = hss('diagonal', ones(n,1)) + c * A;
-    eTd = hss('diagonal', ones(n,1)) - c * A;
+    eTn = hss('diagonal', ones(n,1), 'cluster', cluster(A)) + c * A;
+    eTd = hss('diagonal', ones(n,1), 'cluster', cluster(A)) - c * A;
     
     q = floor(N / 2);
     p = 1;
