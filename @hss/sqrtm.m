@@ -1,4 +1,4 @@
-function X = sqrtm(A)
+function [X, Y] = sqrtm(A)
 %SQRTM Compute the matrix square root of X.
 %
 % Y = SQRT(X) computes a matrix Y such that Y^2 = X. The computed square
