@@ -10,7 +10,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -20,16 +20,11 @@ jobs:
       # Install GNU/Octave
       - name: Install GNU/Octave
         run: |
-          sudo add-apt-repository ppa:alexlarsson/flatpak
           sudo apt-get update
-          sudo apt-get -y install flatpak
-          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y org.octave.Octave
-          flatpak run org.octave.Octave --no-gui --eval "pkg install -local -forge control"
-          flatpak run org.octave.Octave --no-gui --eval "pkg install -local -forge statistics"
+          sudo apt-get -y install octave octave-control octave-statistics
 
       # Runs a set of commands using the runners shell
       - name: Run the tests
         run: |
-          echo "Testing hm-toolbox with HODLR / QR compression"
-          flatpak run org.octave.Octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'qr'); hodlr_RunAllTests;"
+          echo "Testing hm-toolbox with HODLR / SVD compression"
+          octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'svd'); hodlr_RunAllTests;"
