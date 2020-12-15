@@ -16,7 +16,7 @@ else
         size(H.A22,2), hodlroption('threshold'), [], []);
     
     if isempty(H.U12)
-        [H.U12, H.V12] = compress_matrix(full(Aeval(1:m1, 1:n1)));
+        [H.U12, H.V12] = compress_matrix(full(Aeval(m1:mm-1, nm:n2)));
     end
     
     % ACA for the block (2,1)
@@ -24,7 +24,7 @@ else
         size(H.A11, 2), hodlroption('threshold'), [], []);
     
     if isempty(H.U21)
-        [H.U21, H.V21] = compress_matrix(full(Aeval(1:m1, 1:n1)));
+        [H.U21, H.V21] = compress_matrix(full(Aeval(mm:m2, n1:nm-1)));
     end
 end
 

@@ -122,10 +122,11 @@ end
 
 function [ind, new_ind, row, col] = find_pivot(Afun, U, V, taken_row, m, n, ns)
     kk = 5;
+    ks = max(1, ns - 2*kk);
     rowind = [ 1 : kk, ...
-        randsample(setdiff(kk+1:m-kk, taken_row), ns - 2 * kk), ...
+        randsample(setdiff(kk+1:m-kk, taken_row), ks), ...
         m-kk+1 : m ];
-    colind = [ 1 : kk, randsample(1:n, ns-2*kk), n-kk+1:n ];
+    colind = [ 1 : kk, randsample(1:n, ks), n-kk+1:n ];
 
 	rowind = sort(rowind);
 	colind = sort(colind);
