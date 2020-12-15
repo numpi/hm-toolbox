@@ -3,12 +3,7 @@
 name: CI
 
 # Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,11 +23,14 @@ jobs:
       # Install GNU/Octave
       - name: Install GNU/Octave
         run: |
+          sudo add-apt-repository ppa:alexlarsson/flatpak
           sudo apt-get update
-          sudo apt-get -y install octave octave-control octave-statistics
+          sudo apt-get -y install flatpak
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y org.octave.Octave
 
       # Runs a set of commands using the runners shell
       - name: Run the tests
         run: |
           echo "Testing hm-toolbox with HODLR / QR compression"
-          octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'qr'); hodlr_RunAllTests;"
+          flatpak run org.octave.Octave --no-gui --eval "pkg load control; pkg load statistics; addpath tests; hodlroption('compression', 'qr'); hodlr_RunAllTests;"
