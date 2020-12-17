@@ -1,4 +1,4 @@
-function [V, K, H, params] = ek_krylov(varargin)
+function [V, K, H, params] = ek_krylov2(varargin)
 %EK_KRYLOV Extended Krylov projection of a matrix A.
 %
 % [V, K, H, params] = EK_KRYLOV(A, B) construct the extended Krylov
@@ -97,11 +97,14 @@ H(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 [w, r] = qr(w, 0);
 
 % Reorthogonalize
-hh = V' * w;
-w = w - V * hh; % A*v = V*h + (w + V*hh)*r
+%hh = V' * w;
+%w = w - V * hh; % A*v = V*h + (w + V*hh)*r
+[w, hh] = mgs_orthogonalize(V, w);
+
 K(1:end-bs, end-bs+1:end) = K(1:end-bs, end-bs+1:end) + hh * r;
 
-K(end-bs+1:end, end-bs+1:end) = r;
+[w, rr] = qr(w, 0);
+K(end-bs+1:end, end-bs+1:end) = rr * r;
 
 V = [V, w];
 end
@@ -132,11 +135,13 @@ K(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 [w, r] = qr(w, 0);
 
 % Reorthogonalize
-hh = V' * w;
-w = w - V * hh;
+%hh = V' * w;
+%w = w - V * hh;
+[w, hh] = mgs_orthogonalize(V, w);
 H(1:end-bs, end-bs+1:end) = H(1:end-bs, end-bs+1:end) + hh * r;
 
-H(end-bs+1:end, end-bs+1:end) = r;
+[w, rr] = qr(w, 0);
+H(end-bs+1:end, end-bs+1:end) = rr * r;
 
 V = [V, w];
 end
