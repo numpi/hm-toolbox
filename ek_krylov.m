@@ -1,4 +1,4 @@
-function [V, K, H, params] = ek_krylov2(varargin)
+function [V, K, H, params] = ek_krylov(varargin)
 %EK_KRYLOV Extended Krylov projection of a matrix A.
 %
 % [V, K, H, params] = EK_KRYLOV(A, B) construct the extended Krylov
