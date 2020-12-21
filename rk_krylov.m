@@ -115,13 +115,19 @@ end
 % Normalize w
 [w, s] = qr(w, 0);
 
+% 2nd Reorthogonalize
+[w, bb] = mgs_orthogonalize(V, w);
+[w, ss] = qr(w, 0);
+
+%b = b + bb;
+ss = ss * s;
 % Extend the matrices
 if abs(pole) > 1
-    K = [ K , c - kh * b ; zeros(bs, size(K, 2)) , -s * kh ];
-    H = [ H , -hh * b ; zeros(bs, size(H, 2)) , -s * hh ];
+    K = [ K , c - kh * (b + bb * s) ; zeros(bs, size(K, 2)) , -ss * kh ];
+    H = [ H , -hh * (b + bb * s) ; zeros(bs, size(H, 2)) , -ss * hh ];
 else
-    K = [ K , -kh * b ; zeros(bs, size(K, 2)) , -s * kh ];
-    H = [ H , -c - hh * b ; zeros(bs, size(H, 2)) , -s * hh ];
+    K = [ K , -kh * (b + bb * s) ; zeros(bs, size(K, 2)) , -ss * kh ];
+    H = [ H , -c - hh * (b + bb * s) ; zeros(bs, size(H, 2)) , -ss * hh ];
 end
 
 V = [ V, w ];
@@ -150,9 +156,6 @@ end
 % get BLAS3 speeds.
 %
 function [w, h] = mgs_orthogonalize(V, w)
-h = zeros(size(V, 2), size(w, 2));
-for j = 1 : size(V, 2)
-    h(j,:) = (V(:,j)' * w);
-    w = w - V(:,j) * (V(:,j)' * w);
-end
+    h = V' * w;
+    w = w - V * h;
 end

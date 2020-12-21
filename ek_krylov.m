@@ -97,13 +97,11 @@ H(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 [w, r] = qr(w, 0);
 
 % Reorthogonalize
-%hh = V' * w;
-%w = w - V * hh; % A*v = V*h + (w + V*hh)*r
 [w, hh] = mgs_orthogonalize(V, w);
-
-K(1:end-bs, end-bs+1:end) = K(1:end-bs, end-bs+1:end) + hh * r;
-
 [w, rr] = qr(w, 0);
+K(1:end-bs, end-bs+1:end) = K(1:end-bs, end-bs+1:end) + hh  * r;
+
+
 K(end-bs+1:end, end-bs+1:end) = rr * r;
 
 V = [V, w];
@@ -135,12 +133,9 @@ K(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
 [w, r] = qr(w, 0);
 
 % Reorthogonalize
-%hh = V' * w;
-%w = w - V * hh;
 [w, hh] = mgs_orthogonalize(V, w);
-H(1:end-bs, end-bs+1:end) = H(1:end-bs, end-bs+1:end) + hh * r;
-
 [w, rr] = qr(w, 0);
+H(1:end-bs, end-bs+1:end) = H(1:end-bs, end-bs+1:end) + hh * r ;
 H(end-bs+1:end, end-bs+1:end) = rr * r;
 
 V = [V, w];
@@ -152,8 +147,8 @@ end
 function [w, h] = mgs_orthogonalize(V, w)
     h = V' * w;
     w = w - V * h;
-    h1 = V' * w;
-    h = h + h1;
-    w = w - V * h1;
+    %h1 = V' * w;
+    %h = h + h1;
+    %w = w - V * h1;
 end
 
