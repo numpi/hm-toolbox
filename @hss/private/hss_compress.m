@@ -69,10 +69,13 @@ else
     if A.A11.leafnode == 0
         A.A11.Rl = A.A11.Rl * Us;
         A.A11.Rr = A.A11.Rr * Us;
+    else
+        A.A11.U = A.A11.U * Us;
+	end
+    if A.A22.leafnode == 0	
         A.A22.Wl = A.A22.Wl * Ut;
         A.A22.Wr = A.A22.Wr * Ut;
     else
-        A.A11.U = A.A11.U * Us;
         A.A22.V = A.A22.V * Ut;
     end
     
@@ -87,12 +90,15 @@ else
     if A.A22.leafnode == 0
         A.A22.Rl = A.A22.Rl * Us;
         A.A22.Rr = A.A22.Rr * Us;
-        A.A11.Wl = A.A11.Wl * Ut;
-        A.A11.Wr = A.A11.Wr * Ut;
-        A.A11 = backward_stage(A.A11, tol, Su, Tu, tcomp);
         A.A22 = backward_stage(A.A22, tol, Sl, Tl, tcomp);
     else        
         A.A22.U = A.A22.U * Us;
+	end
+	if A.A11.leafnode == 0
+        A.A11.Wl = A.A11.Wl * Ut;
+        A.A11.Wr = A.A11.Wr * Ut;
+        A.A11 = backward_stage(A.A11, tol, Su, Tu, tcomp);
+    else        
         A.A11.V = A.A11.V * Ut;
     end
 end
