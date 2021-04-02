@@ -29,7 +29,7 @@ jobs:
           ${OCTAVE} --eval "pkg install -forge control"
           echo "pkg load control" >> ~/.octaverc
           echo "pkg load statistics" >> ~/.octaverc
-      - name: Run tests (Format: ${{ matrix.format }}, Compression: ${{ matrix.compression }})
+      - name: Run tests (Format ${{ matrix.format }} - Compression ${{ matrix.compression }})
         run: |
           ${OCTAVE} --no-gui --eval "addpath tests; ${{ matrix.format }}option('compression', '${{ matrix.compression }}'); ${{ matrix.format }}_RunAllTests;"
 
