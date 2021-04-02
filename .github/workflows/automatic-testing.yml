@@ -45,5 +45,5 @@ jobs:
       - name: Run tests (QR compression)
         uses: matlab-actions/run-command@v0
         with:
-          command: "addpath tests; hodlrption('compression', 'qr'); hssoption('compression', 'qr'); halroption('compression', 'qr'); RunAllTests"
+          command: "addpath tests; hodlroption('compression', 'qr'); hssoption('compression', 'qr'); halroption('compression', 'qr'); RunAllTests"
 
