@@ -1,6 +1,7 @@
 # Hierarchical matrix toolbox
 
 [![tests](https://github.com/numpi/hm-toolbox/actions/workflows/automatic-testing.yml/badge.svg)](https://github.com/numpi/hm-toolbox/actions/workflows/automatic-testing.yml)
+
 The <code>hm-toolbox</code> is a toolbox implementing the arithmetic of HODLR and HSS matrices in MATLAB. 
 
 The HODLR case is handled in the @hodlr class, and correspond to H-matrices with partitioning
