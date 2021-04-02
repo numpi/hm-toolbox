@@ -44,7 +44,7 @@ else
     is_lyapunov = false;
 end
 
-if isa(C, 'hmatrix')
+if isa(C, 'halr')
     X = dac_lyap_blr(varargin{:});
     return;
 end

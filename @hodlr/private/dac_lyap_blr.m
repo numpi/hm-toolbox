@@ -47,10 +47,10 @@ switch firstchar - 1
         is_sparse = true;
 end
 
-X = hmatrix;
+X = halr;
 X.sz = C.sz;
 
-tol = hmatrixoption('threshold');
+tol = halroption('threshold');
 
 if is_leafnode(C) && C.admissible
     if is_sparse
@@ -79,7 +79,7 @@ elseif (is_leafnode(A) && (is_lyapunov || is_leafnode(B))) || any(size(C) <= 512
     
     % Unpack the solution with the same structure that it previously had,
     % if it was not dense because we matched any(size(C)) <= 512
-    X = hmatrix('handle', X.F, size(C, 1), size(C, 2), 'cluster', C);
+    X = halr('handle', X.F, size(C, 1), size(C, 2), 'cluster', C);
     
 elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
             
@@ -90,16 +90,16 @@ elseif ~is_leafnode(A) && (is_lyapunov || ~is_leafnode(B))
     
     if is_leafnode(C)
         repacking_needed = true;
-        % Create an @hmatrix representation of C according to the splitting
+        % Create an @halr representation of C according to the splitting
         % of A and B, so we can perform the low-rank update approach
         % recursively. 
-        CC = hmatrix; CC.sz = [ size(C, 1) , size(C, 2) ];
+        CC = halr; CC.sz = [ size(C, 1) , size(C, 2) ];
         CC.admissible = false;
                 
-        CC.A11 = hmatrix; CC.A11.sz = [ m1 n1 ]; CC.A11.F = C.F(1:m1, 1:n1);
-        CC.A12 = hmatrix; CC.A12.sz = [ m1 n2 ]; CC.A12.F = C.F(1:m1, n1+1:end);
-        CC.A21 = hmatrix; CC.A21.sz = [ m2 n1 ]; CC.A21.F = C.F(m1+1:end, 1:n1);
-        CC.A22 = hmatrix; CC.A22.sz = [ m2 n2 ]; CC.A22.F = C.F(m1+1:end, n1+1:end);        
+        CC.A11 = halr; CC.A11.sz = [ m1 n1 ]; CC.A11.F = C.F(1:m1, 1:n1);
+        CC.A12 = halr; CC.A12.sz = [ m1 n2 ]; CC.A12.F = C.F(1:m1, n1+1:end);
+        CC.A21 = halr; CC.A21.sz = [ m2 n1 ]; CC.A21.F = C.F(m1+1:end, 1:n1);
+        CC.A22 = halr; CC.A22.sz = [ m2 n2 ]; CC.A22.F = C.F(m1+1:end, n1+1:end);        
         
         C = CC;
     end

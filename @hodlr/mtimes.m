@@ -17,8 +17,8 @@ if isa(H1, 'hss') || isa(H2, 'hss')
     return;
 end
 
-if isa(H2, 'hmatrix')
-    H = hodlr2hmatrix(H1) * H2;
+if isa(H2, 'halr')
+    H = hodlr2halr(H1) * H2;
     return;
 end
 
