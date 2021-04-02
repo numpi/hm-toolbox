@@ -10,6 +10,10 @@ jobs:
   octave:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compression: [ qr, svd ]
+        format: [ hodlr, hss, halr ]
     env:
       OCTAVE: "flatpak run org.octave.Octave"
     steps:
@@ -25,12 +29,9 @@ jobs:
           ${OCTAVE} --eval "pkg install -forge control"
           echo "pkg load control" >> ~/.octaverc
           echo "pkg load statistics" >> ~/.octaverc
-      - name: Run tests (QR compression)
+      - name: Run tests (Format: ${{ matrix.format }}, Compression: ${{ matrix.compression }})
         run: |
-          ${OCTAVE} --no-gui --eval "addpath tests; hodlroption('compression', 'qr'); hssoption('compression', 'qr'); halroption('compression', 'qr'); RunAllTests;"
-      - name: Run tests (SVD compression)
-        run: |
-          ${OCTAVE} --no-gui --eval "addpath tests; RunAllTests;"
+          ${OCTAVE} --no-gui --eval "addpath tests; ${{ matrix.format }}option('compression', '${{ matrix.compression }}'); ${{ matrix.format }}_RunAllTests;"
 
   matlab:
     runs-on: ubuntu-latest
