@@ -13,7 +13,15 @@ switch hssoption('compression')
         error('unsupported compression method selected');
 end
 
-B = backward_stage(B, tol * norm(A, 2), [], [], tcomp);
+nrmA = norm(A, 2);
+
+if nrmA == 0
+    % We cannot request high-relative accuracy if the norm of A is zero
+    nrmA = 1;
+end
+
+B = backward_stage(B, tol * nrmA, [], [], tcomp);
+
 end
 
 function A = backward_stage(A, tol, S, T, tcomp)

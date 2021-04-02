@@ -6,11 +6,7 @@ tol = hssoption('threshold');
 
 % Test the Toeplitz solver
 for j = 1 : 2
-    if j == 1
-        n = 6000;
-    else
-        n = 4096;
-    end
+    n = 6000;
     
     c = rand(n, 1);
     r = rand(n, 1).';
