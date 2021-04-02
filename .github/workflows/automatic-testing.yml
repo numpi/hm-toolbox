@@ -35,16 +35,16 @@ jobs:
 
   matlab:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compression: [ qr, svd ]
+        format: [ hodlr, hss, halr ]
     steps:
       - uses: actions/checkout@v2
       - name: Install MATLAB
         uses: matlab-actions/setup-matlab@v0
-      - name: Run tests (SVD compression)
+      - name: Run tests (Format: ${{ matrix.format }} - Compression: ${{ matrix.compression }})
         uses: matlab-actions/run-command@v0
         with:
-          command: "addpath tests; RunAllTests"
-      - name: Run tests (QR compression)
-        uses: matlab-actions/run-command@v0
-        with:
-          command: "addpath tests; hodlroption('compression', 'qr'); hssoption('compression', 'qr'); halroption('compression', 'qr'); RunAllTests"
+          command: "addpath tests; ${{ matrix.format }}option('compression', '${{ matrix.compression }}'); ${{ matrix.format }}_RunAllTests"
 
