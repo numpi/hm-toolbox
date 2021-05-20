@@ -13,6 +13,10 @@ function x = toeplitz_solve(c, r, b)
 %     structured solvers for Toeplitz least squares via randomized sampling
 %     SIAM J. Matrix Anal. Appl., 35 (2014), pp. 44-72.
 
+% Estimate for the HSS rank of the Cauchy-like matrix (by Beckermann,
+% Kressner, Wilber). 
+f = @(n,e) 2*ceil(2 / pi^2 * log(2*n) * log(4/e));
+
 n = length(c);
 
 d0 = exp(1i * pi / n .* (0 : n - 1));
@@ -27,7 +31,7 @@ Fh = ifft((d0.' * ones(1, 2)) .* H) * sqrt(n);
 
 C = hss('handle', @(v) toep_cauchy_matvec(c, r, d0, v), ...
     @(v) toep_cauchy_matvec_trasp(c, r, d0, v), ...
-    @(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n);
+    @(i,j) (Gh(i, :) * Fh(j, :)') ./ (d1(i).' - dm1(j)), n, n, f(n, hssoption('threshold')));
 
 % C1 = (Gh * Fh') ./ (d1.' - dm1);
 
@@ -40,6 +44,8 @@ if isreal(c) && isreal(r) && isreal(b)
 end
 
 end
+
+
 
 function z = toep_cauchy_matvec(c, r, omega, v)
 n = size(v, 1);

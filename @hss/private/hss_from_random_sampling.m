@@ -1,4 +1,4 @@
-function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n)
+function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n, target_rank)
 %HSS_FROM_RANDOM_SAMPLING Build the HSS representation of a matrix
 % 			   using mat-vec multiplication with random (block) vectors
 %			   and access to (block) diagonal entries.
@@ -10,7 +10,11 @@ function B = hss_from_random_sampling(obj, Afun, Afunt, Aeval, m, n)
 %     Journal on Matrix Analysis and Applications 32.4 (2011): 1251-1274
 
 % A few things are not available in Octave, so we use workarounds
-isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+% isOctave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
+if ~exist('target_rank', 'var')
+    target_rank = 0;
+end
 
 tol = hssoption('threshold');
 
@@ -27,6 +31,11 @@ failed = true;
 k = 10;
 a = 10; % additional columns used for testing the residual
 
+if target_rank > 0
+    k = target_rank;
+    a = 0;
+end
+
 Ocol = randn(n, k + a);
 Scol = Afun(Ocol);
 Orow = randn(m, k + a);
@@ -35,14 +44,23 @@ Srow = Afunt(Orow);
 % Increase on the block size when the required accuracy is not reached
 bs = 12;
 
-if isOctave
-    nrm = eigs(@(x, t) real(Afunt(Afun(x))), n, 1, 'lm', ...
-        struct('issym', true, 'tol', 1e-2));
-else
-    nrm = svds(@(x,t) normest_afun(Afun, Afunt, x, t), ...
-        [m n], 1, 'largest', ...
-        struct('tol', 1e-2)); nrm = nrm(1);
-end
+% Norm estimate through a few iterations of the power method. 
+v = randn(n, 1);
+converged = false;
+nrmold = 0; j = 0;
+while ~converged
+    v = Afunt(v / norm(v));
+    v = Afun(v);
+    
+    nrm = sqrt(norm(v));
+    j = j + 1;
+    
+    if (nrm - nrmold) < nrmold * 5e-2
+        converged = true;
+    end
+    
+    nrmold = nrm;
+end    
 
 while failed
     % fprintf('HSS_RANDOM_FROM_SAMPLING :: columns: %d\n', size(Scol, 2));
@@ -236,7 +254,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V, failed] = ...
                 %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice
                 km = 1;
 
-                if norm(Scol2) * km > nrm * tol
+                if norm(Scol2) * km > sqrt(size(Srow, 2)) * nrm * tol
                     failed = true;
                     Scol = []; Srow = []; Ocol = []; Orow = [];
                     Jcol = []; Jrow = []; U = []; V = [];
@@ -267,7 +285,7 @@ function [B, Scol, Srow, Ocol, Orow, Jcol, Jrow, U, V, failed] = ...
                 %km = 1 + 11 * sqrt(size(Q,2) * size(Scol, 1)); % Martinsson's constant, too pessimistic in practice
                 km = 1;
 
-                if norm(Srow2) * km > nrm * tol
+                if norm(Srow2) * km > sqrt(size(Srow, 2)) * nrm * tol
                     failed = true;
                     Scol = []; Srow = []; Ocol = []; Orow = [];
                     Jcol = []; Jrow = []; U = []; V = [];
