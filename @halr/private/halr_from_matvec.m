@@ -172,7 +172,7 @@ function [rind, cind] = indices_from_path(I, J, cl)
 			roffset = size(cl.A11, 1); 
 		end
 		if J(1) == '1'
-			coffset =	size(cl.A11, 2);
+			coffset = size(cl.A11, 2);
 		end
 		[rind, cind] = indices_from_path(I(2:end), J(2:end), ...
 		subsref(cl, struct('type', '.', 'subs', ['A', char(I(1) + 1), char(J(1) +1)])));
@@ -183,7 +183,7 @@ function [rind, cind] = indices_from_path(I, J, cl)
 end
 %---------------------------------------------
 function U = colspan(A, tol)
-		[U, S, ~] = svd(full(A), 'econ'); 
+	[U, S, ~] = svd(full(A), 'econ'); 
         k = sum(abs(diag(S)) > S(1,1) * tol);	
         U = U(:,1:k);
 end
