@@ -77,24 +77,23 @@ residuals = [];
 
 % rk_krylov = @rat_krylov;
 
+
+[VA, KA, HA, param_A] = rk_krylov(AA, u, inf);
+[VB, KB, HB, param_B] = rk_krylov(BB, v, inf);
+Cprojected = (VA(:,1:bsa)' * u) * (VB(:,1:bsb)'*v)';
+
 while max(sa-bsa, sb-bsb) < k
     
     poleA = poles(1, counter);
-    poleB = poles(2, counter);
+    poleB = poles(2, counter);    
     
-    if ~exist('VA', 'var')
-        [VA, KA, HA, param_A] = rk_krylov(AA, u, poleA);
-        [VB, KB, HB, param_B] = rk_krylov(BB, v, poleB);
-        Cprojected = (VA(:,1:bsa)' * u) * (VB(:,1:bsb)'*v)';
-    else
-        [VA, KA, HA, param_A] = rk_krylov(AA, VA, KA, HA, poleA, param_A);
-        [VB, KB, HB, param_B] = rk_krylov(BB, VB, KB, HB, poleB, param_B);
-    end
+    [VA, KA, HA, param_A] = rk_krylov(AA, VA, KA, HA, poleA, param_A);
+    [VB, KB, HB, param_B] = rk_krylov(BB, VB, KB, HB, poleB, param_B);
     
     sa = size(VA, 2);
     sb = size(VB, 2);
     
-        % We only compute the solution and residual of the projected Lyapunov 
+    % We only compute the solution and residual of the projected Lyapunov 
     % equation in the first three iterations, and then use the fact that
     % the convergence is expected to be linear to estimate the number of
     % iterations requires to converge. This saves some Lyapunov dense
@@ -126,8 +125,6 @@ while max(sa-bsa, sb-bsb) < k
         else
             KB2 = KB; HB2 = HB;
         end
-        
-        keyboard;
         
         % Compute the solution and residual of the projected Lyapunov equation
         As = HA2 / KA2(1:end-bsa,:);
