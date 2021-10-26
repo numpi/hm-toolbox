@@ -50,7 +50,7 @@ end
 nrmA = AA.nrm;
 nrmB = BB.nrm;
 
-if size(poles, 1) == 1
+if isfloat(poles) && size(poles, 1) == 1
     poles = [poles; poles];
 end
 
@@ -73,40 +73,71 @@ it=1;
 % Counter for the vector of poles
 counter = 1;
 
+residuals = [];
+
+% rk_krylov = @rat_krylov;
+
 while max(sa-bsa, sb-bsb) < k
-    % fprintf('Using poles: (%e, %e)\n', poles(1,counter), poles(2,counter));
-    next_inf = counter + find(min(poles(:, counter:end), [], 1) == inf) - 1;
-    if isempty(next_inf)
-        next_inf = size(poles, 2);
-    else
-        next_inf = next_inf(1);
-    end
+    
+    poleA = poles(1, counter);
+    poleB = poles(2, counter);
     
     if ~exist('VA', 'var')
-        [VA, KA, HA, param_A] = rk_krylov(AA, u, poles(1, counter:next_inf));
-        [VB, KB, HB, param_B] = rk_krylov(BB, v, poles(2, counter:next_inf));
+        [VA, KA, HA, param_A] = rk_krylov(AA, u, poleA);
+        [VB, KB, HB, param_B] = rk_krylov(BB, v, poleB);
+        Cprojected = (VA(:,1:bsa)' * u) * (VB(:,1:bsb)'*v)';
     else
-        [VA, KA, HA, param_A] = rk_krylov(AA, VA, KA, HA, poles(1, counter:next_inf), param_A);
-        [VB, KB, HB, param_B] = rk_krylov(BB, VB, KB, HB, poles(2, counter:next_inf), param_B);
+        [VA, KA, HA, param_A] = rk_krylov(AA, VA, KA, HA, poleA, param_A);
+        [VB, KB, HB, param_B] = rk_krylov(BB, VB, KB, HB, poleB, param_B);
     end
     
     sa = size(VA, 2);
     sb = size(VB, 2);
     
-    if poles(1, next_inf) == inf && poles(2, next_inf) == inf
-        
-        % Compute the solution and residual of the projected Lyapunov equation
-        As = HA / KA(1:end-bsa,:);
-        Bs = HB / KB(1:end-bsb,:);
-        Cs = zeros(size(As, 1), size(Bs, 1));
-        
-        if ~exist('Cprojected', 'var')
-            Cprojected = (VA(:,1:bsa)' * u) * (VB(:,1:bsb)'*v)';
+        % We only compute the solution and residual of the projected Lyapunov 
+    % equation in the first three iterations, and then use the fact that
+    % the convergence is expected to be linear to estimate the number of
+    % iterations requires to converge. This saves some Lyapunov dense
+    % solutions, which are relatively expensive.
+    if  it <= 3 || ~exist('tol_eps', 'var')
+        check_residual = true;
+    else
+        if it == 4
+            pp = polyfit(1:3, log(residuals(1:3)), 1);
+            r1 = residuals(1) / norm(Y, nrmtype);
+            needed_iterations = ceil(...
+                (log(tol_eps) - log(r1)) / pp(1));
+            needed_iterations = min(20, needed_iterations);
+        end
+        check_residual = it >= needed_iterations;
+    end
+    
+    check_residual = true;
+    
+    if check_residual
+        if poleA ~= inf
+            [~, KA2, HA2] = rk_krylov(AA, VA, KA, HA, inf, param_A);
+        else
+            KA2 = KA; HA2 = HA;
         end
         
+        if poleB ~= inf        
+            [~, KB2, HB2] = rk_krylov(BB, VB, KB, HB, inf, param_B);
+        else
+            KB2 = KB; HB2 = HB;
+        end
+        
+        keyboard;
+        
+        % Compute the solution and residual of the projected Lyapunov equation
+        As = HA2 / KA2(1:end-bsa,:);
+        Bs = HB2 / KB2(1:end-bsb,:);
+        Cs = zeros(size(As, 1), size(Bs, 1));
         Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
         
         [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
+        
+        residuals(it) = res;
         
         % You might want to enable this for debugging purposes
         if debug
@@ -121,7 +152,11 @@ while max(sa-bsa, sb-bsb) < k
     it = it + 1;
     
     % Switch to the next poles for the next round
-    counter = mod(next_inf, length(poles)) + 1;
+    if isfloat(poles)
+        counter = mod(counter, size(poles, 2)) + 1;
+    else
+        counter = counter + 1;
+    end
 end
 
 [UU,SS,VV] = svd(Y);
