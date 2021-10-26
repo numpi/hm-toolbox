@@ -41,6 +41,7 @@ else
 end
 
 if ~isstruct(A)
+	%error('Unsupported case: A has to be a struct\n')
     A = rk_struct(A, B);
 end
 
@@ -67,7 +68,11 @@ else
 end
 
 for j = 1 : length(poles)
-    [V, K, H] = rk_add_pole(A, V, K, H, poles(j), bs);
+	if poles(j) == inf
+		[V, K, H] = add_inf_pole(V, K, H, A, V(:, end-bs+1));
+	else
+    	[V, K, H] = rk_add_pole(A, V, K, H, poles(j), bs);
+    end
 end
 
 end
@@ -158,4 +163,34 @@ end
 function [w, h] = mgs_orthogonalize(V, w)
     h = V' * w;
     w = w - V * h;
+end
+
+function [V, K, H, w] = add_inf_pole(V, K, H, A, w)
+bs = size(w, 2);
+
+if isstruct(A)
+    w = A.multiply(1.0, 0.0, w);
+else
+    w = A * w;
+end
+
+% Perform orthogonalization with modified Gram-Schimidt
+[w, h] = mgs_orthogonalize(V, w);
+
+% Enlarge H and K
+H(size(H, 1) + bs, size(H, 2) + bs) = 0;
+K(size(K, 1) + bs, size(K, 2) + bs) = 0;
+
+H(1:end-bs, end-bs+1:end) = h;
+K(end-2*bs+1:end-bs, end-bs+1:end) = eye(bs);
+
+[w, r] = qr(w, 0);
+
+% Reorthogonalize
+[w, hh] = mgs_orthogonalize(V, w);
+[w, rr] = qr(w, 0);
+H(1:end-bs, end-bs+1:end) = H(1:end-bs, end-bs+1:end) + hh * r ;
+H(end-bs+1:end, end-bs+1:end) = rr * r;
+
+V = [V, w];
 end
