@@ -68,11 +68,11 @@ else
 end
 
 for j = 1 : length(poles)
-	if poles(j) == inf
-		[V, K, H] = add_inf_pole(V, K, H, A, V(:, end-bs+1));
-	else
-    	[V, K, H] = rk_add_pole(A, V, K, H, poles(j), bs);
-    end
+	%if poles(j) == inf 
+	%	[V, K, H] = add_inf_pole(V, K, H, A, V(:, end-bs+1));
+	%else
+    [V, K, H] = rk_add_pole(A, V, K, H, poles(j), bs);
+    %end
 end
 
 end
