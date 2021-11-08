@@ -20,6 +20,9 @@ switch ul
         V = [ Vl , zeros(size(Vl,1), size(Vr,2)) ; ...
             zeros(size(Vr,1), size(Vl,2)) , Vr ];
 end
+
+[U, V] = compress_factors(U, V, hssoption('threshold'));
+
 end
 
 function [U,V] = hss_generators(A)

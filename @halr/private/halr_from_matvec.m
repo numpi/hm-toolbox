@@ -4,7 +4,7 @@ function H = halr_from_matvec(Afun, ATfun, maxrank, cl)
 % Computes the halr representation of the matrix with assigned cluster 
 % by means of matvecs
 %
-%	Afun, ATfun		handle function that evaluate A*x and A'*x
+%	Afun, ATfun		handle functions that evaluate A*x and A'*x
 %	maxrank			maximum rank allowed for the the low-rank blocks
 %	cl				cluster tree
 %
