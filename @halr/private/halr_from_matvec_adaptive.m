@@ -1,53 +1,99 @@
-function H = halr_from_matvec(Afun, ATfun, maxrank, cl)
+function H = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n)
 %---------------------------------------------------------------------
 %
 % Computes the halr representation of the matrix with assigned cluster 
 % by means of matvecs
 %
-%	Afun, ATfun		handle function that evaluate A*x and A'*x
+%	Afun, ATfun		handle functions that evaluate A*x and A'*x
 %	maxrank			maximum rank allowed for the the low-rank blocks
 %	cl				cluster tree
 %
 %---------------------------------------------------------------------
 	tol = halroption('threshold');
-	H = halr('low-rank', zeros(size(cl, 1), 0), zeros(size(cl, 2), 0), 'cluster', cl);
-	matr = find_cluster_matrices(cl, {});
-	l = length(matr);
-	for j = 2:l
-		[vectors, pos] = gen_random_sampling(matr, j, cl, maxrank);
+	% H = halr('low-rank', zeros(size(cl, 1), 0), zeros(size(cl, 2), 0), 'cluster', cl);
+	% matr = find_cluster_matrices(cl, {});
+	% l = length(matr);
+    
+    
+    cl = halr; cl.sz = [m n]; cl.admissible = 1;
+    H = halr('low-rank', zeros(m,0), zeros(n,0), 'cluster', cl);
+    l = 1;
+   
+    matr = cell(1, l);
+    matr{1} = 0;
+    
+    % Generate the random vector for sampling the first level
+    vectors = { randn(n, maxrank) };
+    pos = { 1 };
+    
+    A0 = { Afun(vectors{1}) };
+    
+    [A0{1}, R0] = qr(A0{1}, 0);
+    
+    % FIXME: Make a sensible check
+    if min(svd(R0)) <= tol
+        % Compute the low-rank representation
+        temp = ATfun(A0{1});
+        temp = temp';
+        
+        [U, V] = compress_matrix(temp);
+        U = A0{1} * U; 
+        H.U = U; H.V = V;
+    else
+        matr{1} = 1; H.admissible = 0;
+    end
+    
+	while ~can_stop(matr, l, H)
+        H = add_one_level(H, l);
+        l = l + 1;
+        matr{l} = kron(matr{l-1}, zeros(2));
+        
+		[vectors, pos] = gen_random_sampling(matr, l, H, maxrank);
+        
+   		partialT = @(x) H'*x;
+        partial  = @(x) H*x;
+        
 		AO = cell(1, length(vectors));
 		for h = 1:length(vectors)
-			AO{h} = Afun(vectors{h}) - H * vectors{h};
+			AO{h} = Afun(vectors{h}) - partial(vectors{h});
 			[I, J] = find(pos == h);
 			for t = 1:length(I) % Orthogonalize the right products
-				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, j - 1), dec2bin(J(t) - 1, j - 1), cl);
-				%AO{h}(rind, :) = colspan(AO{h}(rind, :), tol);
-				[AO{h}(rind, :), ~] = qr(AO{h}(rind, :), 0);
+				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
+				[AO{h}(rind, :), R0] = qr(AO{h}(rind, :), 0);
+                
+                if min(svd(R0)) > tol
+                    matr{l}(I(t), J(t)) = 1;
+                    % Set the non-admissible flag
+                    H = save_to_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
+                end
 			end
-		end	
-		[lvectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, maxrank);
-		partialT = @(x) H'*x;	
+        end
+        
+		[lvectors, lpos] = gen_basis_vectors(matr, l, H, pos, AO, maxrank);
 		for h = 1:length(lvectors)
 			temp = ATfun(lvectors{h}) - partialT(lvectors{h});	
 			temp = temp';
 			[J, I] = find(lpos == h);
 			for t = 1:length(I)
-				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, j - 1), dec2bin(J(t) - 1, j - 1), cl);
+				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
 				[U, V] = compress_matrix(temp(:, cind));
 				ht = pos(I(t), J(t));
 				U = AO{ht}(rind, :) * U;
-				H = save_to_path(dec2bin(I(t) - 1, j - 1), dec2bin(J(t) - 1, j - 1), H, U, V);
+				H = save_to_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H, U, V);
 			end
-		end	
-	end
+        end        
+    end
+    
+    H = add_dense_admissible_blocks(H);
+    
 	% Retrieve dense blocks at the end
-	[vectors, pos] = gen_dense_sampling(matr, cl);
+	[vectors, pos] = gen_dense_sampling(matr, H);
 	partial = @(x) H*x;	
 	for h = 1:length(vectors)
 		temp = Afun(vectors{h}) - partial(vectors{h});	
 		[I, J] = find(pos == h);
 		for t = 1:length(I)
-				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), cl);
+				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
 				F = temp(rind, 1:length(rind));
 				H = save_to_path(dec2bin(I(t) - 1, l-1), dec2bin(J(t) - 1, l-1), H, F);
 		end
@@ -95,7 +141,7 @@ end
 function [vectors, pos] = gen_random_sampling(matr, j, cl, maxrank)
 % Generate the vectors for Martinsson's algorithm, for level j, i.e. vectors whose sparsity patterns is
 % described with the auxiliary matrices 
-	[vectors, pos] = compute_symbol_vectors(matr, j, cl);
+	[vectors, pos] = compute_symbol_vectors(matr, j);
 	% We reduce the number of vectors required by leveraging the free entries marked with 2
 	% the correspondence in the matrix pos is updated accordingly
 	[vectors, pos] = merge_vec(vectors, pos, 'r'); 
@@ -113,7 +159,7 @@ function [vectors, pos] = gen_random_sampling(matr, j, cl, maxrank)
 	
 end
 %---------------------------------------------------------------------------
-function [vectors, pos] = compute_symbol_vectors(matr, j, cl)
+function [vectors, pos] = compute_symbol_vectors(matr, j)
 	if j <= length(matr)
 		P1 = kron(matr{j-1}, ones(2)); % P1 has ones for low-rank blocks of level j and for recursively partioned ones
 		P2 = P1 - matr{j}; % P2 has ones only for the low-rank blocks of level j
@@ -194,7 +240,7 @@ function [vectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, maxrank)
 	for h = 1:length(matr)
 		matr{h} = matr{h}';
 	end
-	[vectors, lpos] = compute_symbol_vectors(matr, j, cl');
+	[vectors, lpos] = compute_symbol_vectors(matr, j);
 	% We reduce the number of vectors required by leveraging the free entries marked with 2
 	% the correspondence in the matrix pos is updated accordingly
 	[vectors, lpos] = merge_vec(vectors, lpos, 'l'); 
@@ -215,11 +261,17 @@ end
 function H = save_to_path(I, J, H, varargin)
 % Set the dense or the low-rank factorization U*V' into the block corresponding to the path I,J
 	if isempty(I)
-		if length(varargin) == 1
-			H.F = varargin{1};
-		else
-			H.U = varargin{1};
-			H.V = varargin{2};
+        switch length(varargin)
+            case 0
+                H.admissible = false;
+            case 1
+                H.F = varargin{1};
+            case 2
+                H.U = varargin{1};
+                H.V = varargin{2};
+                H.admissible = true;
+            otherwise
+                error('Unsupported call to save_to_path');
 		end
 	else
 		res = subsref(H, struct('type', '.', 'subs', ['A', char(I(1) + 1), char(J(1) +1)]));
@@ -232,7 +284,7 @@ function [vectors, pos] = gen_dense_sampling(matr, cl)
 % Generate the vectors for extracting the dense blocks at the final level
 % described with the auxiliary matrices 
 	l = length(matr);
-	[vectors, pos] = compute_symbol_vectors(matr, length(matr) + 1, cl);
+	[vectors, pos] = compute_symbol_vectors(matr, length(matr) + 1);
 	% We reduce the number of vectors required by leveraging the free entries marked with 2
 	% the correspondence in the matrix pos is updated accordingly
 	[vectors, pos] = merge_vec(vectors, pos, 'r'); 
@@ -248,5 +300,66 @@ function [vectors, pos] = gen_dense_sampling(matr, cl)
 		vectors{h} = w;
 	end
 	
+end
+
+function r = can_stop(matr, l, H)
+    % FIXME: We should check if the blocks are smaller than the minimal
+    % block size using H, instead of just estimating by recursive splitting
+    if l > log2(min(size(H)) / halroption('block-size'))
+        r = true;
+    else
+        r = all(matr{l} == 0);
+    end
+end
+
+function H = add_one_level(H, l)
+    if l == 1
+        if ~H.admissible
+            m = size(H, 1); 
+            n = size(H, 2);
+            m1 = ceil(m / 2);
+            n1 = ceil(n / 2);
+            
+            H.A11 = halr; H.A11.sz = [m1, n1];     H.A11.admissible = true;
+            H.A11.U = zeros(m1, 0); H.A11.V = zeros(n1, 0);
+            H.A12 = halr; H.A12.sz = [m1, n-n1];   H.A12.admissible = true;
+            H.A12.U = zeros(m1, 0); H.A12.V = zeros(n-n1, 0);
+            H.A21 = halr; H.A21.sz = [m-m1, n1];   H.A21.admissible = true;
+            H.A21.U = zeros(m-m1, 0); H.A21.V = zeros(n1, 0);
+            H.A22 = halr; H.A22.sz = [m-m1, n-n1]; H.A22.admissible = true;
+            H.A22.U = zeros(m-m1, 0); H.A22.V = zeros(n-n1, 0);
+        end
+    else
+        H.U = []; H.V = [];
+        
+        if ~H.A11.admissible
+            H.A11 = add_one_level(H.A11, l-1);
+        end
+        
+        if ~H.A12.admissible
+            H.A12 = add_one_level(H.A12, l-1);
+        end
+        
+        if ~H.A21.admissible
+            H.A21 = add_one_level(H.A21, l-1);
+        end
+        
+        if ~H.A22.admissible
+            H.A22 = add_one_level(H.A22, l-1);
+        end
+    end
+end
+
+function H = add_dense_admissible_blocks(H)
+    if is_leafnode(H)
+        if ~H.admissible && isempty(H.F)
+            H.F = zeros(size(H));
+        end
+    else
+        H.A11 = add_dense_admissible_blocks(H.A11);
+        H.A12 = add_dense_admissible_blocks(H.A12);
+        H.A21 = add_dense_admissible_blocks(H.A21);
+        H.A22 = add_dense_admissible_blocks(H.A22);
+    end
 end
 
