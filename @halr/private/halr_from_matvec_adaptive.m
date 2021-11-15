@@ -21,17 +21,20 @@ function H = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n)
    
     matr = cell(1, l);
     matr{1} = 0;
+	
+	oversampling = 10;
     
     % Generate the random vector for sampling the first level
-    vectors = { randn(n, maxrank) };
+    vectors = { randn(n, maxrank+oversampling) };
     pos = { 1 };
     
     A0 = { Afun(vectors{1}) };
     
     [A0{1}, R0] = qr(A0{1}, 0);
-    
+    s=svd(R0);
+	
     % FIXME: Make a sensible check
-    if min(svd(R0)) <= tol
+    if s(maxrank) <= tol
         % Compute the low-rank representation
         temp = ATfun(A0{1});
         temp = temp';
@@ -48,7 +51,7 @@ function H = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n)
         l = l + 1;
         matr{l} = kron(matr{l-1}, zeros(2));
         
-		[vectors, pos] = gen_random_sampling(matr, l, H, maxrank);
+		[vectors, pos] = gen_random_sampling(matr, l, H, maxrank+oversampling);
         
    		partialT = @(x) H'*x;
         partial  = @(x) H*x;
@@ -60,8 +63,9 @@ function H = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n)
 			for t = 1:length(I) % Orthogonalize the right products
 				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
 				[AO{h}(rind, :), R0] = qr(AO{h}(rind, :), 0);
+				s=svd(R0);
                 
-                if min(svd(R0)) > tol
+                if s(maxrank) > tol
                     matr{l}(I(t), J(t)) = 1;
                     % Set the non-admissible flag
                     H = save_to_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
@@ -69,7 +73,7 @@ function H = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n)
 			end
         end
         
-		[lvectors, lpos] = gen_basis_vectors(matr, l, H, pos, AO, maxrank);
+		[lvectors, lpos] = gen_basis_vectors(matr, l, H, pos, AO, maxrank+oversampling);
 		for h = 1:length(lvectors)
 			temp = ATfun(lvectors{h}) - partialT(lvectors{h});	
 			temp = temp';
@@ -138,7 +142,7 @@ function matr = extend_matr(matr, mx)
 	end
 end
 %--------------------------------------------------------------------------
-function [vectors, pos] = gen_random_sampling(matr, j, cl, maxrank)
+function [vectors, pos] = gen_random_sampling(matr, j, cl, oversampmaxrank)
 % Generate the vectors for Martinsson's algorithm, for level j, i.e. vectors whose sparsity patterns is
 % described with the auxiliary matrices 
 	[vectors, pos] = compute_symbol_vectors(matr, j);
@@ -146,13 +150,13 @@ function [vectors, pos] = gen_random_sampling(matr, j, cl, maxrank)
 	% the correspondence in the matrix pos is updated accordingly
 	[vectors, pos] = merge_vec(vectors, pos, 'r'); 
 	for h = 1:length(vectors)
-		w = zeros(size(cl, 1), maxrank);
+		w = zeros(size(cl, 1), oversampmaxrank);
 		[I, J] = find(pos == h);
 		for t = 1:length(I)
 		% Applying the function dec2bin to the entries of I and J returns binary strings that 
 		% encode the path to get the corresponding block starting from the root, 
 			[rind, cind] = indices_from_path(dec2bin(I(t) - 1, j - 1), dec2bin(J(t) - 1, j - 1), cl);
-			w(cind, :) = randn(length(cind), maxrank);
+			w(cind, :) = randn(length(cind), oversampmaxrank);
 		end
 		vectors{h} = w;
 	end
@@ -234,7 +238,7 @@ function U = colspan(A, tol)
         U = U(:,1:k);
 end
 %---------------------------------------------------------------
-function [vectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, maxrank)
+function [vectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, oversampmaxrank)
 	% Generate the row vectors for Martinsson's algorithm, for level j, i.e. vectors whose sparsity patterns is
 % described with the auxiliary matrices 
 	for h = 1:length(matr)
@@ -245,7 +249,7 @@ function [vectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, maxrank)
 	% the correspondence in the matrix pos is updated accordingly
 	[vectors, lpos] = merge_vec(vectors, lpos, 'l'); 
 	for h = 1:length(vectors)
-		w = zeros(size(cl, 2), maxrank);
+		w = zeros(size(cl, 2), oversampmaxrank);
 		[J, I] = find(lpos == h);
 		for t = 1:length(J)
 		% Applying the function dec2bin to the entries of I and J returns binary strings that 
