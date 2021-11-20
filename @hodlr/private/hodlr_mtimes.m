@@ -30,20 +30,20 @@ if is_leafnode(H1)
     H.F = H1.F * H2.F;
 else
     H.A11 = hodlr_mtimes_ric(H1.A11, H2.A11, nrm);
-    U = H1.U12 * (H1.V12.' * H2.U21);
+    U = H1.U12 * (H1.V12' * H2.U21);
     H.A11 = hodlr_rank_update(H.A11, U, H2.V21, nrm);
     
     H.A22 = hodlr_mtimes_ric(H1.A22, H2.A22, nrm);
-    U = H1.U21 * (H1.V21.' * H2.U12);
+    U = H1.U21 * (H1.V21' * H2.U12);
     H.A22 = hodlr_rank_update(H.A22, U, H2.V12, nrm);
     
     H.U12 = [ hodlr_mtimes_dense(H1.A11, H2.U12), H1.U12 ];
-    H.V12 = [ H2.V12, dense_mtimes_hodlr(H1.V12.', H2.A22).' ];
+    H.V12 = [ H2.V12, dense_mtimes_hodlr(H1.V12', H2.A22)' ];
     
     % [H.U12, H.V12] = compress_factors(H.U12, H.V12, nrm);
     
     H.U21 = [ hodlr_mtimes_dense(H1.A22, H2.U21), H1.U21 ];
-    H.V21 = [ H2.V21, dense_mtimes_hodlr(H1.V21.', H2.A11).' ];
+    H.V21 = [ H2.V21, dense_mtimes_hodlr(H1.V21', H2.A11)' ];
     
     % [H.U21, H.V21] = compress_factors(H.U21, H.V21, nrm);
 end

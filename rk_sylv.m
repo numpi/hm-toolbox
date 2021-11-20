@@ -127,13 +127,16 @@ while max(sa-bsa, sb-bsb) < k
         end
         
         % Compute the solution and residual of the projected Lyapunov equation
+        %fprintf('cond KA = %e, cond KB = %e\n', cond(KA2(1:end-bsa,:)), cond(KB2(1:end-bsb,:)))
         As = HA2 / KA2(1:end-bsa,:);
         Bs = HB2 / KB2(1:end-bsb,:);
         Cs = zeros(size(As, 1), size(Bs, 1));
         Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
         
         [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
-        
+        temp=KA2(1:end-bsa, :)\Y;
+        keyboard
+        fprintf('res = %e\n', norm(temp(end-bsa+1:end, :)))
         residuals(it) = res;
         
         % You might want to enable this for debugging purposes
