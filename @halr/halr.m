@@ -46,6 +46,16 @@ classdef halr
     % H = HALR('handle', Afun, m, n) builds an M x N matrix by evaluting
     %     the handle function Afun(I, J) at some pivots by means of ACA
     %     (Adaptive Cross Approximation).
+    %
+    % H = HALR('matvec', AFUN, ATFUN, MAXRANK, 'cluster', C) builds the
+    %     HALR matrix by applying matvec with A or A' (implemented by the
+    %     handle functions AFUN, ATFUN), using the prescribed cluster tree 
+    %     in the HALR object C. 
+    %
+    % H = HALR('matvec', AFUN, ATFUN, MAXRANK, M, N) is analogous to the 
+    %     previous constructor, but adaptively determines the cluster tree,
+    %     and only takes as input the dimensions M, N of the matrix A. 
+    
     
     properties
         % Left factor of the low-rank factorization of this block, in case
@@ -137,6 +147,19 @@ classdef halr
                         
                     case 'handle'
                         obj = halr_from_aca(H, varargin{2:4}, progress_fcn);
+                        
+                    case 'matvec'
+                        Afun = varargin{2};
+                        ATfun = varargin{3};
+                        maxrank = varargin{4};
+                        
+                        if isempty(H)
+                            m = varargin{5}; n = varargin{6};
+                            obj = halr_from_matvec_adaptive(Afun, ATfun, maxrank, m, n);
+                        else
+                            obj = halr_from_matvec(Afun, ATfun, maxrank, H);
+                        end
+                        
                     case 'eye'
                         obj = halr_eye(H, varargin{2});
                     case 'banded'
