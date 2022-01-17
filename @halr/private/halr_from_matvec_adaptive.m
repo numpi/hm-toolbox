@@ -311,7 +311,7 @@ function r = can_stop(matr, l, H)
 if l > log2(min(size(H)) / halroption('block-size'))
     r = true;
 else
-    r = all(matr{l} == 0);
+    r = all(matr{l} == 0, 'all');
 end
 end
 
