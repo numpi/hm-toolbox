@@ -103,7 +103,7 @@ for h = 1:length(vectors)
     [I, J] = find(pos == h);
     for t = 1:length(I)
         [rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
-        F = temp(rind, 1:length(rind));
+        F = temp(rind, 1:length(cind));
         H = save_to_path(dec2bin(I(t) - 1, l-1), dec2bin(J(t) - 1, l-1), H, F);
     end
 end
