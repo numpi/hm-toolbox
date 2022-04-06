@@ -7,31 +7,31 @@ on: [push, pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  octave:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compression: [ qr, svd ]
-        format: [ hodlr, hss, halr ]
-    env:
-      OCTAVE: "flatpak run org.octave.Octave"
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install GNU/Octave
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install flatpak
-          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y org.octave.Octave
-          ${OCTAVE} --eval "pkg install -forge io"
-          ${OCTAVE} --eval "pkg install -forge statistics"
-          ${OCTAVE} --eval "pkg install -forge control"
-          echo "pkg load control" >> ~/.octaverc
-          echo "pkg load statistics" >> ~/.octaverc
-      - name: Run tests (Format ${{ matrix.format }} - Compression ${{ matrix.compression }})
-        run: |
-          ${OCTAVE} --no-gui --eval "addpath tests; ${{ matrix.format }}option('compression', '${{ matrix.compression }}'); ${{ matrix.format }}_RunAllTests;"
+  #octave:
+  #  # The type of runner that the job will run on
+  #  runs-on: ubuntu-latest
+  #  strategy:
+  #    matrix:
+  #      compression: [ qr, svd ]
+  #      format: [ hodlr, hss, halr ]
+  #  env:
+  #    OCTAVE: "flatpak run org.octave.Octave"
+  #  steps:
+  #    - uses: actions/checkout@v2
+  #    - name: Install GNU/Octave
+  #      run: |
+  #        sudo apt-get update
+  #        sudo apt-get -y install flatpak
+  #        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  #        sudo flatpak install -y org.octave.Octave
+  #        ${OCTAVE} --eval "pkg install -forge io"
+  #        ${OCTAVE} --eval "pkg install -forge statistics"
+  #        ${OCTAVE} --eval "pkg install -forge control"
+  #        echo "pkg load control" >> ~/.octaverc
+  #        echo "pkg load statistics" >> ~/.octaverc
+  #    - name: Run tests (Format ${{ matrix.format }} - Compression ${{ matrix.compression }})
+  #      run: |
+  #        ${OCTAVE} --no-gui --eval "addpath tests; ${{ matrix.format }}option('compression', '${{ matrix.compression }}'); ${{ matrix.format }}_RunAllTests;"
 
   matlab:
     runs-on: ubuntu-latest
