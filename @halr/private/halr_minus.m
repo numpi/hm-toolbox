@@ -10,8 +10,7 @@ H.sz = H1.sz;
 if is_leafnode(H1)
     if is_leafnode(H2)
         if H1.admissible && H2.admissible
-            H.U = [H1.U, -H2.U];
-            H.V = [H1.V, H2.V];
+            [H.U, H.V] = compress_factors([H1.U, -H2.U], [H1.V, H2.V]);
             H.admissible = true;
         else
             H.F = full(H1) - full(H2);

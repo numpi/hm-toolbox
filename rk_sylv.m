@@ -98,20 +98,32 @@ while max(sa-bsa, sb-bsb) < k
     % the convergence is expected to be linear to estimate the number of
     % iterations requires to converge. This saves some Lyapunov dense
     % solutions, which are relatively expensive.
-    if  it <= 3 || ~exist('tol_eps', 'var')
+    check_residual_n = 4;
+    if  it < check_residual_n
         check_residual = true;
     else
-        if it == 4
-            pp = polyfit(1:3, log(residuals(1:3)), 1);
-            r1 = residuals(1) / norm(Y, nrmtype);
-            needed_iterations = ceil(...
-                (log(tol_eps) - log(r1)) / pp(1));
-            needed_iterations = min(20, needed_iterations);
+        if it == check_residual_n
+            pp = polyfit(1:check_residual_n-1, log(residuals(1:check_residual_n-1)), 1);
+            
+            if exist('tol_eps', 'var')            
+                r1 = residuals(1) / norm(Y, nrmtype);
+                needed_iterations = ceil(...
+                    (log(tol_eps) - log(r1)) / pp(1));
+                needed_iterations = min(20, needed_iterations);
+            else
+                j = it + 1;
+                nrmY = norm(Y, nrmtype);
+                while ~tol(exp(polyval(pp, j)), nrmY) && j <= 30
+                    j = j + 1;
+                end
+                needed_iterations = min(30, j);
+                needed_iterations = 6;                
+            end
         end
         check_residual = it >= needed_iterations;
     end
     
-    check_residual = true;
+    % check_residual = true;
     
     if check_residual
         if poleA ~= inf
@@ -134,9 +146,8 @@ while max(sa-bsa, sb-bsb) < k
         Cs(1:size(u,2), 1:size(v,2)) = Cprojected;
         
         [Y, res] = lyap_galerkin(As, Bs, Cs, bsa, bsb, nrmtype);
-        temp=KA2(1:end-bsa, :)\Y;
-        keyboard
-        fprintf('res = %e\n', norm(temp(end-bsa+1:end, :)))
+        % temp=KA2(1:end-bsa, :)\Y;
+        % fprintf('res = %e\n', norm(temp(end-bsa+1:end, :)))
         residuals(it) = res;
         
         % You might want to enable this for debugging purposes
@@ -145,6 +156,8 @@ while max(sa-bsa, sb-bsb) < k
         end
         
         if tol(res, norm(Y, nrmtype)) % res < norm(Y) * tol
+            %fprintf('Needed iterations = %d, it = %d\n', needed_iterations, it);
+            %pause(1);
             break
         end
     end

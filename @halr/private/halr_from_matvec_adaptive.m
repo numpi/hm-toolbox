@@ -108,6 +108,8 @@ for h = 1:length(vectors)
     end
 end
 
+H = halr_compress(H, nrmA);
+
 
 end
 
