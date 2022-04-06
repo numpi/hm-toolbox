@@ -2,9 +2,17 @@ function [U,S,V] = tsvd(A,tol)
 if min(size(A)) == 0
     U = zeros(size(A, 1), 0); S = []; V = zeros(size(A, 2), 0); return;
 end
+
 [U,S,V] = svd(A);
 
-t = diag(S);
+if isvector(S)
+    % We handle the special case where A is either 1 x n or n x 1, and
+    % therefore S is already a vector and calling diag would needlessly
+    % create a diagonal matrix. 
+    t = S(1,1);
+else
+    t = diag(S);
+end
 
 switch hssoption('norm')
     case 2
