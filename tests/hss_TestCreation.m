@@ -75,5 +75,22 @@ for n = [ 100, 1000 ]
 		'Generation of an HSS representation for Cauchy A built with the Cauchy constructor');
 end
 
+n = 1024;
+
+lambda = rand(1,n); mu = rand(1,n);
+V = randn(n, 4); R = randn(4, n);
+L = randn(n, 3); W = randn(3, n);
+
+H = hss('loewner', mu, lambda, V, R, L, W);
+LO = (V*R - L*W) ./ (mu.' + lambda);
+
+CheckTestResult(norm(full(H) - LO, 'fro'), '<', norm(LO, 'fro') * sqrt(n) * tol, ...
+    'Generation of a HSS representation for a Loewner matrix A');
+
+H = hss('shifted-loewner', mu, lambda, V, R, L, W);
+LO = (diag(mu)*V*R + L*W*diag(lambda)) ./ (mu.' + lambda);
+
+CheckTestResult(norm(full(H) - LO, 'fro'), '<', norm(LO, 'fro') * sqrt(n) * tol, ...
+    'Generation of a HSS representation for a shifted Loewner matrix A');
 
 end

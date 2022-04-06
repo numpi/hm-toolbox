@@ -144,5 +144,20 @@ A = toeplitz(c, r);
 CheckTestResult(hnrm(A*v - H*v), '<', hnrm(v) * sqrt(n) * tol, ...
     'Generation of an hodlr representation for Toeplitz A (nonstandard clustering)');
 
+lambda = rand(1,n); mu = rand(1,n);
+V = randn(n, 4); R = randn(4, n);
+L = randn(n, 3); W = randn(3, n);
 
+H = hodlr('loewner', mu, lambda, V, R, L, W);
+LO = (V*R - L*W) ./ (mu.' + lambda);
+
+CheckTestResult(norm(full(H) - LO, 'fro'), '<', norm(LO, 'fro') * sqrt(n) * tol, ...
+    'Generation of a hodlr representation for a Loewner matrix A');
+
+
+H = hodlr('shifted-loewner', mu, lambda, V, R, L, W);
+LO = (diag(mu)*V*R + L*W*diag(lambda)) ./ (mu.' + lambda);
+
+CheckTestResult(norm(full(H) - LO, 'fro'), '<', norm(LO, 'fro') * sqrt(n) * tol, ...
+    'Generation of a hodlr representation for a shifted Loewner matrix A');
 end

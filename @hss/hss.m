@@ -31,6 +31,22 @@ classdef hss
     %     integer vectors I, J returns the submatrix A(I, J). M and N are the
     %     number of rows and columns of A.
     %
+    % H = HSS('loewner', MU, LAMBDA, V, R, L, W) constructs an HSS matrix
+    %     representing the Loewner matrix with entries equal to:
+    %
+    %       H(i,j) = (V(i,:)*R(:,j)-L(i,:)*W(:,j)) ./ (MU(i).' + LAMBDA(j)),
+    %
+    %     where V, L are p x n, the matrices R, W are n x q, and MU and LAMBDA
+    %     are vectors of length n.
+    %
+    % H = HSS('shifted-loewner', MU, LAMBDA, V, R, L, W) constructs a HSS matrix
+    %     representing the shifted Loewner matrix with entries equal to:
+    %
+    %       H(i,j) = (MU(i)*V(i,:)*R(:,j)+L(i,:)*W(:,j)*LAMBDA(j)) ./ (MU(i) + LAMBDA(j)),
+    %
+    %     where V, L are p x n, the matrices R, W are n x q, and MU and LAMBDA
+    %     are vectors of length n.
+    %
     % H = HSS('low-rank', U, V) construct an HSS representation of the low-rank
     %     matrix U*V'.
     %
@@ -157,6 +173,19 @@ classdef hss
                         % If we need to do this, make sure that hodlroption
                         % matches hssoption according to the threshold, at
                         % least for this operation.
+                        hodlr_tol = hodlroption('threshold');
+                        hodlroption('threshold', hssoption('threshold'));
+                        obj = hodlr2hss(hodlr(varargin{1:end}));
+                        hodlroption('threshold', hodlr_tol);
+
+                    case 'loewner'
+                        % See the note in 'cauchy' concerning the threshold
+                        hodlr_tol = hodlroption('threshold');
+                        hodlroption('threshold', hssoption('threshold'));
+                        obj = hodlr2hss(hodlr(varargin{1:end}));
+                        hodlroption('threshold', hodlr_tol);
+                    case 'shifted-loewner'
+                        % See the note in 'cauchy' concerning the threshold
                         hodlr_tol = hodlroption('threshold');
                         hodlroption('threshold', hssoption('threshold'));
                         obj = hodlr2hss(hodlr(varargin{1:end}));

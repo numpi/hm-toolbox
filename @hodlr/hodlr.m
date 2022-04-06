@@ -28,6 +28,22 @@ classdef hodlr
     %     using the adaptive cross approximation strategy. M and N are the
     %     number of rows and columns of A.
     %
+    % H = HODLR('loewner', MU, LAMBDA, V, R, L, W) constructs a HODLR matrix
+    %     representing the Loewner matrix with entries equal to:
+    %
+    %       H(i,j) = (V(i,:)*R(:,j)-L(i,:)*W(:,j)) ./ (MU(i) + LAMBDA(j)),
+    %
+    %     where V, R are n x p, the matrices L, W are q x n, and MU and LAMBDA
+    %     are vectors of length n.
+    %
+    % H = HODLR('shifted-loewner', MU, LAMBDA, V, R, L, W) constructs a HODLR matrix
+    %     representing the shifted Loewner matrix with entries equal to:
+    %
+    %       H(i,j) = (MU(i)*V(i,:)*R(:,j)+L(i,:)*W(:,j)*LAMBDA(j)) ./ (MU(i) + LAMBDA(j)),
+    %
+    %     where V, L are p x n, the matrices R, W are n x q, and MU and LAMBDA
+    %     are vectors of length n.
+    %
     % H = HODLR('low-rank', U, V) construct an HODLR representation of the low-rank
     %     matrix U*V'.
     %
@@ -141,6 +157,47 @@ classdef hodlr
                         obj = hodlr('handle', @(i,j) 1 ./ (x(i).' + y(j)), ...
                             length(x), length(y), 'cluster', ...
                             rowcluster, colcluster);
+                    
+                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    % Davide
+                    case 'loewner'
+                        % mu and lambda: frequencies
+                        mu = varargin{2};
+                        lambda = varargin{3};
+                        % V and L are pxn whereas R and W are nxq
+                        V = varargin{4};
+                        R = varargin{5};
+                        L = varargin{6};
+                        W = varargin{7};
+                        
+                        % We make sure that mu, lambda are row vectors
+                        mu = mu(:).'; lambda = lambda(:).';
+                        
+                        obj = hodlr('handle', @(i,j) (V(i,:)*R(:,j)- L(i,:)*W(:,j)) ./ (mu(i).' + lambda(j)), ...
+                            length(mu), length(lambda), 'cluster', ...
+                            rowcluster, colcluster);
+                        
+                    % shifted-loewner
+                    case 'shifted-loewner'
+                        % mu and lambda: frequencies
+                        mu = varargin{2};
+                        lambda = varargin{3};
+                                                
+                        % We make sure that mu, lambda are row vectors
+                        mu = mu(:).'; lambda = lambda(:).';
+                        
+                        % V and L are pxn whereas R and W are nxq
+                        V = spdiags(mu.',0:0,length(mu),length(mu))*varargin{4};
+                        R = varargin{5};
+                        L = varargin{6};
+                        W = varargin{7};
+                        W = W*spdiags(-lambda.',0:0,length(lambda),length(lambda));
+                        
+                        obj = hodlr('handle', @(i,j) (V(i,:)*R(:,j)- L(i,:)*W(:,j)) ./ (mu(i).' + lambda(j)), ...
+                            length(mu), length(lambda), 'cluster', ...
+                            rowcluster, colcluster);
+                       
+                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
                         
                     case 'diagonal'
                         if ~check_cluster_equality(rowcluster, colcluster)
