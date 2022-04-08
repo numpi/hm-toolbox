@@ -30,6 +30,12 @@ for n = [ 100, 1000 ]
 
 	CheckTestResult(hnrm(full(A) - full(H)), '<', C(A) * hnrm(full(A)) * hodlroption('threshold'), ...
 		'Generation of an hodlr representation for a sparse A');
+    
+    A = zeros(n, n);
+    H = hodlr(A);
+    
+    CheckTestResult(hnrm(A - full(H)), '<=', 0, ...
+		'Generation of an hodlr representation for a zero matrix A');
 end
 
 for n = [ 100, 1000 ]

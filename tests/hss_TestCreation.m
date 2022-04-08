@@ -21,6 +21,12 @@ H = hss(A);
 CheckTestResult(norm(A - full(H)), '<', C(A) * hnrm(A) * tol, ...
     'Generation of an HSS representation for unstructured A');
 
+A = zeros(n, n);
+H = hodlr(A);
+
+CheckTestResult(norm(A - full(H)), '<=', 0, ...
+    'Generation of an HSS representation for a zero matrix A');
+
 n = 2^15;
 A = spdiags(randn(n, 6) , -2:3, n, n);
 H = hss('banded', A, 2, 3);

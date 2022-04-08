@@ -12,7 +12,7 @@ end
 
 switch compression
 	case 'svd'
-		[U,S,V] = svd(full(A));
+		[U,S,V] = svd(full(A), 'econ');
 
         switch hodlroption('norm')
             case 2

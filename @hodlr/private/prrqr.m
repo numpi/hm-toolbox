@@ -46,15 +46,15 @@ for j = 1 : min(m, n - 1)
     switch hodlroption('norm')
         case 2
             if relative
-                stop = sqrt(mx) < sqrt(v(1)) / sqrt(n-j) * tol;
+                stop = sqrt(mx) <= sqrt(v(1)) / sqrt(n-j) * tol;
             else
-                stop = sqrt(mx) < 1 / sqrt(n-j) * tol;
+                stop = sqrt(mx) <= 1 / sqrt(n-j) * tol;
             end
         case 'fro'
             if relative
-                stop = sqrt(sum(v(j:end))) < sqrt(sum(v(1:j-1))) * tol;
+                stop = sqrt(sum(v(j:end))) <= sqrt(sum(v(1:j-1))) * tol;
             else
-                stop = sqrt(sum(v(j:end))) < tol;
+                stop = sqrt(sum(v(j:end))) <= tol;
             end
     end
 	
@@ -127,6 +127,13 @@ end
 function [b, u] = householder_reflector(w)
 	u = w;
 	b = norm(u);
+    
+    if b == 0
+        u = 0 * w;
+        b = 0;
+        return;
+    end
+    
     s = sign(u(1));
     if s == 0
         s = 1;
