@@ -105,7 +105,8 @@ if autosplit
   
     % disp(bs)
     
-    % bs = 16;
+    % bs = 8;
+    % bs
     
     for j = 1 : bs : size(ss, 2)
         % Build the RHS
@@ -124,11 +125,14 @@ if autosplit
         Xu = [ Xu, xu ];
         Xv = [ Xv, xv ];
     end
+
+    res = lr_norm([ AA.multiply(1.0, 0.0, Xu), Xu, u ], ...
+        [Xv, BB.multiply(1.0, 0.0, Xv), v ], nrmtype);
     
-    [qu, ru] = qr(Xu, 0);
-    [qv, rv] = qr(Xv, 0);
-    
-    [uu, SS, vv] = svd(ru * rv');
+    [VA, ru] = qr(Xu, 0);
+    [VB, rv] = qr(Xv, 0);
+    Y = ru * rv';
+    [UU,SS,VV] = svd(Y);
     
     switch nrmtype
         case 2
@@ -137,14 +141,17 @@ if autosplit
         case 'fro'
             d = sort(diag(SS));
             s = sqrt(cumsum(d.^2));
-            rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+            s2 = sqrt(cumsum(d(end:-1:1).^2));
+            % rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+            rk = sum( arrayfun(@(j) tol(res + (nrmA + nrmB) * s(j), s2(j)), 1 : length(s)) == 0 );
     end
     
-    uu = qu * uu(:, 1:rk);
-    vv = qv * vv(:, 1:rk);
+    Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
+    Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
     
-    Xu = uu * SS(1:rk, 1:rk);
-    Xv = vv;
+    if debug
+        fprintf('Final solution rank: %d\n', rk);
+    end
     
     return;
 end
@@ -175,6 +182,7 @@ while max(sa-2*bsa, sb-2*bsb) < k
         B = BB.multiply(1.0, 0.0, eye(nb));
         
         Y = lyap(A, B', u * v');
+        res = norm(A * Y + Y*B - u*v', nrmtype);
         
         [UU,SS,VV] = svd(Y);
         
@@ -185,7 +193,9 @@ while max(sa-2*bsa, sb-2*bsb) < k
     		case 'fro'
         	d = sort(diag(SS));
         	s = sqrt(cumsum(d.^2));
-        	rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+            s2 = sqrt(cumsum(d(end:-1:1).^2));
+        	% rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+            rk = sum( arrayfun(@(j) tol(res + (nrmA + nrmB) * s(j), s2(j)), 1 : length(s)) == 0 );
 	end
         
         Xu = UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
@@ -275,11 +285,17 @@ switch nrmtype
     case 'fro'
         d = sort(diag(SS));
         s = sqrt(cumsum(d.^2));
-        rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+        s2 = sqrt(cumsum(d(end:-1:1).^2));
+        % rk = sum( arrayfun(@(ss) tol(ss, s(end) / (nrmA + nrmB)), s) == 0 );
+        rk = sum( arrayfun(@(j) tol(res + (nrmA + nrmB) * s(j), s2(j)), 1 : length(s)) == 0 );
 end
 
 Xu = VA(:,1:size(Y,1)) * UU(:,1:rk) * sqrt(SS(1:rk,1:rk));
 Xv = VB(:,1:size(Y,2)) * VV(:,1:rk) * sqrt(SS(1:rk,1:rk));
+
+if debug
+    fprintf('Final solution rank: %d\n', rk);
+end
 
 end
 
