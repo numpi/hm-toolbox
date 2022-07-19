@@ -21,8 +21,9 @@ function H = halr_from_matvec(Afun, ATfun, maxrank, cl)
 			[I, J] = find(pos == h);
 			for t = 1:length(I) % Orthogonalize the right products
 				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, j - 1), dec2bin(J(t) - 1, j - 1), cl);
-				%AO{h}(rind, :) = colspan(AO{h}(rind, :), tol);
-				[AO{h}(rind, :), ~] = qr(AO{h}(rind, :), 0);
+				mindim = min(size(AO{h}(rind, :)));
+				[AO{h}(rind, 1:mindim), ~] = qr(AO{h}(rind, :), 0);
+				AO{h}(rind, mindim+1:end) = 0;
 			end
 		end	
 		[lvectors, lpos] = gen_basis_vectors(matr, j, cl, pos, AO, maxrank);
@@ -48,7 +49,7 @@ function H = halr_from_matvec(Afun, ATfun, maxrank, cl)
 		[I, J] = find(pos == h);
 		for t = 1:length(I)
 				[rind, cind] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), cl);
-				F = temp(rind, 1:length(rind));
+				F = temp(rind, 1:length(cind));
 				H = save_to_path(dec2bin(I(t) - 1, l-1), dec2bin(J(t) - 1, l-1), H, F);
 		end
 	end

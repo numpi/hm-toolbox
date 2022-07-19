@@ -33,12 +33,22 @@ for n = [ 100, 1000 ]
     CheckTestResult(norm(A - full(H)), '<', 10 * norm(A) * halroption('threshold'), ...
         'Generation of an halr representation for Cauchy A built from dense');
     
-    %H = halr('cauchy', -y, x);
+    H = halr('matvec', @(v) A*v, @(v) A'*v, 50, n, n);
     
-    %CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * halroption('threshold'), ...
-    %	'Generation of an halr representation for Cauchy A built with the Cauchy constructor');
+    CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * halroption('threshold'), ...
+    	'Generation of an halr representation for Cauchy A built with the matvec adaptive constructor');
 end
 
+load cluster_halr_random.mat
+%%
+A = rand(798,12) * rand(12, 798);
+H = halr('matvec',...
+           @(x) A*x,...
+           @(x) A'*x,...
+           20,'cluster', HT_v);
+     CheckTestResult(norm(A - full(H)), '<', 10 * log2(n) * norm(A) * halroption('threshold'), ...
+    	'Generation of an halr representation for random low-rank A built with the matvec constructor');          
+           
 n = 10000;
 % A = spdiags(ones(n, 1) * [-1 2 -1], -1:1, n, n);
 % H = halr('banded', A);

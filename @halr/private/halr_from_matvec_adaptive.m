@@ -67,10 +67,12 @@ while ~can_stop(matr, l, H)
         [I, J] = find(pos == h);
         for t = 1:length(I) % Orthogonalize the right products
             [rind, ~] = indices_from_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
-            [AO{h}(rind, :), R0] = qr(AO{h}(rind, :), 0);
+            mindim = min(size(AO{h}(rind, :)));
+            [AO{h}(rind, 1:mindim), R0] = qr(AO{h}(rind, :), 0);
+            AO{h}(rind, mindim+1:end)=0;
             s=svd(R0);
             
-            if s(maxrank+1) > tol * nrmA
+            if maxrank >= size(R0, 1) || s(maxrank+1) > tol * nrmA
                 matr{l}(I(t), J(t)) = 1;
                 % Set the non-admissible flag
                 H = save_to_path(dec2bin(I(t) - 1, l - 1), dec2bin(J(t) - 1, l - 1), H);
