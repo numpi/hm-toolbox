@@ -16,7 +16,7 @@ set(gca, 'YDir', 'reverse');
 axis([ 0 n 0 m ]);
 hold on;
 
-spy_draw_block(H, 0, 0, hssrank(H));
+spy_draw_block(H, 0, 0, hodlrrank(H));
 
 hold off;
 

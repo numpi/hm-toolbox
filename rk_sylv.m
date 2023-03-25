@@ -123,7 +123,7 @@ while max(sa-bsa, sb-bsb) < k
         check_residual = it >= needed_iterations;
     end
     
-    % check_residual = true;
+     %check_residual = true;
     
     if check_residual
         if poleA ~= inf

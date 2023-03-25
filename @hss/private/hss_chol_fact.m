@@ -43,7 +43,7 @@ if A.leafnode == 1  % LEAF
     k = size(A.U, 2);
     [row, col] = size(A.D);
     if k == row
-        x = zeros(col, size(b,2)); D = A.D; U = A.U; ind = zeros(1,0); cind = [1:col];
+        D = A.D; U = A.U; ind = zeros(1,0); cind = [1:col];
         return
     end
     ind = [1:row-k];  % Indices of computed entries in the solution, at the end

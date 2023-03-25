@@ -1,3 +1,4 @@
 function k = hssrank(A)
-k = hss_rank(A);
+% Maximum rank of all the HSS block rows at each level
+	k = hss_rank(A);
 end
