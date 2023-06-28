@@ -1,4 +1,16 @@
 function H = hodlr_build_hodlr_tree(m, n, block_size, partitionm, partitionn)
+%HODLR_BUILD_HODLR_TREE
+%
+% Build an "empty" HODLR matrix that can be used to specify the cluster. We
+% now support the particular case where the cluster is already given as a
+% HODLR matrix, and in that case this function is a no-op. 
+%
+
+if isa(partitionm, 'hodlr') 
+    H = partitionm;
+    return;
+end
+
 if isempty(partitionm)
     H = build_hodlr_tree_rec(m, n, block_size);
 else
