@@ -1,4 +1,16 @@
 function H = hss_build_hss_tree(m, n, block_size, partitionm, partitionn)
+%HSS_BUILD_HSS_TREE
+%
+% Build an "empty" HSS matrix that can be used to specify the cluster. We
+% now support the particular case where the cluster is already given as a
+% HSS matrix, and in that case this function is a no-op. 
+%
+
+if isa(partitionm, 'hss') 
+    H = partitionm;
+    return;
+end
+
 if isempty(partitionm)
     H = build_hss_tree_rec(m, n, block_size);
 else
