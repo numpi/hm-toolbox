@@ -14,6 +14,9 @@ classdef tel
         % inner telescopic matrix, defined recursively; at the bottom of
         % the recursion, this is a dense matrix
         M
+        
+        %flag for the deepest level
+        top
     end
     
     methods
