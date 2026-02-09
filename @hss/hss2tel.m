@@ -47,7 +47,8 @@ else
         T.U{index} = H.U;
         T.V{index} = H.V;
     else
-    T.D{index} = [zeros(size(H.B12,1), size(H.B12,1)), H.B12; H.B21, zeros(size(H.B12,2),size(H.B12,2))];
+    T.D{index} = [zeros(size(H.B12,1), size(H.B21, 2)), H.B12; ...
+        H.B21, zeros(size(H.B21, 1), size(H.B12, 2))];
     T.U{index} = [H.Rl; H.Rr];
     T.V{index} = [H.Wl; H.Wr];  
     end
